@@ -30,6 +30,43 @@ julia --project=. scripts/03_run_m1_m2_m3.jl
 If you skip step 2, the build script in step 3 falls back to a small
 deterministic synthetic dataset so that tests and a first run still work.
 
+## Recommended experiment workflow after M3 fix
+
+M3 (full-year economic dispatch LP) now solves one 8760-hour RTS-GMLC
+scenario in approximately 100 seconds after an out-of-memory fix that
+replaced large JuMP sum expressions with incremental objective construction.
+
+**Key performance guidance:**
+
+- M3 solves one full-year scenario but is still much slower than M1 (~100 s vs. ~1 s per scenario).
+- M2 (rolling-window LP) is very slow for 8760-hour datasets because it solves one LP per hour per scenario (~354 s/scenario). **Do not run M2 by default** in broad experiments; use it only for selected look-ahead sensitivity cases.
+- For broad experiments, start with M1 and M3. The default model selection of `scripts/03_run_m1_m2_m3.jl` (no `--models` flag) is `M1,M3` for this reason.
+
+**Step 1 — Verify M3 with a single-scenario smoke test (~100 s):**
+
+```bash
+julia --project=. scripts/06_smoke_test_m3_full_year.jl
+```
+
+**Step 2 — Broad experiment run with M1 + M3:**
+
+```bash
+julia --project=. scripts/03_run_m1_m2_m3.jl --models M1,M3 --n-scenarios 20 --seed 42
+```
+
+**Step 3 — Full three-model comparison (small N only, M2 is slow):**
+
+```bash
+julia --project=. scripts/03_run_m1_m2_m3.jl --models M1,M2,M3 --n-scenarios 5 --seed 42
+```
+
+Each run writes to a unique timestamped folder
+`results/runs/run_YYYYMMDD_HHMMSS/` and updates convenience copies at
+`results/metrics/latest_aggregate_metrics.csv`.  Aggregate metrics now
+include 95% Monte Carlo confidence interval columns
+(`eue_ci95_rel_halfwidth`, `lolh_ci95_rel_halfwidth`) for convergence
+assessment.
+
 ## Preparing the full RTS-GMLC dataset
 
 The official RTS-GMLC dataset is hosted at
@@ -235,9 +272,10 @@ RAChronoOps/
     02_generate_scenarios.jl       # generate outage scenarios standalone
     03_run_m1_m2_m3.jl             # run all models, save metrics
     04_summarize_processed_data.jl # write data_summary/ CSVs + terminal report
-    05_smoke_test_full_rts_data.jl # assert 8760 h, run M1 (3 scenarios)
-    06_build_experiment_cases.jl   # build 20 case folders under data_processed/cases/
-    07_run_case.jl                 # run M1/M2/M3 on one case, write results/cases/<name>/
+    05_smoke_test_full_rts_data.jl     # assert 8760 h, run M1 (3 scenarios)
+    06_build_experiment_cases.jl       # build 20 case folders under data_processed/cases/
+    06_smoke_test_m3_full_year.jl      # assert 8760 h, run M3 (1 scenario, ~100 s)
+    07_run_case.jl                     # run M1/M2/M3 on one case, write results/cases/<name>/
   test/
     runtests.jl
     test_storage.jl
