@@ -179,4 +179,37 @@ M4 will couple with HOPE (a Julia production-cost model) using:
 - `unit_commitment = 0` (ED, consistent with M3) or `= 1` (full UC)
 
 See `src/data/ExportHOPECase.jl` for the planned interface.
-M5 (multi-zone) is not yet scoped.
+M5 will be a screened MC+UC/PCM approximation that runs HOPE UC only on stress
+periods identified by M3.  Multi-zone and network-constrained extensions are
+outside the scope of the first implementation.
+
+## Main experiment roadmap
+
+### Phase 1: Baseline full RTS-GMLC run
+
+- RTS-GMLC single-zone, 8760 hours
+- 100 shared outage scenarios
+- 4-hour battery scaled to 10% of peak load
+- M1, M2 with 24-hour look-ahead, M3
+- Main question: does the baseline system have meaningful scarcity?
+
+### Phase 2: Load-scaling calibration
+
+- Load scale factors: 1.00, 1.05, 1.10, 1.15, 1.20
+- Goal: find a calibrated scarcity case where M3 has nonzero but not extreme
+  LOLH/EUE.
+
+### Phase 3: Storage duration and penetration matrix
+
+- Storage power: 5%, 10%, 20% of peak load
+- Storage duration: 2, 4, 8, 12 hours
+- Goal: quantify how M1 and M2 differ from M3 as storage becomes more
+  important.
+
+### Phase 4: VRE profile sensitivity
+
+- Balanced high VRE: wind scale 2.0, solar scale 2.0
+- Solar-heavy: wind scale 1.0, solar scale 3.0
+- Wind-heavy: wind scale 3.0, solar scale 1.0
+- Goal: test whether look-ahead and full-year ED matter differently under
+  daily solar cycling versus multi-day wind variation.
