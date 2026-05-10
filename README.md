@@ -51,6 +51,31 @@ julia --project=. scripts/04_summarize_processed_data.jl
 julia --project=. scripts/05_smoke_test_full_rts_data.jl
 ```
 
+## Building formal experiment cases
+
+After building the base dataset, create the 20 experiment case folders used
+in the main experiments:
+
+```bash
+julia --project=. scripts/06_build_experiment_cases.jl
+```
+
+This writes one subfolder per case under `data_processed/cases/`, each
+containing `generators.csv`, `storage.csv`, `load_timeseries.csv`,
+`wind_timeseries.csv`, `solar_timeseries.csv`, and `case_metadata.csv`.
+A master `case_index.csv` is written to `data_processed/cases/`.
+
+Cases are derived from the base processed dataset by applying scale factors —
+the original files in `data_processed/rts_single_zone/` are never modified.
+
+| Experiment group | Scale factors applied |
+|-----------------|----------------------|
+| Load scaling (×5) | `load_scale` ∈ {1.00, 1.05, 1.10, 1.15, 1.20} |
+| Storage matrix (×12) | `storage_power_pct_peak` ∈ {5%, 10%, 20%} × `storage_duration_hours` ∈ {2, 4, 8, 12} |
+| VRE sensitivity (×3) | Balanced 2× / solar-heavy 3× / wind-heavy 3× |
+
+The `data_processed/cases/` directory is git-ignored (generated data).
+
 ### What the builder does
 
 `BuildRTSSingleZone.jl` aggregates the RTS-GMLC three-area system into a
@@ -164,6 +189,7 @@ RAChronoOps/
     03_run_m1_m2_m3.jl             # run all models, save metrics
     04_summarize_processed_data.jl # write data_summary/ CSVs + terminal report
     05_smoke_test_full_rts_data.jl # assert 8760 h, run M1 (3 scenarios)
+    06_build_experiment_cases.jl   # build 20 case folders under data_processed/cases/
   test/
     runtests.jl
     test_storage.jl
