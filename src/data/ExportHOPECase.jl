@@ -2,7 +2,8 @@
 #
 # M4 will connect to HOPE (written in Julia) with:
 #   network_model   = 0   (copper-plate / single-zone, no transmission)
-#   unit_commitment = 1   (binary commitment variables for thermal units)
+#   unit_commitment = 0   (economic dispatch, consistent with M3)
+#                or = 1   (full unit commitment with binary variables)
 #
 # The HOPE interface expects:
 #   - A HOPECase struct populated from SystemData
@@ -25,7 +26,7 @@
 Writes a HOPEModelCase directory that M4 will consume.  Call this after
 running `build_rts_single_zone` and before invoking HOPE.
 """
-function export_hope_case(system::SystemData, config::SimConfig, out_dir::String)
+function export_hope_case(::SystemData, ::SimConfig, ::String)
     error("export_hope_case is not yet implemented. " *
           "M4 (HOPE integration) is planned for a future milestone.")
 end

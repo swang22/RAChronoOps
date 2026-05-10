@@ -129,3 +129,77 @@ function compute_metrics(results ::Vector{DispatchResult},
                           config ::SimConfig)::MetricsResult
     return compute_metrics(results, system.load_mw; cvar_alpha=config.cvar_alpha)
 end
+
+# ── Individual metric functions (spec-required public API) ────────────────
+
+"""
+    compute_lolh(load_shed) -> Float64
+
+Loss-of-load hours for a single scenario: number of hours with load_shed > 0.
+Average across scenarios to get the LOLH reliability index.
+"""
+compute_lolh(load_shed::Vector{Float64})::Float64 =
+    Float64(count(x -> x > 0.0, load_shed))
+
+"""
+    compute_eue(load_shed) -> Float64
+
+Expected unserved energy (MWh) for a single scenario.
+"""
+compute_eue(load_shed::Vector{Float64})::Float64 = sum(load_shed)
+
+"""
+    compute_neue(load_shed, load_mw) -> Float64
+
+Normalised EUE — ratio of unserved energy to total energy demand.
+"""
+function compute_neue(load_shed::Vector{Float64},
+                       load_mw  ::Vector{Float64})::Float64
+    demand = sum(load_mw)
+    demand > 0.0 ? compute_eue(load_shed) / demand : 0.0
+end
+
+"""
+    compute_shortage_events(load_shed) -> Vector{Int}
+
+Return the duration (hours) of each contiguous shortage episode in a scenario.
+"""
+compute_shortage_events(load_shed::Vector{Float64})::Vector{Int} =
+    _find_shortage_durations(load_shed)
+
+"""
+    compute_cvar(values; alpha=0.95) -> Float64
+
+Conditional Value at Risk of `values` at confidence level `alpha`.
+`values` need not be pre-sorted.
+"""
+function compute_cvar(values::Vector{Float64}; alpha::Float64 = 0.95)::Float64
+    _cvar(sort(values), alpha)
+end
+
+"""
+    aggregate_metrics(scenario_lolh, scenario_eue, load_mw; cvar_alpha=0.95)
+        -> MetricsResult
+
+Build a `MetricsResult` from pre-computed per-scenario vectors.
+Useful when scenario dispatch is computed outside `compute_metrics`.
+"""
+function aggregate_metrics(
+        scenario_lolh      ::Vector{Float64},
+        scenario_eue       ::Vector{Float64},
+        scenario_durations ::Vector{Vector{Int}},
+        load_mw            ::Vector{Float64};
+        cvar_alpha         ::Float64 = 0.95)::MetricsResult
+
+    lolh         = mean(scenario_lolh)
+    eue          = mean(scenario_eue)
+    neue         = sum(load_mw) > 0.0 ? eue / sum(load_mw) : 0.0
+    all_dur      = Float64.(vcat(scenario_durations...))
+    n_events     = mean(length.(scenario_durations))
+    max_sf       = 0.0   # not computable without raw load_shed here
+    sorted_eue   = sort(scenario_eue)
+    cvar         = _cvar(sorted_eue, cvar_alpha)
+
+    return MetricsResult(lolh, eue, neue, n_events, all_dur, max_sf,
+                         scenario_eue, cvar)
+end

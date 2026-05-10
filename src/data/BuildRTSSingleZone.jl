@@ -227,7 +227,9 @@ function _build_synthetic(out_dir::String)
     )
     CSV.write(joinpath(out_dir, "storage.csv"), stor_df)
 
-    n = 8760
+    # 168-hour (1-week) fallback so tests run quickly without external data.
+    # For production RA studies, replace with 8760-hour RTS-GMLC data.
+    n = 168
     CSV.write(joinpath(out_dir, "load_timeseries.csv"),
               DataFrame(hour=1:n, load_mw=_synthetic_load(n)))
     CSV.write(joinpath(out_dir, "wind_timeseries.csv"),

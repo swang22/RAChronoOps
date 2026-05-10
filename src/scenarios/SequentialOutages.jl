@@ -7,23 +7,21 @@
 #   p_fail   = 1 - exp(-1 / MTTF)    [prob of failing in one hour when up]
 #   p_repair = 1 - exp(-1 / MTTR)    [prob of repairing in one hour when down]
 #
-# Steady-state availability = 1 - FOR  (used to draw the initial state).
-#
-# Returns availability[scenario, generator, hour] ∈ {0, 1}.
+# Initial state drawn from the steady-state distribution (prob_up = 1 − FOR).
+# Returns a ScenarioSet whose .availability[scenario, gen, hour] ∈ {0, 1}.
 
 """
-    generate_scenarios(system, n_scenarios, seed) -> Array{Int8, 3}
+    generate_scenarios(system, n_scenarios, seed) -> ScenarioSet
 
 Sample `n_scenarios` independent availability trajectories for all thermal
-generators in `system`.  Uses a seeded MersenneTwister for reproducibility.
+generators in `system` using a seeded MersenneTwister.
 
-Returns a 3-D Int8 array of shape (n_scenarios, n_thermal, n_hours).
-Availability == 1 means the unit is operational, 0 means forced-out.
+Returns a `ScenarioSet` with `availability[scenario, generator, hour]` ∈ {0,1}.
 """
 function generate_scenarios(
-        system::SystemData,
-        n_scenarios::Int,
-        seed::Int)::Array{Int8, 3}
+        system      ::SystemData,
+        n_scenarios ::Int,
+        seed        ::Int)::ScenarioSet
 
     therm   = thermal_generators(system)
     n_therm = nrow(therm)
@@ -33,10 +31,10 @@ function generate_scenarios(
 
     rng = MersenneTwister(seed)
 
-    # pre-compute transition probabilities
+    # pre-compute per-generator transition probabilities
     p_fail   = Vector{Float64}(undef, n_therm)
     p_repair = Vector{Float64}(undef, n_therm)
-    p_ss_up  = Vector{Float64}(undef, n_therm)  # steady-state probability of being up
+    p_ss_up  = Vector{Float64}(undef, n_therm)
 
     for (g, row) in enumerate(eachrow(therm))
         FOR  = Float64(row.forced_outage_rate)
@@ -60,12 +58,9 @@ function generate_scenarios(
 
     for s in 1:n_scenarios
         for g in 1:n_therm
-            # Draw initial state from steady-state distribution
             state = rand(rng) < p_ss_up[g] ? Int8(1) : Int8(0)
-
-            pf = p_fail[g]
-            pr = p_repair[g]
-
+            pf    = p_fail[g]
+            pr    = p_repair[g]
             for h in 1:n_hours
                 if state == Int8(1)
                     state = rand(rng) < pf ? Int8(0) : Int8(1)
@@ -77,14 +72,15 @@ function generate_scenarios(
         end
     end
 
-    return avail
+    return ScenarioSet(avail, n_scenarios, n_therm, n_hours, seed)
 end
 
 """
-    generate_scenarios(system, config) -> Array{Int8, 3}
+    generate_scenarios(system, config) -> ScenarioSet
 
-Convenience overload that reads n_scenarios and seed from `config`.
+Convenience overload that reads `n_scenarios` and `seed` from `config`.
 """
-function generate_scenarios(system::SystemData, config::SimConfig)::Array{Int8, 3}
+function generate_scenarios(system::SystemData,
+                             config::SimConfig)::ScenarioSet
     return generate_scenarios(system, config.n_scenarios, config.seed)
 end

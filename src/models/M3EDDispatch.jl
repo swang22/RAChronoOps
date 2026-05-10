@@ -188,6 +188,17 @@ function run_m3_ed_dispatch(
 end
 
 """
+    run_m3_ed_dispatch(system, scenarios::ScenarioSet, config) -> Vector{DispatchResult}
+
+ScenarioSet overload.
+"""
+function run_m3_ed_dispatch(system    ::SystemData,
+                             scenarios ::ScenarioSet,
+                             config    ::SimConfig)::Vector{DispatchResult}
+    return run_m3_ed_dispatch(system, scenarios.availability, config)
+end
+
+"""
     run_m3_ed_dispatch(system, config) -> Vector{DispatchResult}
 
 Generate scenarios internally then run M3.

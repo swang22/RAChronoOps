@@ -170,6 +170,17 @@ function run_m2_rolling_window(
 end
 
 """
+    run_m2_rolling_window(system, scenarios::ScenarioSet, config) -> Vector{DispatchResult}
+
+ScenarioSet overload.
+"""
+function run_m2_rolling_window(system    ::SystemData,
+                                scenarios ::ScenarioSet,
+                                config    ::SimConfig)::Vector{DispatchResult}
+    return run_m2_rolling_window(system, scenarios.availability, config)
+end
+
+"""
     run_m2_rolling_window(system, config) -> Vector{DispatchResult}
 
 Generate scenarios internally then run M2.

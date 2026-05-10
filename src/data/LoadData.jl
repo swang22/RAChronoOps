@@ -1,14 +1,50 @@
-# ── SystemData ─────────────────────────────────────────────────────────────
+# ── Core data structs ─────────────────────────────────────────────────────
+
+"""
+    GeneratorData
+
+Immutable parameters for one generator (thermal or VRE).
+Thermal generators have meaningful FOR and mean_repair_time_hours.
+VRE generators have is_vre=true and a non-empty vre_type ("wind" or "solar").
+"""
+struct GeneratorData
+    gen_id                 ::String
+    gen_type               ::String
+    fuel                   ::String
+    pmax_mw                ::Float64
+    pmin_mw                ::Float64
+    variable_cost_per_mwh  ::Float64
+    forced_outage_rate     ::Float64
+    mean_repair_time_hours ::Float64
+    is_thermal             ::Bool
+    is_vre                 ::Bool
+    vre_type               ::String   # "wind", "solar", or ""
+end
+
+"""
+    StorageData
+
+Immutable parameters for one storage unit.
+"""
+struct StorageData
+    storage_id            ::String
+    power_mw              ::Float64   # charge / discharge power limit
+    energy_mwh            ::Float64   # usable energy capacity
+    charge_efficiency     ::Float64   # η_ch  ∈ (0,1]
+    discharge_efficiency  ::Float64   # η_dis ∈ (0,1]
+    variable_cost_per_mwh ::Float64
+    initial_soc_mwh       ::Float64
+end
 
 """
     SystemData
 
-Holds the processed single-zone system.
+Single-zone system snapshot: generator fleet, storage, and hourly time series.
 
-`generators` contains both thermal (is_thermal=1) and VRE (is_vre=1) rows;
-  thermal rows have valid FOR / MTTR values.
-`storage` holds one row per storage unit.
-Time-series vectors are length n_hours (typically 8760).
+`generators` DataFrame contains both thermal (is_thermal=1) and VRE (is_vre=1)
+rows with columns matching `GeneratorData` fields.
+`storage` DataFrame contains one row per `StorageData` unit.
+Time-series vectors have length `n_hours` (typically 8760).
 """
 struct SystemData
     generators  ::DataFrame
@@ -18,6 +54,27 @@ struct SystemData
     solar_cf    ::Vector{Float64}
     n_hours     ::Int
 end
+
+"""
+    ScenarioSet
+
+Wraps the availability matrix produced by `generate_scenarios`.
+
+`availability[scenario, thermal_generator, hour]` ∈ {0, 1}.
+Carries the seed used so results are reproducible and traceable.
+"""
+struct ScenarioSet
+    availability ::Array{Int8, 3}   # n_scenarios × n_thermal × n_hours
+    n_scenarios  ::Int
+    n_thermal    ::Int
+    n_hours      ::Int
+    seed         ::Int
+end
+
+Base.size(s::ScenarioSet) = (s.n_scenarios, s.n_thermal, s.n_hours)
+
+# NOTE: ModelResults (which references MetricsResult) is defined in
+# src/experiments/RunExperiment.jl, included after ReliabilityMetrics.jl.
 
 # ── convenience selectors ─────────────────────────────────────────────────
 
@@ -37,10 +94,13 @@ function solar_capacity_mw(sys::SystemData)
     isempty(df) ? 0.0 : sum(df.pmax_mw)
 end
 
+# ── CSV loader ────────────────────────────────────────────────────────────
+
 """
     load_system_data(data_dir) -> SystemData
 
-Read the five processed CSVs from `data_dir` and return a SystemData.
+Read the five processed CSVs from `data_dir` and return a `SystemData`.
+Run `scripts/01_build_single_zone_rts.jl` first if files are missing.
 """
 function load_system_data(data_dir::String)::SystemData
     gen_path   = joinpath(data_dir, "generators.csv")

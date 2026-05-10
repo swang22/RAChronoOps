@@ -151,6 +151,17 @@ function run_m1_rule_based(
 end
 
 """
+    run_m1_rule_based(system, scenarios::ScenarioSet, config) -> Vector{DispatchResult}
+
+ScenarioSet overload — extracts the availability array and delegates.
+"""
+function run_m1_rule_based(system    ::SystemData,
+                            scenarios ::ScenarioSet,
+                            config    ::SimConfig)::Vector{DispatchResult}
+    return run_m1_rule_based(system, scenarios.availability, config)
+end
+
+"""
     run_m1_rule_based(system, config) -> Vector{DispatchResult}
 
 Generate scenarios internally then run M1.
