@@ -145,16 +145,22 @@ function run_m3_ed_dispatch(
         end
 
         # ── objective ─────────────────────────────────────────────────────
-        gen_cost  = sum(var_cost[g] * p[g, h] for g in 1:n_therm, h in 1:T)
-        shed_cost = VOLL * sum(load_shed)
-        if n_stor > 0
-            cyc_cost = sum(
-                (s_vcost[st] + cyc_cc) * (charge[st, h] + discharge_s[st, h])
-                for st in 1:n_stor, h in 1:T)
-            @objective(mdl, Min, gen_cost + cyc_cost + shed_cost)
-        else
-            @objective(mdl, Min, gen_cost + shed_cost)
+        # Build incrementally to avoid allocating 639K+ temporary AffExprs.
+        obj = JuMP.AffExpr(0.0)
+        for h in 1:T
+            for g in 1:n_therm
+                JuMP.add_to_expression!(obj, var_cost[g], p[g, h])
+            end
+            JuMP.add_to_expression!(obj, VOLL, load_shed[h])
         end
+        if n_stor > 0
+            stor_cost = s_vcost .+ cyc_cc
+            for h in 1:T, st in 1:n_stor
+                JuMP.add_to_expression!(obj, stor_cost[st], charge[st, h])
+                JuMP.add_to_expression!(obj, stor_cost[st], discharge_s[st, h])
+            end
+        end
+        @objective(mdl, Min, obj)
 
         optimize!(mdl)
 
