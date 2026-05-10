@@ -50,11 +50,21 @@ a synthetic fallback dataset instead.
 """
 function build_rts_single_zone(rts_dir::String, out_dir::String)
     mkpath(out_dir)
-    gen_src = joinpath(rts_dir, "SourceData", "gen.csv")
+
+    # The cloned RTS-GMLC repo places all data under RTS_Data/.
+    # Support both the cloned layout (rts_dir/RTS_Data/SourceData/gen.csv)
+    # and a flat layout (rts_dir/SourceData/gen.csv) for flexibility.
+    rts_root = if isdir(joinpath(rts_dir, "RTS_Data"))
+        joinpath(rts_dir, "RTS_Data")
+    else
+        rts_dir
+    end
+
+    gen_src = joinpath(rts_root, "SourceData", "gen.csv")
 
     if isfile(gen_src)
-        @info "RTS-GMLC gen.csv found — building single-zone aggregation"
-        _build_from_rts(rts_dir, out_dir)
+        @info "RTS-GMLC gen.csv found at $gen_src — building single-zone aggregation"
+        _build_from_rts(rts_root, out_dir)
     else
         @warn "RTS-GMLC source data not found at $rts_dir — using synthetic fallback"
         _build_synthetic(out_dir)
@@ -63,6 +73,7 @@ function build_rts_single_zone(rts_dir::String, out_dir::String)
 end
 
 # ── RTS-GMLC path ─────────────────────────────────────────────────────────
+# rts_dir here is already resolved to the root that contains SourceData/
 function _build_from_rts(rts_dir::String, out_dir::String)
     gen_raw = CSV.read(joinpath(rts_dir, "SourceData", "gen.csv"), DataFrame)
 

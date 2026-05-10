@@ -19,6 +19,7 @@ include("utils/Config.jl")
 include("data/LoadData.jl")
 
 # 3. data preparation
+include("data/GetRTSGMLCData.jl")
 include("data/BuildRTSSingleZone.jl")
 include("data/ExportHOPECase.jl")
 
@@ -46,6 +47,7 @@ export thermal_generators, vre_generators, wind_capacity_mw, solar_capacity_mw
 
 export SimConfig, load_config
 
+export ensure_rts_gmlc_data
 export build_rts_single_zone
 export export_hope_case  # placeholder
 
