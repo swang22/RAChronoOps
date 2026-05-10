@@ -1,0 +1,17 @@
+# Julia
+Manifest.toml
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+# Generated data and results (not tracked; run scripts to reproduce)
+data_processed/
+data_raw/
+results/
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/

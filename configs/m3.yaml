@@ -1,0 +1,17 @@
+# M3: full-year economic dispatch LP (per scenario).
+# Each scenario is one large LP; keep n_scenarios small for tractability.
+
+n_scenarios: 20
+seed: 42
+voll: 10000.0
+
+# Full-year ED options
+cyclic_soc: true
+storage_cycling_cost: 0.01
+
+# Risk metric
+cvar_alpha: 0.95
+
+# Output
+save_dispatch: false
+output_dir: results/m3

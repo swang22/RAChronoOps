@@ -1,0 +1,17 @@
+# M2: rolling-window LP (MPC).
+# Each scenario × hour requires one small LP solve; keep n_scenarios moderate.
+
+n_scenarios: 100
+seed: 42
+voll: 10000.0
+
+# Rolling window
+lookahead_hours: 168        # 1-week look-ahead
+epsilon_cycling: 0.001
+
+# Risk metric
+cvar_alpha: 0.95
+
+# Output — disable dispatch CSV by default (100 × 8760 rows is large)
+save_dispatch: false
+output_dir: results/m2

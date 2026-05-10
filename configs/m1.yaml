@@ -1,0 +1,17 @@
+# M1: rule-based storage dispatch
+# More scenarios than M2/M3 because each scenario is cheap (no LP solve).
+
+n_scenarios: 500
+seed: 42
+voll: 10000.0
+
+# Rule thresholds
+high_net_load_quantile: 0.75
+charge_net_load_quantile: 0.25
+
+# Risk metric
+cvar_alpha: 0.95
+
+# Output
+save_dispatch: true
+output_dir: results/m1

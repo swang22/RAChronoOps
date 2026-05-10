@@ -1,0 +1,27 @@
+# Base case configuration shared across M1 / M2 / M3.
+# Individual model configs inherit and override these defaults.
+
+n_scenarios: 100
+seed: 42
+
+# Economics
+voll: 10000.0                   # $/MWh value of lost load
+
+# M1 rule-based thresholds
+high_net_load_quantile: 0.75    # proactive discharge above this percentile of net-load
+charge_net_load_quantile: 0.25  # charge storage below this percentile
+
+# M2 rolling-window LP
+lookahead_hours: 24
+epsilon_cycling: 0.001          # small $/MWh penalty on charge + discharge
+
+# M3 full-year ED
+cyclic_soc: true
+storage_cycling_cost: 0.01      # $/MWh extra cost to discourage simultaneous c/d
+
+# Risk metric
+cvar_alpha: 0.95
+
+# Output
+save_dispatch: false
+output_dir: results
