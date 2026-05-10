@@ -7,6 +7,7 @@ using Random
 using Statistics
 using Distributions
 using JuMP
+import MathOptInterface as MOI
 using HiGHS
 using Logging
 

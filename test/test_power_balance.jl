@@ -1,7 +1,8 @@
 @testset "Power balance — M3" begin
     sys    = make_test_system(168)    # short horizon for speed
     config = SimConfig(n_scenarios=5, seed=33, cyclic_soc=true)
-    avail  = generate_scenarios(sys, config)
+    scen   = generate_scenarios(sys, config)
+    avail  = scen.availability   # Array{Int8,3}: n_scen × n_therm × n_hours
     results = run_m3_ed_dispatch(sys, avail, config)
 
     therm  = thermal_generators(sys)

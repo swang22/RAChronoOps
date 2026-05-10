@@ -5,7 +5,7 @@
 # data_processed/rts_single_zone/.
 #
 # Usage:
-#   julia --project scripts/01_build_single_zone_rts.jl
+#   julia --project=. scripts/01_build_single_zone_rts.jl
 #
 # If RTS-GMLC files are absent a synthetic 8760-hour fallback is written
 # automatically so that all tests can run without external data.
@@ -14,6 +14,7 @@ using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
 
 using RAChronoOps
+using DataFrames
 using Logging
 
 const PROJECT_ROOT = joinpath(@__DIR__, "..")

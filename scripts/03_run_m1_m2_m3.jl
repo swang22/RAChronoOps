@@ -8,7 +8,7 @@
 #   results/logs/<timestamp>.log            — run log
 #
 # Usage:
-#   julia --project scripts/03_run_m1_m2_m3.jl
+#   julia --project=. scripts/03_run_m1_m2_m3.jl
 
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
@@ -85,7 +85,7 @@ let
 
         sm = build_scenario_metrics_df(res)
         insertcols!(sm, 1, :model => fill(tag, nrow(sm)))
-        append!(scen_rows, Tables.rowtable(sm))
+        append!(scen_rows, [NamedTuple(row) for row in eachrow(sm)])
 
         if cfg.save_dispatch
             disp_path = joinpath(res_dir, "dispatch", "$(lowercase(tag))_dispatch.csv")
@@ -106,12 +106,10 @@ let
     println("\n" * "="^72)
     println("Reliability Metrics Comparison")
     println("="^72)
-    @printf "%-6s %10s %12s %12s %12s %10s\n" \
-        "Model" "LOLH (h)" "EUE (MWh)" "nEUE (ppm)" "CVaR-EUE" "Time (s)"
+    @printf "%-6s %10s %12s %12s %12s %10s\n" "Model" "LOLH (h)" "EUE (MWh)" "nEUE (ppm)" "CVaR-EUE" "Time (s)"
     println("-"^72)
     for r in agg_rows
-        @printf "%-6s %10.2f %12.1f %12.4f %12.1f %10.1f\n" \
-            r.model r.lolh_hours r.eue_mwh r.neue_ppm r.cvar_eue_mwh r.runtime_s
+        @printf "%-6s %10.2f %12.1f %12.4f %12.1f %10.1f\n" r.model r.lolh_hours r.eue_mwh r.neue_ppm r.cvar_eue_mwh r.runtime_s
     end
     println("="^72)
 end

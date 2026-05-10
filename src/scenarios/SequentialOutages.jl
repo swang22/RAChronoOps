@@ -49,9 +49,11 @@ function generate_scenarios(
             p_repair[g] = 0.0
             p_ss_up[g]  = 0.0
         else
-            MTTF        = MTTR * (1.0 - FOR) / FOR
-            p_fail[g]   = 1.0 - exp(-1.0 / MTTF)
+            # p_repair from hourly repair rate; p_fail calibrated so that
+            # the DTMC steady-state unavailability exactly equals FOR:
+            #   p_fail / (p_fail + p_repair) = FOR  =>  p_fail = FOR * p_repair / (1 - FOR)
             p_repair[g] = 1.0 - exp(-1.0 / MTTR)
+            p_fail[g]   = FOR * p_repair[g] / (1.0 - FOR)
             p_ss_up[g]  = 1.0 - FOR
         end
     end

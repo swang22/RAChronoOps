@@ -27,7 +27,7 @@ MPC rolling-window LP for each scenario.
 
 `config.lookahead_hours` controls the look-ahead horizon H_LA.
 `config.epsilon_cycling` is the small cycling cost ε.
-`config.voll`            is the value of lost load ($/MWh).
+`config.voll`            is the value of lost load (\$/MWh).
 """
 function run_m2_rolling_window(
         system      ::SystemData,

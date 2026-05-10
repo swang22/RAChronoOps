@@ -6,7 +6,7 @@
 # internally — but useful for standalone analysis and debugging.
 #
 # Usage:
-#   julia --project scripts/02_generate_scenarios.jl
+#   julia --project=. scripts/02_generate_scenarios.jl
 
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
@@ -23,7 +23,8 @@ sys    = load_system_data(DATA_DIR)
 config = SimConfig(n_scenarios=200, seed=42)
 
 @info "Generating $(config.n_scenarios) scenarios for $(nrow(thermal_generators(sys))) thermal units..."
-avail  = generate_scenarios(sys, config)
+scenarios = generate_scenarios(sys, config)
+avail     = scenarios.availability
 
 therm  = thermal_generators(sys)
 n_therm, n_hours, n_scen = nrow(therm), sys.n_hours, config.n_scenarios
