@@ -1,8 +1,7 @@
-# M3: full-year economic dispatch LP (per scenario).
-# Each scenario is one large LP; keep n_scenarios small for tractability.
+# M3: full-year economic dispatch LP (per scenario)
+# n_scenarios and seed are set in base_case.yaml and must not be overridden
+# here — scenario generation is shared across models for fair comparison.
 
-n_scenarios: 20
-seed: 42
 voll: 10000.0
 
 # Full-year ED options

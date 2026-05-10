@@ -1,8 +1,7 @@
 # M1: rule-based storage dispatch
-# More scenarios than M2/M3 because each scenario is cheap (no LP solve).
+# n_scenarios and seed are set in base_case.yaml and must not be overridden
+# here — scenario generation is shared across models for fair comparison.
 
-n_scenarios: 500
-seed: 42
 voll: 10000.0
 
 # Rule thresholds

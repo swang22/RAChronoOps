@@ -40,15 +40,31 @@ let
         isfile(p) ? load_config(p) : SimConfig()
     end
 
+    # Warn if a model-specific config overrides CRN parameters that must
+    # come from base_case.yaml in a comparison run.
+    function _check_crn(tag, cfg, base)
+        if cfg.n_scenarios != base.n_scenarios
+            @warn "$tag config n_scenarios=$(cfg.n_scenarios) differs from " *
+                  "base_case n_scenarios=$(base.n_scenarios); " *
+                  "scenario generation uses base_case — model value ignored"
+        end
+        if cfg.seed != base.seed
+            @warn "$tag config seed=$(cfg.seed) differs from " *
+                  "base_case seed=$(base.seed); " *
+                  "scenario generation uses base_case — model value ignored"
+        end
+    end
+
     @info "Loading system data from $data_dir"
     sys = load_system_data(data_dir)
     @info "System: $(nrow(thermal_generators(sys))) thermal, " *
           "$(nrow(vre_generators(sys))) VRE, " *
           "$(nrow(sys.storage)) storage, $(sys.n_hours) hours"
 
-    # ── generate shared scenario set (same seed for fair comparison) ──────
+    # ── generate scenarios once from base_case.yaml (CRN for fair comparison)
     base_cfg  = get_config("base_case")
-    @info "Generating $(base_cfg.n_scenarios) shared outage scenarios (seed=$(base_cfg.seed))"
+    @info "Generating $(base_cfg.n_scenarios) shared outage scenarios " *
+          "(seed=$(base_cfg.seed)) — same ScenarioSet for all models"
     scenarios = generate_scenarios(sys, base_cfg)
 
     # ── run each model ────────────────────────────────────────────────────
@@ -62,9 +78,11 @@ let
         ]
 
         cfg = get_config(cfg_name)
+        _check_crn(tag, cfg, base_cfg)   # warn if model config tries to change CRN params
+
         @info "\n=== $tag ==="
         t0  = time()
-        res = model_fn(sys, scenarios, cfg)
+        res = model_fn(sys, scenarios, cfg)   # same ScenarioSet for all models
         rt  = time() - t0
 
         m = compute_metrics(res, sys, cfg)
@@ -73,7 +91,7 @@ let
 
         push!(agg_rows, (
             model            = tag,
-            n_scenarios      = cfg.n_scenarios,
+            n_scenarios      = scenarios.n_scenarios,   # always from the shared set
             lolh_hours       = m.lolh,
             eue_mwh          = m.eue,
             neue_ppm         = m.neue * 1e6,

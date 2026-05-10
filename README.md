@@ -70,6 +70,22 @@ using RAChronoOps
 ensure_rts_gmlc_data("data_raw/RTS-GMLC")
 ```
 
+## Common random numbers
+
+M1, M2, and M3 are evaluated on **identical Monte Carlo outage scenarios**
+generated once from `configs/base_case.yaml` (the `n_scenarios` and `seed`
+keys).  A single `ScenarioSet` is drawn before the model loop and passed
+unchanged to every model, guaranteeing that differences in reliability
+metrics are attributable to dispatch strategy alone and not to sampling
+noise.
+
+Model-specific configs (`configs/m1.yaml`, `configs/m2.yaml`,
+`configs/m3.yaml`) control **operational parameters only** — storage dispatch
+strategy, look-ahead horizon, cycling cost, cyclic-SOC constraint, and
+whether to save dispatch CSVs.  They must not contain `n_scenarios` or `seed`
+keys; if they do, `scripts/03_run_m1_m2_m3.jl` logs a warning and uses the
+base-case values.
+
 ## Ignored features (first implementation)
 
 The following features are intentionally excluded from M1–M3 to keep the
@@ -126,6 +142,7 @@ RAChronoOps/
     test_storage.jl
     test_outages.jl
     test_power_balance.jl
+    test_common_scenarios.jl
 ```
 
 ## Connecting to HOPE (M4 / M5)

@@ -1,8 +1,7 @@
-# M2: rolling-window LP (MPC).
-# Each scenario × hour requires one small LP solve; keep n_scenarios moderate.
+# M2: rolling-window LP (MPC)
+# n_scenarios and seed are set in base_case.yaml and must not be overridden
+# here — scenario generation is shared across models for fair comparison.
 
-n_scenarios: 100
-seed: 42
 voll: 10000.0
 
 # Rolling window
@@ -12,6 +11,6 @@ epsilon_cycling: 0.001
 # Risk metric
 cvar_alpha: 0.95
 
-# Output — disable dispatch CSV by default (100 × 8760 rows is large)
+# Output — disable dispatch CSV by default (large file)
 save_dispatch: false
 output_dir: results/m2
