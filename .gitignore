@@ -11,6 +11,7 @@ results/metrics/*
 results/dispatch/*
 results/logs/*
 results/data_summary/*
+results/cases/*
 !results/metrics/.gitkeep
 !results/dispatch/.gitkeep
 !results/logs/.gitkeep

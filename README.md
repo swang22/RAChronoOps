@@ -76,6 +76,53 @@ the original files in `data_processed/rts_single_zone/` are never modified.
 
 The `data_processed/cases/` directory is git-ignored (generated data).
 
+## Running one experiment case
+
+Run all three models on a single case and write results to
+`results/cases/<case_name>/`:
+
+```bash
+julia --project=. scripts/07_run_case.jl data_processed/cases/rts_base
+```
+
+Optional arguments:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--models M1,M2,M3` | `M1,M2,M3` | Comma-separated subset of models to run |
+| `--n-scenarios N` | from `base_case.yaml` | Override scenario count |
+| `--seed S` | from `base_case.yaml` | Override random seed |
+| `--lookahead-hours H` | from `m2.yaml` | Override M2 look-ahead window |
+| `--save-dispatch true\|false` | from each model config | Override dispatch CSV output |
+
+Examples:
+
+```bash
+# Run only M1 and M3 with 20 scenarios
+julia --project=. scripts/07_run_case.jl data_processed/cases/load_scale_110 \
+    --models M1,M3 --n-scenarios 20
+
+# Run M2 with a shorter look-ahead (faster)
+julia --project=. scripts/07_run_case.jl data_processed/cases/rts_base \
+    --models M2 --lookahead-hours 48
+```
+
+All models use a **single shared ScenarioSet** generated once from the
+base config (common random numbers), so metric differences are attributable
+to dispatch strategy alone.
+
+Output files written to `results/cases/<case_name>/`:
+
+| File | Contents |
+|------|----------|
+| `aggregate_metrics.csv` | One row per model — LOLH, EUE, nEUE, CVaR-EUE, runtime |
+| `scenario_metrics.csv` | One row per (model, scenario) |
+| `run_metadata.csv` | Case path, config, timestamps, scale factors |
+| `dispatch/<model>_dispatch.csv` | Hourly dispatch (only if `--save-dispatch true`) |
+| `logs/run_<timestamp>.log` | Full run log |
+
+The `results/cases/` directory is git-ignored (generated outputs).
+
 ### What the builder does
 
 `BuildRTSSingleZone.jl` aggregates the RTS-GMLC three-area system into a
@@ -190,6 +237,7 @@ RAChronoOps/
     04_summarize_processed_data.jl # write data_summary/ CSVs + terminal report
     05_smoke_test_full_rts_data.jl # assert 8760 h, run M1 (3 scenarios)
     06_build_experiment_cases.jl   # build 20 case folders under data_processed/cases/
+    07_run_case.jl                 # run M1/M2/M3 on one case, write results/cases/<name>/
   test/
     runtests.jl
     test_storage.jl
