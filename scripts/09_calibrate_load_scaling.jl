@@ -161,8 +161,7 @@ let
     println("\n" * "=" ^ 96)
     println("Calibration Summary")
     println("=" ^ 96)
-    @printf "%-20s %10s %10s %10s %12s %12s %13s %14s\n" \
-        "case_name" "load_scale" "M1_LOLH" "M3_LOLH" "M1_EUE" "M3_EUE" "EUE_M1-M3" "M3_runtime_s"
+    @printf "%-20s %10s %10s %10s %12s %12s %13s %14s\n" "case_name" "load_scale" "M1_LOLH" "M3_LOLH" "M1_EUE" "M3_EUE" "EUE_M1-M3" "M3_runtime_s"
     println("-" ^ 96)
     for (cn, ls) in zip(CASE_NAMES, LOAD_SCALES)
         sub    = filter(r -> r.case_name == cn, df)
@@ -175,8 +174,7 @@ let
         m1l = m1_sub[1, :lolh_hours];  m3l = m3_sub[1, :lolh_hours]
         m1e = m1_sub[1, :eue_mwh];     m3e = m3_sub[1, :eue_mwh]
         m3r = m3_sub[1, :runtime_s]
-        @printf "%-20s %10.2f %10.2f %10.2f %12.1f %12.1f %13.1f %14.1f\n" \
-            cn ls m1l m3l m1e m3e (m1e - m3e) m3r
+        @printf "%-20s %10.2f %10.2f %10.2f %12.1f %12.1f %13.1f %14.1f\n" cn ls m1l m3l m1e m3e (m1e - m3e) m3r
     end
     println("=" ^ 96)
     println("\nRecommendation: $rec_text")
