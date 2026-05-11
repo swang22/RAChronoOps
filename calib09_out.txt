@@ -1,0 +1,38 @@
+================================================================================
+Load-Scaling Calibration | M1 + M3 | 20 scenarios | seed=42
+================================================================================
+
+--- rts_base  (alpha = 1.0) ---
+  M1   LOLH=   0.10 h  EUE=      5.8 MWh  CVaR=     58.0  EUE_CI95=  196%  t=   1.7 s
+  M3   LOLH=   0.00 h  EUE=      0.0 MWh  CVaR=      0.0  EUE_CI95=   ---  t=7205.4 s
+
+--- load_scale_105  (alpha = 1.05) ---
+  M1   LOLH=   1.35 h  EUE=    169.6 MWh  CVaR=   1052.0  EUE_CI95=   94%  t=   2.1 s
+  M3   LOLH=   0.00 h  EUE=      0.0 MWh  CVaR=      0.0  EUE_CI95=   ---  t=7186.8 s
+
+--- load_scale_110  (alpha = 1.1) ---
+  M1   LOLH=   8.65 h  EUE=   1641.4 MWh  CVaR=   6003.4  EUE_CI95=   55%  t=   2.1 s
+  M3   LOLH=   0.05 h  EUE=      4.0 MWh  CVaR=     40.1  EUE_CI95=  196%  t=7076.2 s
+
+--- load_scale_115  (alpha = 1.15) ---
+  M1   LOLH=  35.90 h  EUE=   8697.8 MWh  CVaR=  19648.5  EUE_CI95=   29%  t=   2.1 s
+  M3   LOLH=   0.35 h  EUE=    145.7 MWh  CVaR=   1317.4  EUE_CI95=  143%  t=7246.6 s
+
+--- load_scale_120  (alpha = 1.2) ---
+  M1   LOLH=  95.40 h  EUE=  31017.1 MWh  CVaR=  51937.3  EUE_CI95=   16%  t=   1.0 s
+  M3   LOLH=   5.70 h  EUE=   2479.2 MWh  CVaR=   9782.9  EUE_CI95=   61%  t=7242.7 s
+
+================================================================================================
+Calibration Summary
+================================================================================================
+case_name            load_scale    M1_LOLH    M3_LOLH       M1_EUE       M3_EUE     EUE_M1-M3   M3_runtime_s
+------------------------------------------------------------------------------------------------
+rts_base                   1.00       0.10       0.00          5.8          0.0           5.8         7205.4
+load_scale_105             1.05       1.35       0.00        169.6          0.0         169.6         7186.8
+load_scale_110             1.10       8.65       0.05       1641.4          4.0        1637.4         7076.2
+load_scale_115             1.15      35.90       0.35       8697.8        145.7        8552.1         7246.6
+load_scale_120             1.20      95.40       5.70      31017.1       2479.2       28538.0         7242.7
+================================================================================================
+
+Recommendation: Recommended case: load_scale_120 (load_scale=1.2, M3 LOLH=5.7 h/yr, M3 EUE=2479.2 MWh/yr)
+Results → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\calibration

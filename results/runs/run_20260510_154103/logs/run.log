@@ -1,0 +1,30 @@
+┌ Info: Models=M1,M2,M3, n_scenarios=5, seed=42
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:105
+┌ Info: Loading system data from D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\data_processed\rts_single_zone
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:108
+┌ Info: System: 73 thermal, 60 VRE, 1 storage, 8760 hours
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:110
+┌ Info: Generating 5 shared outage scenarios (seed=42) — same ScenarioSet for all models
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:115
+┌ Info: === M1 ===
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:139
+┌ Info: M1 done in 0.8s | LOLH=0.0 | EUE=0.0 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:145
+┌ Info: Dispatch saved to D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\runs\run_20260510_154103\dispatch\m1_dispatch.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:179
+┌ Info: === M2 ===
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:139
+┌ Info: M2 done in 1161.9s | LOLH=0.0 | EUE=0.0 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:145
+┌ Info: === M3 ===
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:139
+┌ Info: M3 done in 1801.3s | LOLH=0.0 | EUE=0.0 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:145
+┌ Info: Aggregate metrics → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\runs\run_20260510_154103\aggregate_metrics.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:194
+┌ Info: Scenario metrics  → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\runs\run_20260510_154103\scenario_metrics.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:195
+┌ Info: Run metadata      → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\runs\run_20260510_154103\run_metadata.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:211
+┌ Info: Latest copies → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\metrics
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\03_run_m1_m2_m3.jl:216

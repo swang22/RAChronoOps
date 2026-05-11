@@ -1,0 +1,2 @@
+run_id,started_at,finished_at,selected_models,n_scenarios,seed,n_hours,system_path,total_runtime_s,notes
+run_20260510_154103,2026-05-10T15:41:11.913,2026-05-10T16:30:38.963,"M1,M2,M3",5,42,8760,D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\data_processed\rts_single_zone,2964.0,

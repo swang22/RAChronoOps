@@ -1,0 +1,4 @@
+model,n_scenarios,seed,lolh_hours,eue_mwh,neue_ppm,n_events,max_shortfall_mw,cvar_eue_mwh,eue_se_mwh,eue_ci95_halfwidth_mwh,eue_ci95_rel_halfwidth,lolh_se,lolh_ci95_halfwidth,lolh_ci95_rel_halfwidth,runtime_s
+M1,5,42,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,NaN,0.0,0.0,NaN,0.8179998397827148
+M2,5,42,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,NaN,0.0,0.0,NaN,1161.8780000209808
+M3,5,42,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,NaN,0.0,0.0,NaN,1801.2610001564026

@@ -1,0 +1,13 @@
+  Activating project at `D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps`
+ERROR: LoadError: ArgumentError: First argument to `@printf` after `io` must be a format string
+Stacktrace:
+ [1] var"@printf"(__source__::LineNumberNode, __module__::Module, io_or_fmt::Any, args::Vararg{Any})
+   @ Printf C:\Users\swang16\.julia\juliaup\julia-1.12.6+0.x64.w64.mingw32\share\julia\stdlib\v1.12\Printf\src\Printf.jl:1017
+ [2] include(mod::Module, _path::String)
+   @ Base .\Base.jl:306
+ [3] exec_options(opts::Base.JLOptions)
+   @ Base .\client.jl:317
+ [4] _start()
+   @ Base .\client.jl:550
+in expression starting at D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\09_calibrate_load_scaling.jl:178
+in expression starting at D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\09_calibrate_load_scaling.jl:41
