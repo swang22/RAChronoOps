@@ -1,16 +1,20 @@
 #!/usr/bin/env julia
 # 09_calibrate_load_scaling.jl
 #
-# Loops over five load-scaling cases (rts_base → load_scale_120), runs M1
-# and M3 with a shared ScenarioSet (20 scenarios, seed=42) for each case,
-# and identifies the load-scale factor that gives M3 LOLH closest to 10 h/yr.
+# Loops over load-scaling cases, runs M1 and M3 with a shared ScenarioSet
+# for each case, and identifies the load-scale factor giving M3 LOLH ≈ 10 h/yr.
 #
-# Outputs:
-#   results/calibration/load_scaling_calibration.csv  — full metrics per case/model
-#   results/calibration/recommended_case.txt           — recommended load scale
+# Outputs (base mode):
+#   results/calibration/load_scaling_calibration.csv
+#   results/calibration/recommended_case.txt
+#
+# Outputs (--extended mode):
+#   results/calibration/load_scaling_calibration_extended.csv
+#   results/calibration/recommended_case.txt  (overwritten)
 #
 # Usage:
 #   julia --project=. scripts/09_calibrate_load_scaling.jl
+#   julia --project=. scripts/09_calibrate_load_scaling.jl --extended --n-scenarios 10 --seed 42
 
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
@@ -20,12 +24,41 @@ using CSV, DataFrames
 using Printf
 using Statistics
 
-const N_SCENARIOS = 20
-const SEED        = 42
+# ── CLI parsing ───────────────────────────────────────────────────────────────
+function _parse_cli(args)
+    d = Dict{String,String}()
+    i = 1
+    while i <= length(args)
+        k = args[i]
+        if k == "--extended"
+            d["extended"] = "true"
+            i += 1
+        elseif i < length(args) && startswith(k, "--")
+            d[lstrip(k, '-')] = args[i+1]
+            i += 2
+        else
+            i += 1
+        end
+    end
+    return d
+end
 
-const CASE_NAMES  = ["rts_base", "load_scale_105", "load_scale_110",
-                     "load_scale_115", "load_scale_120"]
-const LOAD_SCALES = [1.00, 1.05, 1.10, 1.15, 1.20]
+cli = _parse_cli(ARGS)
+
+const EXTENDED    = get(cli, "extended", "false") == "true"
+const N_SCENARIOS = parse(Int, get(cli, "n-scenarios", "20"))
+const SEED        = parse(Int, get(cli, "seed",         "42"))
+
+const BASE_CASE_NAMES  = ["rts_base", "load_scale_105", "load_scale_110",
+                           "load_scale_115", "load_scale_120"]
+const BASE_LOAD_SCALES = [1.00, 1.05, 1.10, 1.15, 1.20]
+
+const EXT_CASE_NAMES   = ["load_scale_120",  "load_scale_1225", "load_scale_125",
+                           "load_scale_1275", "load_scale_130",  "load_scale_135"]
+const EXT_LOAD_SCALES  = [1.20, 1.225, 1.25, 1.275, 1.30, 1.35]
+
+const CASE_NAMES  = EXTENDED ? EXT_CASE_NAMES  : BASE_CASE_NAMES
+const LOAD_SCALES = EXTENDED ? EXT_LOAD_SCALES : BASE_LOAD_SCALES
 
 # ── Monte Carlo 95% CI ────────────────────────────────────────────────────────
 function _mc_ci95(values::Vector{Float64})
@@ -45,6 +78,9 @@ let
     out_dir      = joinpath(project_root, "results", "calibration")
     mkpath(out_dir)
 
+    csv_name = EXTENDED ? "load_scaling_calibration_extended.csv" :
+                          "load_scaling_calibration.csv"
+
     function _get_cfg(name)
         p = joinpath(conf_dir, "$name.yaml")
         isfile(p) ? load_config(p) : SimConfig()
@@ -52,8 +88,9 @@ let
     m1_cfg = _get_cfg("m1")
     m3_cfg = _get_cfg("m3")
 
+    mode_tag = EXTENDED ? "EXTENDED" : "BASE"
     println("=" ^ 80)
-    @printf "Load-Scaling Calibration | M1 + M3 | %d scenarios | seed=%d\n" N_SCENARIOS SEED
+    @printf "Load-Scaling Calibration [%s] | M1 + M3 | %d scenarios | seed=%d\n" mode_tag N_SCENARIOS SEED
     println("=" ^ 80)
 
     all_rows = NamedTuple[]
@@ -130,16 +167,17 @@ let
 
     # ── save CSV ──────────────────────────────────────────────────────────────
     df       = DataFrame(all_rows)
-    csv_path = joinpath(out_dir, "load_scaling_calibration.csv")
+    csv_path = joinpath(out_dir, csv_name)
     CSV.write(csv_path, df)
 
     # ── recommended case ──────────────────────────────────────────────────────
     m3_df = filter(r -> r.model == "M3" && !isnan(r.lolh_hours), df)
+    max_scale = maximum(LOAD_SCALES)
 
     rec_text = if nrow(m3_df) == 0
         "No M3 results available (all cases failed)."
     elseif all(iszero.(m3_df.lolh_hours))
-        "All tested load scales have zero M3 LOLH. Increase load_scale beyond 1.20."
+        "All tested load scales have zero M3 LOLH. Increase load_scale beyond $max_scale."
     else
         nonzero = filter(r -> r.lolh_hours > 0.0, m3_df)
         if all(nonzero.lolh_hours .> 50.0)
@@ -159,7 +197,7 @@ let
 
     # ── summary table ─────────────────────────────────────────────────────────
     println("\n" * "=" ^ 96)
-    println("Calibration Summary")
+    println("Calibration Summary [$mode_tag]")
     println("=" ^ 96)
     @printf "%-20s %10s %10s %10s %12s %12s %13s %14s\n" "case_name" "load_scale" "M1_LOLH" "M3_LOLH" "M1_EUE" "M3_EUE" "EUE_M1-M3" "M3_runtime_s"
     println("-" ^ 96)
@@ -168,15 +206,15 @@ let
         m1_sub = filter(r -> r.model == "M1", sub)
         m3_sub = filter(r -> r.model == "M3", sub)
         if nrow(m1_sub) == 0 || nrow(m3_sub) == 0
-            @printf "%-20s %10.2f  (data missing)\n" cn ls
+            @printf "%-20s %10.3f  (data missing)\n" cn ls
             continue
         end
         m1l = m1_sub[1, :lolh_hours];  m3l = m3_sub[1, :lolh_hours]
         m1e = m1_sub[1, :eue_mwh];     m3e = m3_sub[1, :eue_mwh]
         m3r = m3_sub[1, :runtime_s]
-        @printf "%-20s %10.2f %10.2f %10.2f %12.1f %12.1f %13.1f %14.1f\n" cn ls m1l m3l m1e m3e (m1e - m3e) m3r
+        @printf "%-20s %10.3f %10.2f %10.2f %12.1f %12.1f %13.1f %14.1f\n" cn ls m1l m3l m1e m3e (m1e - m3e) m3r
     end
     println("=" ^ 96)
     println("\nRecommendation: $rec_text")
-    println("Results → $out_dir")
+    println("Results → $out_dir/$csv_name")
 end

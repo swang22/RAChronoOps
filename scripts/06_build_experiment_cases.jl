@@ -36,10 +36,15 @@ const CASES = CaseDef[
     CaseDef("rts_base",       1.00, 1.00, 1.00, 0.10,  4, "RTS-GMLC baseline"),
 
     # ── Phase 2: load-scaling calibration ───────────────────────────────
-    CaseDef("load_scale_105", 1.05, 1.00, 1.00, 0.10,  4, "Load scaled to 105%"),
-    CaseDef("load_scale_110", 1.10, 1.00, 1.00, 0.10,  4, "Load scaled to 110%"),
-    CaseDef("load_scale_115", 1.15, 1.00, 1.00, 0.10,  4, "Load scaled to 115%"),
-    CaseDef("load_scale_120", 1.20, 1.00, 1.00, 0.10,  4, "Load scaled to 120%"),
+    CaseDef("load_scale_105",  1.05,  1.00, 1.00, 0.10,  4, "Load scaled to 105%"),
+    CaseDef("load_scale_110",  1.10,  1.00, 1.00, 0.10,  4, "Load scaled to 110%"),
+    CaseDef("load_scale_115",  1.15,  1.00, 1.00, 0.10,  4, "Load scaled to 115%"),
+    CaseDef("load_scale_120",  1.20,  1.00, 1.00, 0.10,  4, "Load scaled to 120%"),
+    CaseDef("load_scale_1225", 1.225, 1.00, 1.00, 0.10,  4, "Load scaled to 122.5%"),
+    CaseDef("load_scale_125",  1.25,  1.00, 1.00, 0.10,  4, "Load scaled to 125%"),
+    CaseDef("load_scale_1275", 1.275, 1.00, 1.00, 0.10,  4, "Load scaled to 127.5%"),
+    CaseDef("load_scale_130",  1.30,  1.00, 1.00, 0.10,  4, "Load scaled to 130%"),
+    CaseDef("load_scale_135",  1.35,  1.00, 1.00, 0.10,  4, "Load scaled to 135%"),
 
     # ── Phase 3: storage duration × penetration matrix ───────────────────
     CaseDef("storage_p05_d2",  1.00, 1.00, 1.00, 0.05,  2, "Storage 5% peak, 2-hour"),
