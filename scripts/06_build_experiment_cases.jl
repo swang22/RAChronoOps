@@ -46,7 +46,7 @@ const CASES = CaseDef[
     CaseDef("load_scale_130",  1.30,  1.00, 1.00, 0.10,  4, "Load scaled to 130%"),
     CaseDef("load_scale_135",  1.35,  1.00, 1.00, 0.10,  4, "Load scaled to 135%"),
 
-    # ── Phase 3: storage duration × penetration matrix ───────────────────
+    # ── Phase 3: storage duration × penetration matrix (base load) ──────
     CaseDef("storage_p05_d2",  1.00, 1.00, 1.00, 0.05,  2, "Storage 5% peak, 2-hour"),
     CaseDef("storage_p05_d4",  1.00, 1.00, 1.00, 0.05,  4, "Storage 5% peak, 4-hour"),
     CaseDef("storage_p05_d8",  1.00, 1.00, 1.00, 0.05,  8, "Storage 5% peak, 8-hour"),
@@ -59,6 +59,20 @@ const CASES = CaseDef[
     CaseDef("storage_p20_d4",  1.00, 1.00, 1.00, 0.20,  4, "Storage 20% peak, 4-hour"),
     CaseDef("storage_p20_d8",  1.00, 1.00, 1.00, 0.20,  8, "Storage 20% peak, 8-hour"),
     CaseDef("storage_p20_d12", 1.00, 1.00, 1.00, 0.20, 12, "Storage 20% peak, 12-hour"),
+
+    # ── Phase 3b: calibrated storage matrix (load_scale = 1.20) ─────────
+    CaseDef("storage120_p05_d2",  1.20, 1.00, 1.00, 0.05,  2, "Calibrated load, storage 5% peak, 2-hour"),
+    CaseDef("storage120_p05_d4",  1.20, 1.00, 1.00, 0.05,  4, "Calibrated load, storage 5% peak, 4-hour"),
+    CaseDef("storage120_p05_d8",  1.20, 1.00, 1.00, 0.05,  8, "Calibrated load, storage 5% peak, 8-hour"),
+    CaseDef("storage120_p05_d12", 1.20, 1.00, 1.00, 0.05, 12, "Calibrated load, storage 5% peak, 12-hour"),
+    CaseDef("storage120_p10_d2",  1.20, 1.00, 1.00, 0.10,  2, "Calibrated load, storage 10% peak, 2-hour"),
+    CaseDef("storage120_p10_d4",  1.20, 1.00, 1.00, 0.10,  4, "Calibrated load, storage 10% peak, 4-hour"),
+    CaseDef("storage120_p10_d8",  1.20, 1.00, 1.00, 0.10,  8, "Calibrated load, storage 10% peak, 8-hour"),
+    CaseDef("storage120_p10_d12", 1.20, 1.00, 1.00, 0.10, 12, "Calibrated load, storage 10% peak, 12-hour"),
+    CaseDef("storage120_p20_d2",  1.20, 1.00, 1.00, 0.20,  2, "Calibrated load, storage 20% peak, 2-hour"),
+    CaseDef("storage120_p20_d4",  1.20, 1.00, 1.00, 0.20,  4, "Calibrated load, storage 20% peak, 4-hour"),
+    CaseDef("storage120_p20_d8",  1.20, 1.00, 1.00, 0.20,  8, "Calibrated load, storage 20% peak, 8-hour"),
+    CaseDef("storage120_p20_d12", 1.20, 1.00, 1.00, 0.20, 12, "Calibrated load, storage 20% peak, 12-hour"),
 
     # ── Phase 4: VRE profile sensitivity ─────────────────────────────────
     CaseDef("vre_balanced_2x", 1.00, 2.00, 2.00, 0.10,  4, "Balanced high VRE (2x wind, 2x solar)"),
