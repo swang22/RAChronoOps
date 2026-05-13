@@ -318,6 +318,49 @@ outside the scope of the first implementation.
 - Goal: quantify how M1 and M2 differ from M3 as storage becomes more
   important.
 
+### Phase 3b: Extended load-scaling calibration
+
+- Load scale factors: 1.20, 1.225, 1.25, 1.275, 1.30, 1.35
+- Goal: narrow down the alpha that puts M3 LOLH closest to 10 h/yr.
+- Result: `load_scale_120` (α=1.20, M3 LOLH≈7.7 h/yr) is the best match.
+
+```bash
+julia --project=. scripts/09_calibrate_load_scaling.jl --extended --n-scenarios 10 --seed 42
+```
+
+### Phase 3c: Calibrated storage matrix (load_scale = 1.20)
+
+- Storage power: 5%, 10%, 20% of peak load
+- Storage duration: 2, 4, 8, 12 hours
+- All cases at `load_scale = 1.20`
+- Goal: quantify reliability sensitivity to storage power and duration at the calibrated stress level.
+
+```bash
+julia --project=. scripts/10_run_storage_matrix.jl --n-scenarios 10 --seed 42
+```
+
+## Selected storage validation
+
+After the 10-scenario storage matrix, selected cases are re-run with more
+scenarios to confirm that the key findings are not small-sample artifacts.
+
+Selected cases:
+- `storage120_p05_d4` — 5% penetration, 4-hour (low-storage baseline)
+- `storage120_p10_d2` — 10% penetration, 2-hour (power-limited)
+- `storage120_p10_d4` — 10% penetration, 4-hour (closest to 10 h/yr target)
+- `storage120_p10_d8` — 10% penetration, 8-hour (diminishing-returns test)
+- `storage120_p20_d2` — 20% penetration, 2-hour (anomaly case)
+- `storage120_p20_d4` — 20% penetration, 4-hour (near-zero scarcity)
+
+```bash
+julia --project=. scripts/12_run_selected_storage_validation.jl --n-scenarios 50 --seed 42
+```
+
+Outputs:
+- `results/storage_validation/selected_storage_validation_results.csv`
+- `results/storage_validation/selected_storage_validation_errors.csv`
+- `results/storage_validation/selected_storage_validation_summary.txt`
+
 ### Phase 4: VRE profile sensitivity
 
 - Balanced high VRE: wind scale 2.0, solar scale 2.0
