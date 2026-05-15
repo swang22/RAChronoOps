@@ -283,7 +283,7 @@ let
         function _val(cn, model, field)
             lut = model == "M3" ? m3_lut : m1_lut
             r   = get(lut, cn, nothing)
-            isnothing(r) ? NaN : getfield(r, field)
+            isnothing(r) ? NaN : Float64(r[field])
         end
 
         # 1. Is 10%/4h near target?

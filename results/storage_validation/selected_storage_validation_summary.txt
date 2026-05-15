@@ -1,0 +1,46 @@
+Selected Storage Validation Summary
+N=50 scenarios, seed=42, load_scale=1.20
+========================================================================
+
+1. Is 10%/4h near the 10 h/yr reliability target?
+   p10_d4  M3 LOLH = 6.22 h/yr  (target 10 h/yr, delta = 3.78 h)
+   LOLH CI95 halfwidth = ±2.07 h
+   Verdict: MARGINAL — within 6 h/yr of target
+
+2. Does increasing duration 2h→4h at 10% give a large reliability gain?
+   p10_d2  M3 LOLH = 20.06 h/yr  EUE = 9669.8 MWh
+   p10_d4  M3 LOLH = 6.22 h/yr  EUE = 2888.5 MWh
+   LOLH reduction: 13.84 h/yr  |  EUE reduction: 70.1%
+   Verdict: YES — large LOLH reduction
+
+3. Does increasing duration 4h→8h at 10% show diminishing returns?
+   p10_d4  M3 LOLH = 6.22 h/yr  EUE = 2888.5 MWh
+   p10_d8  M3 LOLH = 2.78 h/yr  EUE = 542.9 MWh
+   LOLH reduction 4h→8h: 3.44 h/yr
+   LOLH reduction 2h→4h: 13.84 h/yr  (for comparison)
+   Verdict: YES — 4h→8h gain is less than half of 2h→4h gain
+
+4. Does 20%/4h remain near-zero scarcity?
+   p20_d4  M3 LOLH = 0.30 h/yr  EUE = 214.6 MWh
+   Verdict: YES — LOLH < 1 h/yr
+
+5. Do p10_d4 and p20_d2 still have similar EUE with 50 scenarios?
+   p10_d4  M3 LOLH = 6.22 h/yr  EUE = 2888.5 MWh
+   p20_d2  M3 LOLH = 4.90 h/yr  EUE = 2888.5 MWh
+   |EUE difference| = 0.0 MWh  (0.0% relative)
+   Verdict: STILL SIMILAR — within 5% relative
+   Note: At 10 scenarios, EUE was identical (32,453 MWh) — a sampling coincidence.
+
+6. Does M1 systematically overestimate scarcity relative to M3?
+   M1/M3 LOLH ratios across cases with M3 LOLH > 0:
+     storage120_p05_d4       M1=96.48  M3=28.96  ratio=3.3×
+     storage120_p10_d2       M1=96.48  M3=20.06  ratio=4.8×
+     storage120_p10_d4       M1=96.48  M3=6.22  ratio=15.5×
+     storage120_p10_d8       M1=96.48  M3=2.78  ratio=34.7×
+     storage120_p20_d2       M1=96.48  M3=4.90  ratio=19.7×
+     storage120_p20_d4       M1=96.48  M3=0.30  ratio=321.6×
+   Median M1/M3 ratio: 17.6×
+   Verdict: YES — M1 strongly overestimates (median >5× M3)
+
+========================================================================
+Total runtime: 111742 s (31.0 h)
