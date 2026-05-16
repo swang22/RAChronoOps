@@ -420,3 +420,5 @@ the first implementation.
 - [docs/redesigned_experiment_plan.md](docs/redesigned_experiment_plan.md)
   — forward design: research questions, method hierarchy, VRE experiment
   matrix, metrics, expected figures, and implementation task list.
+- [docs/results_index.md](docs/results_index.md) — index of completed and
+  planned result folders with commit policy and key file names.
