@@ -33,6 +33,7 @@ let
     # parameters (seed, VOLL, storage, …) stay identical to base_case.yaml.
     cfg3 = SimConfig(3, cfg.seed, cfg.voll,
                      cfg.high_net_load_quantile, cfg.charge_net_load_quantile,
+                     cfg.reserve_fraction,
                      cfg.lookahead_hours, cfg.epsilon_cycling, cfg.cyclic_soc,
                      cfg.storage_cycling_cost, cfg.cvar_alpha,
                      cfg.save_dispatch, cfg.output_dir)

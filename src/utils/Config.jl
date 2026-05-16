@@ -9,9 +9,10 @@ Base.@kwdef struct SimConfig
     # ── Economics ─────────────────────────────────────────────────────────
     voll::Float64        = 10_000.0   # $/MWh value of lost load
 
-    # ── M1 rule thresholds ────────────────────────────────────────────────
+    # ── M1/M1b rule thresholds ───────────────────────────────────────────
     high_net_load_quantile::Float64   = 0.75  # proactive discharge above this
     charge_net_load_quantile::Float64 = 0.25  # charge below this
+    reserve_fraction::Float64         = 0.50  # M1b: SOC floor as fraction of total energy
 
     # ── M2 rolling-window LP ──────────────────────────────────────────────
     lookahead_hours::Int              = 24

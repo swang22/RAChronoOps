@@ -118,17 +118,18 @@ proactive discharge is suppressed when `SOC < reserve_fraction ×
 total_energy`.  This prevents peak-shaving from pre-empting emergency
 storage capacity.
 
-**Scaffolding complete:** `src/models/M1bReserveAwareStorage.jl` and
-`configs/m1b.yaml` are in place.  `run_m1b_reserve_aware` is exported but
-throws `"RA-1b reserve-aware heuristic is not implemented yet."` until the
-model body is written.
+**Implemented** (`reserve_fraction = 0.50` default):
 
-Remaining implementation tasks:
-- Fill in the dispatch loop in `src/models/M1bReserveAwareStorage.jl`.
-- Add `reserve_fraction` field to `SimConfig` in `src/utils/Config.jl`.
-- Validation script: `scripts/14_run_ra1b_validation.jl`.
-- Compare RA-1a, RA-1b, and RA-3 on the calibrated reference case
-  (`storage120_p10_d4`, N=50).
+- `src/models/M1bReserveAwareStorage.jl` — full three-priority dispatch loop
+  identical to RA-1a except Priority-2 is restricted to SOC above the floor.
+  Priority-1 emergency discharge ignores the floor.
+- `src/utils/Config.jl` — `reserve_fraction::Float64 = 0.50` added to
+  `SimConfig` (field 6; keyword-only callers unaffected).
+- `configs/m1b.yaml` — `reserve_fraction: 0.50` read at runtime.
+- `test/test_storage.jl` — four new testsets: SOC dynamics, RF=1.0 disables
+  P2, RF=0.0 matches RA-1a exactly, storage-sensitivity on calibrated cases.
+- `scripts/14_run_ra1b_validation.jl` — compare RA-1a / RA-1b / RA-3 on
+  `storage120_p05/p10/p20_d4`; answers four research questions in summary.txt.
 
 ### Phase C — Implement RA-2 event-window LP
 

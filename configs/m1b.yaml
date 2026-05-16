@@ -1,8 +1,6 @@
 # RA-1b: reserve-aware chronological storage heuristic
-# reserve_fraction is the planned RA-1b-specific parameter (not yet read by
-# SimConfig — will be added when the model is implemented in Phase B).
 
-reserve_fraction: 0.50
-high_net_load_quantile: 0.75
-charge_net_load_quantile: 0.25
+reserve_fraction: 0.50          # SOC floor: Priority-2 cannot use energy below this fraction
+high_net_load_quantile: 0.75    # Priority-2 fires when net load >= Q0.75
+charge_net_load_quantile: 0.25  # Priority-3 charges when net load <= Q0.25
 save_dispatch: false
