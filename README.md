@@ -1,15 +1,27 @@
 # RAChronoOps
 
-Probabilistic resource adequacy assessment with chronological storage operations.
-Single-zone copper-plate system based on a modified RTS-GMLC dataset.
+RAChronoOps is a research codebase for evaluating how much operational detail
+is needed inside probabilistic sequential Monte Carlo resource adequacy
+assessment for high-VRE, storage-rich power systems.  The project compares
+fast RA-compatible dispatch approximations against full-year economic dispatch
+and later UC/PCM benchmarks.
 
-## Models
+Single-zone copper-plate system based on the RTS-GMLC dataset.
 
-| Model | Method | Storage dispatch |
-|-------|--------|-----------------|
-| M1 | Sequential Monte Carlo | Rule-based (peak-shaving / valley-filling) |
-| M2 | Sequential Monte Carlo | Rolling-window LP (model predictive control) |
-| M3 | Sequential Monte Carlo | Full-year economic dispatch LP (perfect foresight per scenario) |
+## Method hierarchy
+
+| Label | Status | Method | Optimization | Intended role |
+|-------|--------|--------|--------------|---------------|
+| RA-0 | not yet implemented | Static capacity-balance RA | None | Classical baseline |
+| RA-1a / M1 | implemented | Sequential MC + naive peak-shaving storage heuristic | None | Cautionary heuristic baseline |
+| RA-1b | planned next | Sequential MC + reserve-aware storage heuristic | None | Practical improved heuristic |
+| RA-2 | planned | Sequential MC + screened/event-window LP | Small LPs near risk periods only | Proposed hybrid method |
+| RA-3 / M3 | implemented | Sequential MC + full-year ED LP per scenario | LP (HiGHS) | Reliability benchmark |
+| RA-4 / M4 | future | HOPE UC/PCM on selected stress periods | UC/PCM | High-fidelity validation benchmark |
+
+All implemented methods use **common random numbers**: one shared
+`ScenarioSet` of thermal outage draws is passed to every method, so
+reliability metric differences are attributable to dispatch strategy alone.
 
 ## Quick start
 
@@ -23,49 +35,134 @@ julia --project=. scripts/00_get_rts_gmlc_data.jl
 # 3. Build the processed single-zone dataset
 julia --project=. scripts/01_build_single_zone_rts.jl
 
-# 4. Run all three models and compare reliability metrics
-julia --project=. scripts/03_run_m1_m2_m3.jl
+# 4. Verify M3 with a single-scenario smoke test (~6 min)
+julia --project=. scripts/06_smoke_test_m3_full_year.jl
+
+# 5. Run RA-1a and RA-3 on the calibrated stress case
+julia --project=. scripts/03_run_m1_m2_m3.jl --models M1,M3 --n-scenarios 20 --seed 42
 ```
 
 If you skip step 2, the build script in step 3 falls back to a small
 deterministic synthetic dataset so that tests and a first run still work.
 
-## Recommended experiment workflow after M3 fix
+## Current completed experiments
 
-M3 (full-year economic dispatch LP) now solves one 8760-hour RTS-GMLC
-scenario in approximately 100 seconds after an out-of-memory fix that
-replaced large JuMP sum expressions with incremental objective construction.
+The diagnostic phase is complete.  Key results:
 
-**Key performance guidance:**
+- **Dataset:** Full RTS-GMLC 8760-hour single-zone system built and
+  validated (73 thermal + 60 VRE generators).
+- **Load calibration:** Base RTS-GMLC is too reliable at load_scale=1.00
+  (M3 LOLH ≈ 0).  `load_scale = 1.20` was selected as the calibrated
+  stress case (M3 LOLH ≈ 6–8 h/yr at 10% peak / 4h storage).
+- **RA-3 (M3):** Full-year ED LP is implemented and runs at ~360 s/scenario
+  after an out-of-memory fix.  Validated at 50 scenarios.
+- **RA-1a (M1) diagnosis:** Priority-2 proactive discharge fires at 25% of
+  all hours and depletes storage SOC to zero before every shortage event.
+  Priority-1 emergency discharge fires zero times across all scenarios and
+  all storage configurations.  M1 LOLH is identical (96.48 h/yr) for all
+  six storage cases tested — a heuristic limitation, not a data bug.
+- **M2 (rolling-window LP):** Works correctly but solves one LP per hour
+  per scenario (~360 s/scenario), giving no runtime advantage over RA-3
+  while sacrificing full-year coherence.  Excluded from forward experiments.
+- **Storage validation:** RA-3 benchmark at load_scale=1.20, 10% / 4h
+  storage: LOLH = 6.22 h/yr, EUE = 2,889 MWh (N=50, seed=42).
 
-- M3 solves one full-year scenario but is still much slower than M1 (~100 s vs. ~1 s per scenario).
-- M2 (rolling-window LP) is very slow for 8760-hour datasets because it solves one LP per hour per scenario (~354 s/scenario). **Do not run M2 by default** in broad experiments; use it only for selected look-ahead sensitivity cases.
-- For broad experiments, start with M1 and M3. The default model selection of `scripts/03_run_m1_m2_m3.jl` (no `--models` flag) is `M1,M3` for this reason.
+Full numeric results and per-script output paths are in
+[docs/experiment_archive.md](docs/experiment_archive.md).
 
-**Step 1 — Verify M3 with a single-scenario smoke test (~100 s):**
+## Why we are redesigning the experiments
 
-```bash
-julia --project=. scripts/06_smoke_test_m3_full_year.jl
-```
+The original M1/M2/M3 storage-duration study is now treated as a
+**diagnostic phase** that exposed two problems with the initial design:
 
-**Step 2 — Broad experiment run with M1 + M3:**
+1. **RA-1a (M1) is not a credible simple RA method.**  The naive
+   peak-shaving heuristic exhausts storage before shortage events and
+   produces reliability metrics insensitive to storage size.  It is a
+   useful failure case but not a fair comparison point for a proposed
+   hybrid method.
 
-```bash
-julia --project=. scripts/03_run_m1_m2_m3.jl --models M1,M3 --n-scenarios 20 --seed 42
-```
+2. **M2 (rolling-window LP) is the wrong incremental approach.**  Solving
+   one LP per hour gives no runtime advantage over the full-year RA-3
+   benchmark.  The correct approach is to solve LPs only near screened
+   risk windows (RA-2 event-window LP).
 
-**Step 3 — Full three-model comparison (small N only, M2 is slow):**
+The **new experiment design** fixes both problems:
 
-```bash
-julia --project=. scripts/03_run_m1_m2_m3.jl --models M1,M2,M3 --n-scenarios 5 --seed 42
-```
+- RA-1b adds an emergency SOC reserve to the heuristic, preventing
+  proactive discharge from pre-empting emergency storage.
+- RA-2 screens for risk periods and solves storage LPs only there,
+  targeting 5–20 s/scenario vs RA-3's ~360 s.
+- The main experiment varies VRE penetration and profile (not storage
+  duration), testing each method's robustness as solar/wind increases.
 
-Each run writes to a unique timestamped folder
-`results/runs/run_YYYYMMDD_HHMMSS/` and updates convenience copies at
-`results/metrics/latest_aggregate_metrics.csv`.  Aggregate metrics now
-include 95% Monte Carlo confidence interval columns
-(`eue_ci95_rel_halfwidth`, `lolh_ci95_rel_halfwidth`) for convergence
-assessment.
+See [docs/redesigned_experiment_plan.md](docs/redesigned_experiment_plan.md)
+for the full design including research questions, experiment matrix,
+metrics, and expected figures.
+
+## Experiment roadmap
+
+### Phase A — Finalize diagnostic baseline (completed)
+
+- Load calibration and storage validation results are preserved as-is.
+- `load_scale = 1.20`, storage = 10% peak / 4h used as the fixed stress
+  case for all forward experiments.
+- RA-1a diagnosis motivates RA-1b and RA-2.
+
+See [docs/experiment_archive.md](docs/experiment_archive.md) for full
+diagnostic results.
+
+### Phase B — Implement RA-1b reserve-aware heuristic
+
+Add an emergency SOC reserve to the heuristic dispatch rule: priority-2
+proactive discharge is suppressed when `SOC < soc_reserve_fraction ×
+total_energy`.  This prevents peak-shaving from pre-empting emergency
+storage capacity.
+
+- New function `run_m1b_reserve_aware` in `src/models/`.
+- New config parameter `soc_reserve_fraction` (suggested default: 0.20).
+- Validation script: `scripts/14_run_ra1b_validation.jl`.
+- Compare RA-1a, RA-1b, and RA-3 on the calibrated reference case
+  (`storage120_p10_d4`, N=50).
+
+### Phase C — Implement RA-2 event-window LP
+
+Screen each scenario for risk windows (hours where available thermal +
+VRE is within a configurable margin of load), expand and merge nearby
+windows, and solve a storage dispatch LP only inside each window.  Use
+RA-1b heuristic dispatch outside windows.
+
+- New model file `src/models/M2EventWindowLP.jl`.
+- Config parameters: `risk_margin_mw`, `window_buffer_hours`.
+- Validation script: `scripts/16_run_ra2_validation.jl`.
+- Target runtime: 5–20 s/scenario (vs RA-3 at ~360 s).
+
+### Phase D — VRE penetration/profile experiment
+
+Run RA-1a, RA-1b, RA-2, and RA-3 across six VRE cases at fixed
+`load_scale = 1.20`, storage = 10% peak / 4h:
+
+| Case | Wind scale | Solar scale |
+|------|-----------|-------------|
+| VRE-Base | 1.0 | 1.0 |
+| VRE-Balanced-1.5x | 1.5 | 1.5 |
+| VRE-Balanced-2x | 2.0 | 2.0 |
+| VRE-Balanced-3x | 3.0 | 3.0 |
+| Solar-heavy | 1.0 | 3.0 |
+| Wind-heavy | 3.0 | 1.0 |
+
+Primary metrics: LOLH error and EUE error vs RA-3 benchmark, and
+runtime ratio.  Experiment script: `scripts/15_run_vre_experiment.jl`
+(RA-1a + RA-1b + RA-3) and `scripts/17_run_vre_all_methods.jl` (adds
+RA-2 after Phase C).
+
+### Phase E — HOPE UC/PCM validation (future)
+
+Use RA-3 to identify stress weeks (scenario-hours with concentrated load
+shedding).  Export those weeks via `src/data/ExportHOPECase.jl` and run
+HOPE with unit commitment.  Compare ED (RA-3) vs UC (RA-4) reliability
+and dispatch feasibility on the selected stress periods.
+
+---
 
 ## Preparing the full RTS-GMLC dataset
 
@@ -84,81 +181,9 @@ julia --project=. scripts/01_build_single_zone_rts.jl
 # Optionally verify: print system summary + write results/data_summary/ CSVs
 julia --project=. scripts/04_summarize_processed_data.jl
 
-# Quick sanity check: assert 8760 h, generate 3 scenarios, run M1
+# Quick sanity check: assert 8760 h, generate 3 scenarios, run RA-1a
 julia --project=. scripts/05_smoke_test_full_rts_data.jl
 ```
-
-## Building formal experiment cases
-
-After building the base dataset, create the 20 experiment case folders used
-in the main experiments:
-
-```bash
-julia --project=. scripts/06_build_experiment_cases.jl
-```
-
-This writes one subfolder per case under `data_processed/cases/`, each
-containing `generators.csv`, `storage.csv`, `load_timeseries.csv`,
-`wind_timeseries.csv`, `solar_timeseries.csv`, and `case_metadata.csv`.
-A master `case_index.csv` is written to `data_processed/cases/`.
-
-Cases are derived from the base processed dataset by applying scale factors —
-the original files in `data_processed/rts_single_zone/` are never modified.
-
-| Experiment group | Scale factors applied |
-|-----------------|----------------------|
-| Load scaling (×5) | `load_scale` ∈ {1.00, 1.05, 1.10, 1.15, 1.20} |
-| Storage matrix (×12) | `storage_power_pct_peak` ∈ {5%, 10%, 20%} × `storage_duration_hours` ∈ {2, 4, 8, 12} |
-| VRE sensitivity (×3) | Balanced 2× / solar-heavy 3× / wind-heavy 3× |
-
-The `data_processed/cases/` directory is git-ignored (generated data).
-
-## Running one experiment case
-
-Run all three models on a single case and write results to
-`results/cases/<case_name>/`:
-
-```bash
-julia --project=. scripts/07_run_case.jl data_processed/cases/rts_base
-```
-
-Optional arguments:
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--models M1,M2,M3` | `M1,M2,M3` | Comma-separated subset of models to run |
-| `--n-scenarios N` | from `base_case.yaml` | Override scenario count |
-| `--seed S` | from `base_case.yaml` | Override random seed |
-| `--lookahead-hours H` | from `m2.yaml` | Override M2 look-ahead window |
-| `--save-dispatch true\|false` | from each model config | Override dispatch CSV output |
-
-Examples:
-
-```bash
-# Run only M1 and M3 with 20 scenarios
-julia --project=. scripts/07_run_case.jl data_processed/cases/load_scale_110 \
-    --models M1,M3 --n-scenarios 20
-
-# Run M2 with a shorter look-ahead (faster)
-julia --project=. scripts/07_run_case.jl data_processed/cases/rts_base \
-    --models M2 --lookahead-hours 48
-```
-
-All models use a **single shared ScenarioSet** generated once from the
-base config (common random numbers), so metric differences are attributable
-to dispatch strategy alone.
-
-Output files written to `results/cases/<case_name>/`:
-
-| File | Contents |
-|------|----------|
-| `aggregate_metrics.csv` | One row per model — LOLH, EUE, nEUE, CVaR-EUE, runtime |
-| `scenario_metrics.csv` | One row per (model, scenario) |
-| `run_metadata.csv` | Case path, config, timestamps, scale factors |
-| `dispatch/<model>_dispatch.csv` | Hourly dispatch (only if `--save-dispatch true`) |
-| `logs/run_<timestamp>.log` | Full run log |
-
-The `results/cases/` directory is git-ignored (generated outputs).
 
 ### What the builder does
 
@@ -197,7 +222,7 @@ the builder writes a deterministic 168-hour system so that tests and scripts
 still run.  The fallback is logged as a warning and never triggers the strict
 8760-hour validation.
 
-You can also call the builder or the data helper programmatically:
+You can also call the builder programmatically:
 
 ```julia
 using RAChronoOps
@@ -205,187 +230,193 @@ ensure_rts_gmlc_data("data_raw/RTS-GMLC")
 build_rts_single_zone("data_raw/RTS-GMLC", "data_processed/rts_single_zone")
 ```
 
+## Building experiment cases
+
+`scripts/06_build_experiment_cases.jl` writes one subfolder per case under
+`data_processed/cases/`, each containing `generators.csv`, `storage.csv`,
+`load_timeseries.csv`, `wind_timeseries.csv`, `solar_timeseries.csv`, and
+`case_metadata.csv`.  A master `case_index.csv` is written to
+`data_processed/cases/`.
+
+Cases are derived from the base processed dataset by applying scale factors —
+the original files in `data_processed/rts_single_zone/` are never modified.
+
+| Experiment group | Scale factors applied | Status |
+|-----------------|----------------------|--------|
+| Load scaling (×5) | `load_scale` ∈ {1.00, 1.05, 1.10, 1.15, 1.20} | Diagnostic — completed |
+| Extended load scaling (×6) | `load_scale` ∈ {1.20, 1.225, 1.25, 1.275, 1.30, 1.35} | Diagnostic — completed |
+| Storage matrix (×12) | `storage_power_pct_peak` ∈ {5%, 10%, 20%} × `storage_duration_hours` ∈ {2, 4, 8, 12} at load_scale=1.20 | Diagnostic — completed |
+| VRE penetration/profile (×6) | wind/solar scale pairs — see Phase D table | Main experiment (Phase D) |
+
+The `data_processed/cases/` directory is git-ignored (generated data).
+
+```bash
+julia --project=. scripts/06_build_experiment_cases.jl
+```
+
+## Running one experiment case
+
+Run selected methods on a single case and write results to
+`results/cases/<case_name>/`:
+
+```bash
+julia --project=. scripts/07_run_case.jl data_processed/cases/rts_base
+```
+
+Optional arguments:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--models M1,M2,M3` | `M1,M2,M3` | Comma-separated subset of models to run |
+| `--n-scenarios N` | from `base_case.yaml` | Override scenario count |
+| `--seed S` | from `base_case.yaml` | Override random seed |
+| `--lookahead-hours H` | from `m2.yaml` | Override M2 look-ahead window |
+| `--save-dispatch true\|false` | from each model config | Override dispatch CSV output |
+
+Examples:
+
+```bash
+# Run RA-1a and RA-3 with 20 scenarios
+julia --project=. scripts/07_run_case.jl data_processed/cases/load_scale_110 \
+    --models M1,M3 --n-scenarios 20
+
+# Run M2 with a shorter look-ahead (diagnostic only — M2 is slow)
+julia --project=. scripts/07_run_case.jl data_processed/cases/rts_base \
+    --models M2 --lookahead-hours 48
+```
+
+Output files written to `results/cases/<case_name>/`:
+
+| File | Contents |
+|------|----------|
+| `aggregate_metrics.csv` | One row per model — LOLH, EUE, nEUE, CVaR-EUE, runtime |
+| `scenario_metrics.csv` | One row per (model, scenario) |
+| `run_metadata.csv` | Case path, config, timestamps, scale factors |
+| `dispatch/<model>_dispatch.csv` | Hourly dispatch (only if `--save-dispatch true`) |
+| `logs/run_<timestamp>.log` | Full run log |
+
+The `results/cases/` directory is git-ignored (generated outputs).
+
 ## Common random numbers
 
-M1, M2, and M3 are evaluated on **identical Monte Carlo outage scenarios**
+All RA methods are evaluated on **identical Monte Carlo outage scenarios**
 generated once from `configs/base_case.yaml` (the `n_scenarios` and `seed`
-keys).  A single `ScenarioSet` is drawn before the model loop and passed
-unchanged to every model, guaranteeing that differences in reliability
+keys).  A single `ScenarioSet` is drawn before the method loop and passed
+unchanged to every method, guaranteeing that differences in reliability
 metrics are attributable to dispatch strategy alone and not to sampling
 noise.
 
-Model-specific configs (`configs/m1.yaml`, `configs/m2.yaml`,
+Method-specific configs (`configs/m1.yaml`, `configs/m2.yaml`,
 `configs/m3.yaml`) control **operational parameters only** — storage dispatch
 strategy, look-ahead horizon, cycling cost, cyclic-SOC constraint, and
 whether to save dispatch CSVs.  They must not contain `n_scenarios` or `seed`
-keys; if they do, `scripts/03_run_m1_m2_m3.jl` logs a warning and uses the
-base-case values.
+keys.
 
-## Ignored features (first implementation)
+## Scope (first implementation)
 
-The following features are intentionally excluded from M1–M3 to keep the
-baseline tractable:
+The following features are intentionally excluded to keep the baseline
+tractable:
 
 - Transmission network (single copper-plate zone)
 - Net imports
 - Operating reserves
 - Demand response
-- Unit commitment (continuous dispatch only)
+- Unit commitment (continuous dispatch only in RA-0 through RA-3)
 - Hydro water budget
 - Fuel constraints
 - VRE curtailment limits (only cost-based)
 
 Storage is the primary energy-limited resource.  Load shedding is allowed
-at a configurable VOLL (default \$10,000/MWh).
+at a configurable VOLL (default \$10,000/MWh).  Unit commitment is
+introduced only in RA-4 via HOPE.
 
 ## Repository layout
 
 ```
 RAChronoOps/
   Project.toml
+  docs/
+    experiment_archive.md        # completed diagnostic results
+    redesigned_experiment_plan.md # forward experiment design
   src/
-    RAChronoOps.jl          # package entry point
+    RAChronoOps.jl               # package entry point
     utils/
-      Config.jl             # SimConfig struct + YAML loader
-      IO.jl                 # result serialisation
+      Config.jl                  # SimConfig struct + YAML loader
+      IO.jl                      # result serialisation
     data/
-      GetRTSGMLCData.jl     # ensure_rts_gmlc_data() helper
-      LoadData.jl           # GeneratorData / StorageData / SystemData / ScenarioSet
-      BuildRTSSingleZone.jl # RTS-GMLC → single-zone aggregation
-      ExportHOPECase.jl     # placeholder for future HOPE interface
+      GetRTSGMLCData.jl          # ensure_rts_gmlc_data() helper
+      LoadData.jl                # GeneratorData / StorageData / SystemData / ScenarioSet
+      BuildRTSSingleZone.jl      # RTS-GMLC → single-zone aggregation
+      ExportHOPECase.jl          # placeholder for RA-4 HOPE interface
     scenarios/
-      SequentialOutages.jl  # two-state Markov outage sampler
+      SequentialOutages.jl       # two-state Markov outage sampler
     models/
-      M1RuleBasedStorage.jl
-      M2RollingWindow.jl
-      M3EDDispatch.jl
+      M1RuleBasedStorage.jl      # RA-1a: naive peak-shaving heuristic
+      M2RollingWindow.jl         # rolling-window LP (diagnostic only)
+      M3EDDispatch.jl            # RA-3: full-year ED LP benchmark
     metrics/
-      ReliabilityMetrics.jl # LOLH, EUE, nEUE, CVaR + individual functions
+      ReliabilityMetrics.jl      # LOLH, EUE, nEUE, CVaR + individual functions
     experiments/
-      RunExperiment.jl      # ModelResults, build_dispatch_df, run_experiment
+      RunExperiment.jl           # ModelResults, build_dispatch_df, run_experiment
   configs/
     base_case.yaml
     m1.yaml  m2.yaml  m3.yaml
   scripts/
-    00_get_rts_gmlc_data.jl        # clone RTS-GMLC from GitHub
-    01_build_single_zone_rts.jl    # build 8760-h processed CSVs
-    02_generate_scenarios.jl       # generate outage scenarios standalone
-    03_run_m1_m2_m3.jl             # run all models, save metrics
-    04_summarize_processed_data.jl # write data_summary/ CSVs + terminal report
-    05_smoke_test_full_rts_data.jl     # assert 8760 h, run M1 (3 scenarios)
-    06_build_experiment_cases.jl       # build 20 case folders under data_processed/cases/
-    06_smoke_test_m3_full_year.jl      # assert 8760 h, run M3 (1 scenario, ~100 s)
-    07_run_case.jl                     # run M1/M2/M3 on one case, write results/cases/<name>/
+    # ── data preparation ──────────────────────────────────────────────────
+    00_get_rts_gmlc_data.jl           # clone RTS-GMLC from GitHub
+    01_build_single_zone_rts.jl       # build 8760-h processed CSVs
+    02_generate_scenarios.jl          # generate outage scenarios standalone
+    04_summarize_processed_data.jl    # write data_summary/ CSVs + terminal report
+    05_smoke_test_full_rts_data.jl    # assert 8760 h, run RA-1a (3 scenarios)
+    06_build_experiment_cases.jl      # build all case folders
+    06_smoke_test_m3_full_year.jl     # assert 8760 h, run RA-3 (1 scenario, ~6 min)
+    # ── general experiment runner ─────────────────────────────────────────
+    03_run_m1_m2_m3.jl                # run selected methods, save metrics
+    07_run_case.jl                    # run methods on one case folder
+    # ── diagnostic scripts (completed) ────────────────────────────────────
+    09_calibrate_load_scaling.jl      # load-scale sweep → load_scale=1.20 selected
+    10_run_storage_matrix.jl          # 12-case storage matrix at load_scale=1.20
+    11_debug_storage_cases.jl         # EUE anomaly investigation (p10_d4 vs p20_d2)
+    12_run_selected_storage_validation.jl # 50-scenario validation of 6 cases
+    13_debug_m1_storage_sensitivity.jl    # RA-1a priority-action diagnosis
+    # ── forward experiment scripts (planned) ──────────────────────────────
+    14_run_ra1b_validation.jl         # Phase B: RA-1b validation on reference case
+    15_run_vre_experiment.jl          # Phase D: RA-1a/1b/RA-3 across VRE cases
+    16_run_ra2_validation.jl          # Phase C: RA-2 single-case sanity check
+    17_run_vre_all_methods.jl         # Phase D: full four-method VRE sweep
+    18_run_hope_stress_weeks.jl       # Phase E: RA-4 HOPE UC/PCM validation
   test/
     runtests.jl
     test_storage.jl
     test_outages.jl
     test_power_balance.jl
     test_common_scenarios.jl
+  results/
+    storage_matrix/          # diagnostic: 12-case storage matrix
+    storage_validation/      # diagnostic: 50-scenario selected validation
+    m1_debug/                # diagnostic: RA-1a priority-action analysis
+    load_scaling/            # diagnostic: calibration sweep results
 ```
 
-## Connecting to HOPE (M4 / M5)
+## Connecting to HOPE (RA-4 / M4)
 
-M4 will couple with HOPE (a Julia production-cost model) using:
+RA-4 will couple with HOPE (a Julia production-cost model) using:
 - `network_model = 0` (single-zone, no transmission)
-- `unit_commitment = 0` (ED, consistent with M3) or `= 1` (full UC)
+- `unit_commitment = 1` (full UC, consistent with RA-4 role)
 
-See `src/data/ExportHOPECase.jl` for the planned interface.
-M5 will be a screened MC+UC/PCM approximation that runs HOPE UC only on stress
-periods identified by M3.  Multi-zone and network-constrained extensions are
-outside the scope of the first implementation.
+The interface is planned via `src/data/ExportHOPECase.jl`.  RA-4 will
+run HOPE only on stress periods identified by RA-3, not for every
+Monte Carlo scenario — making it a feasible high-fidelity validation
+benchmark rather than a full PCM simulation.
 
-## Completed diagnostic experiments
+Multi-zone and network-constrained extensions are outside the scope of
+the first implementation.
 
-The initial experiments (load-scaling calibration, storage matrix, M1 dispatch
-diagnosis) have been completed and are archived.  Key findings:
+## Further reading
 
-- `load_scale = 1.20` is the calibrated stress case (M3 LOLH ≈ 6–8 h/yr).
-- M3 benchmark results for the reference storage case (10% peak / 4h):
-  LOLH = 6.22 h/yr, EUE = 2,889 MWh (50 scenarios, seed 42).
-- M1 (RA-1a naive peak-shaving) produces identical LOLH = 96.48 h/yr across
-  all storage configurations because priority-2 proactive discharge depletes
-  storage to zero before shortage events at 100% of shortage hours.
-  Priority-1 shortage-driven discharge fires zero times.  This is a heuristic
-  limitation motivating the RA-1b and RA-2 methods.
-
-Full details, numeric tables, and per-script outputs are in
-[docs/experiment_archive.md](docs/experiment_archive.md).
-
-The forward experiment design — method hierarchy, VRE experiment matrix,
-research questions, and next implementation tasks — is in
-[docs/redesigned_experiment_plan.md](docs/redesigned_experiment_plan.md).
-
-## Main experiment roadmap (diagnostic phase — completed)
-
-### Phase 1: Baseline full RTS-GMLC run
-
-- RTS-GMLC single-zone, 8760 hours
-- 100 shared outage scenarios
-- 4-hour battery scaled to 10% of peak load
-- M1, M2 with 24-hour look-ahead, M3
-- Main question: does the baseline system have meaningful scarcity?
-
-### Phase 2: Load-scaling calibration
-
-- Load scale factors: 1.00, 1.05, 1.10, 1.15, 1.20
-- Goal: find a calibrated scarcity case where M3 has nonzero but not extreme
-  LOLH/EUE.
-
-### Phase 3: Storage duration and penetration matrix
-
-- Storage power: 5%, 10%, 20% of peak load
-- Storage duration: 2, 4, 8, 12 hours
-- Goal: quantify how M1 and M2 differ from M3 as storage becomes more
-  important.
-
-### Phase 3b: Extended load-scaling calibration
-
-- Load scale factors: 1.20, 1.225, 1.25, 1.275, 1.30, 1.35
-- Goal: narrow down the alpha that puts M3 LOLH closest to 10 h/yr.
-- Result: `load_scale_120` (α=1.20, M3 LOLH≈7.7 h/yr) is the best match.
-
-```bash
-julia --project=. scripts/09_calibrate_load_scaling.jl --extended --n-scenarios 10 --seed 42
-```
-
-### Phase 3c: Calibrated storage matrix (load_scale = 1.20)
-
-- Storage power: 5%, 10%, 20% of peak load
-- Storage duration: 2, 4, 8, 12 hours
-- All cases at `load_scale = 1.20`
-- Goal: quantify reliability sensitivity to storage power and duration at the calibrated stress level.
-
-```bash
-julia --project=. scripts/10_run_storage_matrix.jl --n-scenarios 10 --seed 42
-```
-
-## Selected storage validation (diagnostic — completed)
-
-After the 10-scenario storage matrix, selected cases are re-run with more
-scenarios to confirm that the key findings are not small-sample artifacts.
-
-Selected cases:
-- `storage120_p05_d4` — 5% penetration, 4-hour (low-storage baseline)
-- `storage120_p10_d2` — 10% penetration, 2-hour (power-limited)
-- `storage120_p10_d4` — 10% penetration, 4-hour (closest to 10 h/yr target)
-- `storage120_p10_d8` — 10% penetration, 8-hour (diminishing-returns test)
-- `storage120_p20_d2` — 20% penetration, 2-hour (anomaly case)
-- `storage120_p20_d4` — 20% penetration, 4-hour (near-zero scarcity)
-
-```bash
-julia --project=. scripts/12_run_selected_storage_validation.jl --n-scenarios 50 --seed 42
-```
-
-Outputs:
-- `results/storage_validation/selected_storage_validation_results.csv`
-- `results/storage_validation/selected_storage_validation_errors.csv`
-- `results/storage_validation/selected_storage_validation_summary.txt`
-
-### Phase 4: VRE profile sensitivity
-
-- Balanced high VRE: wind scale 2.0, solar scale 2.0
-- Solar-heavy: wind scale 1.0, solar scale 3.0
-- Wind-heavy: wind scale 3.0, solar scale 1.0
-- Goal: test whether look-ahead and full-year ED matter differently under
-  daily solar cycling versus multi-day wind variation.
+- [docs/experiment_archive.md](docs/experiment_archive.md) — completed
+  diagnostic experiments: data preparation, load calibration, storage
+  matrix, RA-1a diagnosis.
+- [docs/redesigned_experiment_plan.md](docs/redesigned_experiment_plan.md)
+  — forward design: research questions, method hierarchy, VRE experiment
+  matrix, metrics, expected figures, and implementation task list.
