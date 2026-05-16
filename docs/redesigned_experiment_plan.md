@@ -65,7 +65,7 @@ computed inside each scenario.
 
 | Attribute | Detail |
 |-----------|--------|
-| Mathematical idea | Same three-priority rule as RA-1a, but priority 2 (proactive discharge) is suppressed when SOC < `soc_reserve_fraction × total_energy`. The reserve floor keeps storage available for emergency (priority-1) use during outage events. |
+| Mathematical idea | Same three-priority rule as RA-1a, but priority 2 (proactive discharge) is suppressed when SOC < `reserve_fraction × total_energy`. The reserve floor keeps storage available for emergency (priority-1) use during outage events. |
 | Expected runtime | ~1 s/scenario (no LP). |
 | Role in paper | Practical improved heuristic. Tests whether a simple SOC guard is sufficient to recover most RA-3 accuracy. |
 | Implementation status | Scaffolded — placeholder file `src/models/M1bReserveAwareStorage.jl` and `configs/m1b.yaml` exist; function exported but throws until implemented (Phase B). |
@@ -276,10 +276,11 @@ exported from `RAChronoOps` but throws until the dispatch loop is written.
 **Where:** `src/models/M1bReserveAwareStorage.jl` (replace the throwing body).
 
 **What to add:**
-- New config parameter `soc_reserve_fraction` (default 0.20; i.e. reserve
-  20% of total energy for emergency use).
-- Priority-2 discharge is suppressed when `curr_soc < soc_reserve_fraction
-  × total_energy`.
+- New config parameter `reserve_fraction` (default 0.50; i.e. reserve
+  50% of total energy for emergency use).
+- Priority-2 discharge is suppressed when `curr_soc < reserve_fraction
+  × total_energy`; equivalently, proactive discharge can only use energy
+  above `reserve_fraction × total_energy`.
 - All other logic unchanged.
 
 **Validation:** run RA-1b on `storage120_p10_d4` (the reference case from
