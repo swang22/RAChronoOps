@@ -124,9 +124,62 @@ computed inside each scenario.
 | Solar-heavy | 1.0 | 3.0 | Strong daily cycling; duck-curve stress |
 | Wind-heavy | 3.0 | 1.0 | Multi-day wind variability; longer energy depletion risk |
 
-VRE capacity factors are scaled from RTS-GMLC DAY_AHEAD profiles.
-Scaling is applied to the MW output, not CF directly, and clamped to
-[0, net_load] to avoid over-generation artefacts.
+VRE cases are constructed by scaling installed wind and solar capacity:
+
+    P_wind_new  = wind_scale  × P_wind_base
+    P_solar_new = solar_scale × P_solar_base
+
+Hourly RTS-GMLC wind and solar capacity-factor profiles are held fixed.
+Hourly available VRE generation is therefore:
+
+    wind_avail_h  = wind_cf_h  × P_wind_new
+    solar_avail_h = solar_cf_h × P_solar_new
+
+Over-generation is not an artifact; it is part of high-VRE operation and
+should be handled through curtailment in dispatch models.  VRE generation
+is not clamped to load at the data-building stage; curtailment is an
+operational outcome in RA-3 / M3 (and RA-2 outside screened windows).
+
+### VRE penetration metrics to report
+
+Although VRE cases are defined by capacity scaling factors, every VRE case
+should report the following penetration metrics so that results can be
+interpreted in terms of both installed-capacity share and energy share:
+
+**A. VRE capacity share including storage**
+
+    VRECapShareInclStorage =
+        (P_wind + P_solar) /
+        (P_thermal + P_wind + P_solar + P_storage)
+
+**B. VRE capacity share excluding storage**
+
+    VRECapShareNoStorage =
+        (P_wind + P_solar) /
+        (P_thermal + P_wind + P_solar)
+
+**C. Annual available VRE energy share**
+
+    VREEnergyShare =
+        sum_h(wind_avail_h + solar_avail_h) / sum_h(load_h)
+
+This is the ratio of total available (pre-curtailment) VRE energy to annual
+load.  It uses available generation, not actually dispatched generation, so
+it is independent of the dispatch method and can be computed at case-build time.
+
+**D. Net-load statistics**
+
+| Statistic | Definition |
+|-----------|-----------|
+| net\_load\_min\_mw | min over hours of (load\_h − wind\_avail\_h − solar\_avail\_h) |
+| net\_load\_mean\_mw | mean net load (MW) |
+| net\_load\_peak\_mw | max net load (MW) |
+| negative\_net\_load\_hours | count of hours where net load < 0 |
+| vre\_exceeds\_load\_hours | count of hours where wind\_avail\_h + solar\_avail\_h > load\_h |
+
+These statistics are computed at case-build time and stored in
+`results/vre_method_comparison/vre_case_summary.csv` (see
+`docs/results_index.md`, Section 7).
 
 ### Methods compared
 
@@ -252,10 +305,12 @@ VRE120_solar_hvy  — wind=1.0, solar=3.0, load_scale=1.20
 VRE120_wind_hvy   — wind=3.0, solar=1.0, load_scale=1.20
 ```
 
-VRE scaling must be applied to the hourly MW output profiles in
-`BuildRTSSingleZone.jl` or at case-build time, then re-normalised to
-capacity factors.  Clamping to [0, 1] CF or [0, load_mw] generation is
-required to avoid unphysical values.
+VRE scaling is applied by multiplying the base installed capacity of each
+generator type by its scale factor.  The hourly capacity-factor profiles
+from RTS-GMLC DAY_AHEAD data are held fixed; available generation is
+`wind_cf_h × P_wind_new` and `solar_cf_h × P_solar_new`.  No clamping to
+load is applied at the data-building stage — over-generation is an
+operational outcome handled by curtailment in the dispatch models.
 
 **Script:** extend `scripts/06_build_experiment_cases.jl`; rebuild cases
 before Task 3.

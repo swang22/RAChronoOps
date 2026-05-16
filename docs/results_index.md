@@ -143,9 +143,33 @@ committed here because they are small (N=5 scenarios).
 **Folder:** `results/vre_method_comparison/`  *(planned)*
 
 **Intended files:**
+- `vre_case_summary.csv` — one row per VRE case; system-level penetration metrics
+  computed at case-build time (see column list below).  Independent of dispatch method.
 - `vre_method_comparison_results.csv` — one row per (VRE case, method); LOLH, EUE, runtime
 - `vre_method_comparison_errors.csv` — error vs RA-3 benchmark, runtime ratio per (case, method)
 - `accuracy_runtime_frontier.csv` — aggregated accuracy × runtime statistics for Figure 4
+
+**`vre_case_summary.csv` columns:**
+
+| Column | Description |
+|--------|-------------|
+| `case_name` | Case identifier (e.g. `VRE120_bal20`) |
+| `load_scale` | Load multiplier (1.20 for all main cases) |
+| `wind_scale` | Wind capacity scale factor relative to RTS-GMLC base |
+| `solar_scale` | Solar capacity scale factor relative to RTS-GMLC base |
+| `thermal_capacity_mw` | Total installed thermal capacity (MW) |
+| `wind_capacity_mw` | Total installed wind capacity (MW) |
+| `solar_capacity_mw` | Total installed solar capacity (MW) |
+| `storage_power_mw` | Storage power rating (MW) |
+| `storage_energy_mwh` | Storage energy rating (MWh) |
+| `vre_capacity_share_incl_storage` | (P\_wind + P\_solar) / (P\_thermal + P\_wind + P\_solar + P\_storage) |
+| `vre_capacity_share_no_storage` | (P\_wind + P\_solar) / (P\_thermal + P\_wind + P\_solar) |
+| `available_vre_energy_share` | sum\_h(wind\_avail\_h + solar\_avail\_h) / sum\_h(load\_h) |
+| `net_load_min_mw` | Minimum net load over all 8760 hours (MW) |
+| `net_load_mean_mw` | Mean net load (MW) |
+| `net_load_peak_mw` | Maximum net load (MW) |
+| `negative_net_load_hours` | Hours where net load < 0 |
+| `vre_exceeds_load_hours` | Hours where wind\_avail\_h + solar\_avail\_h > load\_h |
 
 **Scripts:** `scripts/15_run_vre_experiment.jl`, `scripts/17_run_vre_all_methods.jl`
 

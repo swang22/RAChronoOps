@@ -156,6 +156,9 @@ Run RA-1a, RA-1b, RA-2, and RA-3 across six VRE cases at fixed
 | Solar-heavy | 1.0 | 3.0 |
 | Wind-heavy | 3.0 | 1.0 |
 
+VRE scenarios are defined by installed capacity scaling; the analysis
+reports both capacity-based and energy-based VRE penetration metrics.
+
 Primary metrics: LOLH error and EUE error vs RA-3 benchmark, and
 runtime ratio.  Experiment script: `scripts/15_run_vre_experiment.jl`
 (RA-1a + RA-1b + RA-3) and `scripts/17_run_vre_all_methods.jl` (adds
