@@ -14,7 +14,7 @@ Single-zone copper-plate system based on the RTS-GMLC dataset.
 |-------|--------|--------|--------------|---------------|
 | RA-0 | not yet implemented | Static capacity-balance RA | None | Classical baseline |
 | RA-1a / M1 | implemented | Sequential MC + naive peak-shaving storage heuristic | None | Cautionary heuristic baseline |
-| RA-1b | planned next | Sequential MC + reserve-aware storage heuristic | None | Practical improved heuristic |
+| RA-1b | scaffolded (not yet implemented) | Sequential MC + reserve-aware storage heuristic | None | Practical improved heuristic |
 | RA-2 | planned | Sequential MC + screened/event-window LP | Small LPs near risk periods only | Proposed hybrid method |
 | RA-3 / M3 | implemented | Sequential MC + full-year ED LP per scenario | LP (HiGHS) | Reliability benchmark |
 | RA-4 / M4 | future | HOPE UC/PCM on selected stress periods | UC/PCM | High-fidelity validation benchmark |
@@ -114,12 +114,18 @@ diagnostic results.
 ### Phase B — Implement RA-1b reserve-aware heuristic
 
 Add an emergency SOC reserve to the heuristic dispatch rule: priority-2
-proactive discharge is suppressed when `SOC < soc_reserve_fraction ×
+proactive discharge is suppressed when `SOC < reserve_fraction ×
 total_energy`.  This prevents peak-shaving from pre-empting emergency
 storage capacity.
 
-- New function `run_m1b_reserve_aware` in `src/models/`.
-- New config parameter `soc_reserve_fraction` (suggested default: 0.20).
+**Scaffolding complete:** `src/models/M1bReserveAwareStorage.jl` and
+`configs/m1b.yaml` are in place.  `run_m1b_reserve_aware` is exported but
+throws `"RA-1b reserve-aware heuristic is not implemented yet."` until the
+model body is written.
+
+Remaining implementation tasks:
+- Fill in the dispatch loop in `src/models/M1bReserveAwareStorage.jl`.
+- Add `reserve_fraction` field to `SimConfig` in `src/utils/Config.jl`.
 - Validation script: `scripts/14_run_ra1b_validation.jl`.
 - Compare RA-1a, RA-1b, and RA-3 on the calibrated reference case
   (`storage120_p10_d4`, N=50).

@@ -27,8 +27,9 @@ include("data/ExportHOPECase.jl")
 # 4. scenario generation (defines ScenarioSet + generate_scenarios)
 include("scenarios/SequentialOutages.jl")
 
-# 5. models (M1 defines DispatchResult; M2 and M3 reuse it)
+# 5. models (M1 defines DispatchResult; M1b/M2/M3 reuse it)
 include("models/M1RuleBasedStorage.jl")
+include("models/M1bReserveAwareStorage.jl")   # RA-1b placeholder — not yet implemented
 include("models/M2RollingWindow.jl")
 include("models/M3EDDispatch.jl")
 
@@ -56,6 +57,7 @@ export generate_scenarios
 
 export DispatchResult
 export run_m1_rule_based
+export run_m1b_reserve_aware   # RA-1b placeholder — throws until implemented
 export run_m2_rolling_window
 export run_m3_ed_dispatch
 

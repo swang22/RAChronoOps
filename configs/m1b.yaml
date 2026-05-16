@@ -1,0 +1,8 @@
+# RA-1b: reserve-aware chronological storage heuristic
+# reserve_fraction is the planned RA-1b-specific parameter (not yet read by
+# SimConfig — will be added when the model is implemented in Phase B).
+
+reserve_fraction: 0.50
+high_net_load_quantile: 0.75
+charge_net_load_quantile: 0.25
+save_dispatch: false

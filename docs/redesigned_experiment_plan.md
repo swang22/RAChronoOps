@@ -68,7 +68,7 @@ computed inside each scenario.
 | Mathematical idea | Same three-priority rule as RA-1a, but priority 2 (proactive discharge) is suppressed when SOC < `soc_reserve_fraction × total_energy`. The reserve floor keeps storage available for emergency (priority-1) use during outage events. |
 | Expected runtime | ~1 s/scenario (no LP). |
 | Role in paper | Practical improved heuristic. Tests whether a simple SOC guard is sufficient to recover most RA-3 accuracy. |
-| Implementation status | Planned next (Phase B). |
+| Implementation status | Scaffolded — placeholder file `src/models/M1bReserveAwareStorage.jl` and `configs/m1b.yaml` exist; function exported but throws until implemented (Phase B). |
 
 ### RA-2 — Event-window LP dispatch
 
@@ -216,8 +216,11 @@ RA-2 differ.
 
 ### Task 1 — Implement RA-1b reserve-aware heuristic
 
-**Where:** `src/models/M1RuleBasedStorage.jl` (new function
-`run_m1b_reserve_aware`) or a new file `src/models/M1bReserveAware.jl`.
+**Scaffolding complete:** placeholder file `src/models/M1bReserveAwareStorage.jl`
+and config `configs/m1b.yaml` are committed.  `run_m1b_reserve_aware` is
+exported from `RAChronoOps` but throws until the dispatch loop is written.
+
+**Where:** `src/models/M1bReserveAwareStorage.jl` (replace the throwing body).
 
 **What to add:**
 - New config parameter `soc_reserve_fraction` (default 0.20; i.e. reserve
