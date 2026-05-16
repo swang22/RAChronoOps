@@ -295,7 +295,24 @@ M5 will be a screened MC+UC/PCM approximation that runs HOPE UC only on stress
 periods identified by M3.  Multi-zone and network-constrained extensions are
 outside the scope of the first implementation.
 
-## Main experiment roadmap
+## Completed diagnostic experiments
+
+The initial experiments (load-scaling calibration, storage matrix, M1 dispatch
+diagnosis) have been completed and are archived.  Key findings:
+
+- `load_scale = 1.20` is the calibrated stress case (M3 LOLH ≈ 6–8 h/yr).
+- M3 benchmark results for the reference storage case (10% peak / 4h):
+  LOLH = 6.22 h/yr, EUE = 2,889 MWh (50 scenarios, seed 42).
+- M1 (RA-1a naive peak-shaving) produces identical LOLH = 96.48 h/yr across
+  all storage configurations because priority-2 proactive discharge depletes
+  storage to zero before shortage events at 100% of shortage hours.
+  Priority-1 shortage-driven discharge fires zero times.  This is a heuristic
+  limitation motivating the RA-1b and RA-2 methods.
+
+Full details, numeric tables, and per-script outputs are in
+[docs/experiment_archive.md](docs/experiment_archive.md).
+
+## Main experiment roadmap (diagnostic phase — completed)
 
 ### Phase 1: Baseline full RTS-GMLC run
 
@@ -339,7 +356,7 @@ julia --project=. scripts/09_calibrate_load_scaling.jl --extended --n-scenarios 
 julia --project=. scripts/10_run_storage_matrix.jl --n-scenarios 10 --seed 42
 ```
 
-## Selected storage validation
+## Selected storage validation (diagnostic — completed)
 
 After the 10-scenario storage matrix, selected cases are re-run with more
 scenarios to confirm that the key findings are not small-sample artifacts.
