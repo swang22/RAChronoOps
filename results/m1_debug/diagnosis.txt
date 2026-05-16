@@ -1,0 +1,70 @@
+M1 Storage Sensitivity Diagnosis
+Cases: storage120_p05_d4 vs storage120_p20_d4
+N_SCENARIOS=5, seed=42
+========================================================================
+
+STORAGE PARAMETERS (read from case-specific storage.csv):
+  storage120_p05_d4: power=492.0 MW, energy=1968.0 MWh, duration=4.0 h
+  storage120_p20_d4: power=1966.0 MW, energy=7864.0 MWh, duration=4.0 h
+
+NET-LOAD THRESHOLDS (same for all storage120 cases — identical load/VRE):
+  high_net_load   (Q0.75) = 4669.8 MW  (2190 hours/yr above this)
+  charge_net_load (Q0.25) = 2506.2 MW
+
+KEY FINDINGS:
+
+1. IS THIS A BUG (wrong storage parameters) OR A HEURISTIC LIMITATION?
+   Storage capacity is read CORRECTLY from each case's storage.csv.
+   The values differ substantially across cases (see table above).
+   → NOT a data-loading bug.
+
+2. DO LOLH AND EUE DIFFER ACROSS CASES?
+   LOLH identical across cases: true
+   EUE identical across cases:  true
+
+3. DOES STORAGE DISPATCH PHYSICALLY DIFFER?
+   P2 discharge volumes differ: true  (larger battery → more proactive discharge MWh)
+   Max SOC differs:             true  (larger battery → higher peak SOC)
+
+4. ROOT CAUSE — PRIORITY-2 PROACTIVE DISCHARGE RULE:
+   M1 priority-2 fires at every hour where net_load >= Q0.75
+   (2190 hours/yr = 25.0% of all hours).
+   At each such hour, M1 discharges the FULL available storage power:
+     dis = min(total_power, curr_soc * eta_dis)
+   This drains storage in proportion to the battery's C-rate (power/energy),
+   which is IDENTICAL for all 4-hour batteries regardless of power rating.
+   A 492 MW/1968 MWh battery and a 1966 MW/7864 MWh battery both deplete
+   in ~4 hours of continuous full-power discharge.
+
+   Because shortage events (generator forced outages) coincide with or follow
+   high-net-load periods, storage is already near-empty when priority-1 fires.
+   The fraction of shortage hours where SOC≈0 confirms this.
+
+5. WHY ARE METRICS EXACTLY IDENTICAL (not just similar)?
+   All storage120 cases share identical:
+     - generator fleet and outage scenarios (same CRN, same FOR/MTTR)
+     - load timeseries, wind CF, solar CF (same load_scale=1.20, same VRE)
+     - net-load thresholds (derived from the same net_load vector)
+   With storage depleted to ~0 before every shortage event, load shedding
+   is determined entirely by the generator availability, which is identical
+   across storage configurations. Hence LOLH and EUE are identical.
+
+6. VERDICT:
+   This is a HEURISTIC LIMITATION, not a coding bug.
+   The priority-2 rule ('discharge fully at all peak net-load hours')
+   is designed for peak-shaving, not reliability. It systematically
+   depletes storage before shortage events, making M1 insensitive to
+   storage size. The rule is self-defeating for reliability assessment:
+   storage is discharged when thermal capacity is adequate and unavailable
+   when generators fail during peak hours.
+
+   This also explains the anomaly in the 50-scenario validation:
+   M1 LOLH=96.48 h/yr for ALL six selected cases (p05-p20, 2h-8h).
+
+   The correct fix (if desired) would be to make the priority-2 rule
+   reserve a fraction of storage for emergency use, or to eliminate
+   priority 2 entirely and rely only on priority-1 (shortage-driven)
+   and priority-3 (valley-filling). This change would make M1 sensitive
+   to storage size but is a model reformulation, not a bug fix.
+
+========================================================================
