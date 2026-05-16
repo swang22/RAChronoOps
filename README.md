@@ -312,6 +312,10 @@ diagnosis) have been completed and are archived.  Key findings:
 Full details, numeric tables, and per-script outputs are in
 [docs/experiment_archive.md](docs/experiment_archive.md).
 
+The forward experiment design — method hierarchy, VRE experiment matrix,
+research questions, and next implementation tasks — is in
+[docs/redesigned_experiment_plan.md](docs/redesigned_experiment_plan.md).
+
 ## Main experiment roadmap (diagnostic phase — completed)
 
 ### Phase 1: Baseline full RTS-GMLC run

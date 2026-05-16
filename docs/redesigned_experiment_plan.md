@@ -1,0 +1,330 @@
+# Redesigned Experiment Plan
+
+## 1. Research goal
+
+Bridge probabilistic sequential Monte Carlo resource adequacy assessment
+and full production-cost / unit-commitment modelling by testing
+RA-compatible dispatch approximations for high-VRE, storage-rich power
+systems.
+
+The central question is: **how much operational detail must be embedded
+inside each Monte Carlo scenario to obtain reliable estimates of LOLH and
+EUE without running a full PCM/UC for every scenario?**
+
+---
+
+## 2. Research questions
+
+**RQ1.** How does the error of simplified sequential-MC dispatch
+approximations change as VRE penetration increases?
+_(Does adding more solar/wind make simple heuristics worse, because
+storage must shift energy across longer time windows?)_
+
+**RQ2.** Can reserve-aware heuristics (RA-1b) approximate full-year ED
+reliability metrics better than naive peak-shaving heuristics (RA-1a)?
+_(Is reserving an emergency SOC floor sufficient to recover most of the
+RA-3 benchmark accuracy at near-zero extra cost?)_
+
+**RQ3.** Can screened event-window LP dispatch (RA-2) recover most of the
+full-year ED benchmark accuracy at much lower runtime than RA-3?
+_(Does solving LPs only near screened risk periods give most of the
+accuracy at a fraction of the cost?)_
+
+**RQ4.** Under which VRE profiles — solar-heavy vs wind-heavy — do
+simplified heuristics fail most severely?
+_(Does multi-day wind variability create longer energy-depletion risks
+than daily solar cycling, making the event-window approximation harder?)_
+
+---
+
+## 3. Method hierarchy
+
+All methods use the same sequential thermal outage Monte Carlo scenarios
+(common random numbers).  They differ only in how storage dispatch is
+computed inside each scenario.
+
+### RA-0 — Static capacity-balance RA
+
+| Attribute | Detail |
+|-----------|--------|
+| Mathematical idea | Convolution / LOLE table using effective load-carrying capability (ELCC). No chronology. Storage counted as firm capacity via its ELCC. |
+| Expected runtime | Seconds (analytic). |
+| Role in paper | Classical baseline. Shows how much the chronological treatment matters. |
+| Implementation status | Not yet implemented. |
+
+### RA-1a / M1 — Naive chronological peak-shaving heuristic
+
+| Attribute | Detail |
+|-----------|--------|
+| Mathematical idea | Three-priority rule per hour: (1) discharge to cover shortfall, (2) proactively discharge at all hours with net load ≥ Q0.75, (3) charge when net load ≤ Q0.25 and surplus exists. No look-ahead. No SOC reservation for emergencies. |
+| Expected runtime | ~1 s/scenario (no LP). |
+| Role in paper | Cautionary baseline. Demonstrates that naive peak-shaving depletes storage before shortage events, producing reliability metrics insensitive to storage size. |
+| Implementation status | Implemented (`src/models/M1RuleBasedStorage.jl`). Diagnosed in `scripts/13_debug_m1_storage_sensitivity.jl`. |
+
+### RA-1b — Reserve-aware chronological heuristic
+
+| Attribute | Detail |
+|-----------|--------|
+| Mathematical idea | Same three-priority rule as RA-1a, but priority 2 (proactive discharge) is suppressed when SOC < `soc_reserve_fraction × total_energy`. The reserve floor keeps storage available for emergency (priority-1) use during outage events. |
+| Expected runtime | ~1 s/scenario (no LP). |
+| Role in paper | Practical improved heuristic. Tests whether a simple SOC guard is sufficient to recover most RA-3 accuracy. |
+| Implementation status | Planned next (Phase B). |
+
+### RA-2 — Event-window LP dispatch
+
+| Attribute | Detail |
+|-----------|--------|
+| Mathematical idea | Screen each scenario for risk windows: hours where (thermal available capacity + VRE) falls within a margin of load. Merge nearby risk hours into contiguous windows with a buffer. Solve a storage dispatch LP only inside each window. Use heuristic dispatch outside windows. |
+| Expected runtime | Target: 5–20 s/scenario (much less than RA-3 at ~360 s/scenario). |
+| Role in paper | Proposed hybrid method. Tests whether accuracy close to RA-3 is achievable by solving LPs only near scarcity events. |
+| Implementation status | Planned (Phase C). |
+
+### RA-3 / M3 — Full-year economic dispatch LP benchmark
+
+| Attribute | Detail |
+|-----------|--------|
+| Mathematical idea | One 8760-hour storage dispatch LP per scenario (perfect foresight within the scenario). JuMP/HiGHS. Minimise load shedding subject to power balance, storage dynamics, and capacity limits. |
+| Expected runtime | ~360 s/scenario at N=50 (HiGHS). |
+| Role in paper | Reliability benchmark. Upper bound on what a storage-aware sequential MC can achieve without unit commitment. |
+| Implementation status | Implemented (`src/models/M3EDDispatch.jl`). Out-of-memory fix applied. |
+
+### RA-4 / M4 — HOPE UC/PCM stress-week validation
+
+| Attribute | Detail |
+|-----------|--------|
+| Mathematical idea | Use RA-3 to identify stress weeks (scenarios and date ranges with concentrated load shedding). Run HOPE (Julia production-cost model with UC) on those stress weeks only. Compare ED vs UC feasibility and metrics. |
+| Expected runtime | Minutes to hours per stress week (full UC). |
+| Role in paper | High-fidelity validation benchmark. Tests whether ignoring UC constraints in RA-3 materially changes the reliability estimate. |
+| Implementation status | Future (Phase E). Interface placeholder in `src/data/ExportHOPECase.jl`. |
+
+---
+
+## 4. Main experiment matrix
+
+### Fixed parameters
+
+| Parameter | Value |
+|-----------|-------|
+| System | RTS-GMLC single-zone, 8760 h |
+| Load scale | 1.20 (calibrated stress case; M3 LOLH ≈ 6–8 h/yr) |
+| Storage | 10% of peak load power, 4-hour duration (983 MW / 3,932 MWh) |
+| Thermal outage model | Two-state Markov, sequential MC |
+| Common random numbers | Single shared `ScenarioSet` per case; all methods use identical outage draws |
+| Scenarios | N = 20 for initial VRE sweep; N = 50 for selected cases |
+| Seed | 42 |
+
+### VRE penetration / profile cases
+
+| Case label | Wind scale | Solar scale | Notes |
+|------------|-----------|-------------|-------|
+| VRE-Base | 1.0 | 1.0 | RTS-GMLC as-built (diagnostics used this) |
+| VRE-Balanced-1.5x | 1.5 | 1.5 | Modest VRE expansion |
+| VRE-Balanced-2x | 2.0 | 2.0 | Moderate VRE expansion |
+| VRE-Balanced-3x | 3.0 | 3.0 | High VRE — storage energy shifting increasingly important |
+| Solar-heavy | 1.0 | 3.0 | Strong daily cycling; duck-curve stress |
+| Wind-heavy | 3.0 | 1.0 | Multi-day wind variability; longer energy depletion risk |
+
+VRE capacity factors are scaled from RTS-GMLC DAY_AHEAD profiles.
+Scaling is applied to the MW output, not CF directly, and clamped to
+[0, net_load] to avoid over-generation artefacts.
+
+### Methods compared
+
+| Method | Included in main experiment |
+|--------|-----------------------------|
+| RA-1a / M1 | Yes — cautionary heuristic baseline |
+| RA-1b | Yes — reserve-aware heuristic |
+| RA-2 | Yes — event-window LP |
+| RA-3 / M3 | Yes — full-year ED benchmark |
+| RA-0 | Optional — static capacity-balance classical baseline |
+| RA-4 / M4 | Optional — HOPE UC/PCM stress-week validation on selected cases |
+
+---
+
+## 5. Metrics
+
+### Per-run reliability metrics
+
+| Metric | Definition |
+|--------|-----------|
+| LOLH | Loss-of-load hours per year (mean across scenarios) |
+| EUE | Expected unserved energy (MWh/yr, mean across scenarios) |
+| nEUE | Normalised EUE (EUE ÷ annual load energy, ppm) |
+| CVaR-EUE | 95th-percentile conditional value-at-risk of scenario EUE |
+| n\_shortage\_events | Mean number of distinct shortage events per scenario |
+| max\_shortfall\_mw | Mean peak shortfall per scenario (MW) |
+| p95\_event\_duration | 95th percentile of shortage event duration (hours) |
+| runtime\_s | Wall-clock time (seconds) |
+
+### Accuracy vs RA-3 benchmark
+
+| Metric | Formula |
+|--------|---------|
+| EUE\_error\_mwh | EUE\_method − EUE\_RA3 |
+| EUE\_rel\_error | (EUE\_method − EUE\_RA3) / EUE\_RA3 |
+| LOLH\_error\_h | LOLH\_method − LOLH\_RA3 |
+| LOLH\_rel\_error | (LOLH\_method − LOLH\_RA3) / LOLH\_RA3 |
+| runtime\_ratio | runtime\_method / runtime\_RA3 |
+
+These error metrics will be the primary outcome for Figures 2–4.
+
+---
+
+## 6. Expected figures
+
+**Figure 1 — Method hierarchy concept.**
+Schematic showing RA-0 through RA-4 on an accuracy × runtime plane.
+RA-1a and RA-0 are fast but inaccurate; RA-3 is accurate but slow; RA-1b
+and RA-2 are proposed to lie on an improved accuracy-runtime frontier.
+
+**Figure 2 — Reliability metrics vs VRE penetration by method.**
+Line chart with VRE scale factor on x-axis (Base, 1.5×, 2×, 3×, solar-heavy,
+wind-heavy).  Separate panels for LOLH and EUE.  One line per method
+(RA-1a, RA-1b, RA-2, RA-3).  Illustrates how method error evolves as
+VRE increases and storage energy-shifting becomes more important.
+
+**Figure 3 — Relative error vs RA-3 by VRE case.**
+Bar chart or line chart of EUE\_rel\_error and LOLH\_rel\_error for RA-1a,
+RA-1b, RA-2 across VRE cases.  Answers RQ1–RQ3 directly.
+
+**Figure 4 — Accuracy-runtime frontier.**
+Scatter plot: x-axis = runtime per scenario (log scale), y-axis = EUE
+relative error.  Each marker is one method × VRE-case combination.
+Shows whether RA-1b and RA-2 shift the frontier toward low error at low
+runtime.
+
+**Figure 5 — Example stress-week dispatch and SOC comparison.**
+Hourly time series for one high-risk week in one scenario under RA-1a,
+RA-1b, RA-2, and RA-3.  Shows how each method handles storage during a
+multi-day shortage event.  Illustrates why RA-1a fails and how RA-1b and
+RA-2 differ.
+
+---
+
+## 7. How completed diagnostic experiments feed into new design
+
+| Diagnostic finding | Implication for new design |
+|--------------------|---------------------------|
+| **Load calibration:** base RTS-GMLC is too reliable (M3 LOLH ≈ 0). load_scale=1.20 gives M3 LOLH ≈ 6–8 h/yr. | **Fixes load_scale=1.20** as the stressed base case for all main experiments. Avoids floor-effects where even the naive heuristic produces zero LOLH. |
+| **Storage validation:** 10%/4h is near (but below) 10 h/yr target; increasing duration from 2h to 4h gives the largest M3 LOLH reduction. | **Fixes storage at 10%/4h** as the reference configuration. It sits in a sensitive region of the reliability curve — close enough to meaningful scarcity that method differences will be detectable. |
+| **M1 (RA-1a) diagnosis:** priority-2 proactive discharge fires at 2,190 h/yr and depletes SOC to zero before every shortage event. Priority-1 emergency discharge fires zero times. M1 LOLH is identical across all storage sizes. | **Motivates RA-1b:** add an SOC reserve floor to prevent priority-2 from pre-empting emergency storage. Tests whether this simple guard is sufficient to recover RA-3 accuracy. |
+| **M2 slowness:** rolling-window LP solves one LP per hour per scenario (~354–380 s/scenario at 8760 h), comparable to RA-3 but without perfect-foresight coherence. | **Motivates RA-2 event-window LP** instead of M2. Rather than solving an LP every hour, screen for risk windows first and solve LPs only there. Target: 5–20 s/scenario vs 360 s for RA-3. |
+
+---
+
+## 8. Next implementation tasks
+
+### Task 1 — Implement RA-1b reserve-aware heuristic
+
+**Where:** `src/models/M1RuleBasedStorage.jl` (new function
+`run_m1b_reserve_aware`) or a new file `src/models/M1bReserveAware.jl`.
+
+**What to add:**
+- New config parameter `soc_reserve_fraction` (default 0.20; i.e. reserve
+  20% of total energy for emergency use).
+- Priority-2 discharge is suppressed when `curr_soc < soc_reserve_fraction
+  × total_energy`.
+- All other logic unchanged.
+
+**Validation:** run RA-1b on `storage120_p10_d4` (the reference case from
+the diagnostic phase) and confirm that priority-1 emergency discharge now
+fires, and that LOLH approaches (but remains above) the RA-3 benchmark.
+
+**Script:** `scripts/14_run_ra1b_validation.jl`.
+
+---
+
+### Task 2 — Add VRE case builder
+
+**Where:** `scripts/06_build_experiment_cases.jl` (add VRE120 cases to the
+`ALL_CASES` list).
+
+**Cases to add:**
+```
+VRE120_base       — wind=1.0, solar=1.0, load_scale=1.20
+VRE120_bal15      — wind=1.5, solar=1.5, load_scale=1.20
+VRE120_bal20      — wind=2.0, solar=2.0, load_scale=1.20
+VRE120_bal30      — wind=3.0, solar=3.0, load_scale=1.20
+VRE120_solar_hvy  — wind=1.0, solar=3.0, load_scale=1.20
+VRE120_wind_hvy   — wind=3.0, solar=1.0, load_scale=1.20
+```
+
+VRE scaling must be applied to the hourly MW output profiles in
+`BuildRTSSingleZone.jl` or at case-build time, then re-normalised to
+capacity factors.  Clamping to [0, 1] CF or [0, load_mw] generation is
+required to avoid unphysical values.
+
+**Script:** extend `scripts/06_build_experiment_cases.jl`; rebuild cases
+before Task 3.
+
+---
+
+### Task 3 — Run RA-1a, RA-1b, RA-3 across VRE cases
+
+**Script:** `scripts/15_run_vre_experiment.jl`.
+
+**Inputs:** six VRE cases (Task 2), N=20, seed=42.
+
+**Output:** `results/vre_experiment/vre_experiment_results.csv` with one
+row per (case, method), plus `vre_experiment_errors.csv` with error vs
+RA-3 and runtime ratios.
+
+**Purpose:** answers RQ1, RQ2, and generates data for Figures 2–4 without
+RA-2 (which is not yet implemented).
+
+---
+
+### Task 4 — Implement RA-2 event-window LP
+
+**Where:** new file `src/models/M2EventWindowLP.jl`
+(replaces the current rolling-window M2).
+
+**Algorithm sketch:**
+
+1. For each scenario, compute the hourly margin:
+   `margin[h] = thermal_available[h] + vre[h] - load[h]`
+2. Flag risk hours: `margin[h] < risk_margin_mw` (config parameter,
+   e.g. `risk_margin_mw = 500.0`).
+3. Expand each risk hour by a buffer (`window_buffer_hours`, e.g. 6 h
+   before and after).
+4. Merge overlapping expanded windows.
+5. Solve a storage dispatch LP for each window (minimise load shed,
+   subject to storage dynamics and power balance, with SOC boundary
+   conditions passed from the heuristic baseline outside the window).
+6. Outside windows: use RA-1b heuristic dispatch.
+
+**Config parameters:** `risk_margin_mw`, `window_buffer_hours`.
+
+**Script:** `scripts/16_run_ra2_validation.jl` — single-case sanity check
+before broad sweep.
+
+---
+
+### Task 5 — Rerun selected VRE cases with RA-2
+
+**Script:** extend `scripts/15_run_vre_experiment.jl` to include RA-2, or
+create `scripts/17_run_vre_all_methods.jl`.
+
+**Purpose:** answers RQ3, RQ4; completes data for all four main figures.
+
+---
+
+### Task 6 — HOPE UC/PCM stress-week validation (future)
+
+**When:** after RA-2 results are available and the paper framing is
+confirmed.
+
+**Approach:**
+1. For the highest-stress VRE case, extract stress weeks from RA-3
+   dispatch (weeks containing the most scenario-hours of load shedding).
+2. Export those weeks as HOPE input cases via `ExportHOPECase.jl`.
+3. Run HOPE with `unit_commitment = 1`.
+4. Compare ED (RA-3) vs UC (RA-4) reliability and dispatch for the
+   selected weeks.
+
+**Script:** `scripts/18_run_hope_stress_weeks.jl`.
+
+---
+
+*Document version: initial design, pre-implementation.*
+*Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
