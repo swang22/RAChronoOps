@@ -3,7 +3,8 @@
 #
 # Quick sanity check for the full 8760-hour RTS single-zone dataset.
 # Loads processed data, asserts it has 8760 hours, generates 3 outage
-# scenarios, runs M1, and prints LOLH / EUE / nEUE.
+# scenarios, runs M1 (RA-1a: naive peak-shaving heuristic), and prints
+# LOLH / EUE / nEUE.
 #
 # Usage:
 #   julia --project=. scripts/05_smoke_test_full_rts_data.jl

@@ -1,4 +1,18 @@
-# ── M3: Full-year economic dispatch LP (per scenario) ─────────────────────
+# ── RA-3 / M3: Full-year economic dispatch LP benchmark ───────────────────
+#
+# This module implements RA-3 in the method hierarchy:
+#   RA-3 is a sequential Monte Carlo method where each scenario is solved as
+#   a single full-year (8760-hour) economic dispatch LP with perfect foresight
+#   within the scenario.  It is the reliability benchmark against which faster
+#   RA-compatible approximations (RA-1b, RA-2) are compared.
+#
+# Scope: ED only (no unit commitment).  RA-4 / M4 (HOPE UC/PCM) will provide
+# a higher-fidelity benchmark for selected stress periods where UC constraints
+# may materially affect feasibility.
+#
+# Runtime: ~360 s/scenario on the 8760-hour RTS-GMLC dataset (HiGHS solver).
+#
+# ── Full-year economic dispatch LP (per scenario) ─────────────────────────
 #
 # For each Monte Carlo scenario, build a single JuMP LP over all T hours.
 #

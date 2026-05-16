@@ -1,8 +1,13 @@
 #!/usr/bin/env julia
 # 07_run_case.jl
 #
-# Run M1, M2, and/or M3 on a single experiment case folder and write results
+# Run selected methods on a single experiment case folder and write results
 # under results/cases/<case_name>/.
+#
+# Method labels:
+#   M1  = RA-1a: naive peak-shaving chronological heuristic (cautionary baseline)
+#   M2  = rolling-window LP (diagnostic only — slow; avoid for broad experiments)
+#   M3  = RA-3: full-year ED LP benchmark
 #
 # Usage:
 #   julia --project=. scripts/07_run_case.jl <case_dir> [options]

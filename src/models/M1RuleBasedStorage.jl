@@ -1,3 +1,20 @@
+# ── RA-1a / M1: Naive peak-shaving chronological heuristic ────────────────
+#
+# This module implements RA-1a in the method hierarchy:
+#   RA-1a is a sequential Monte Carlo method with rule-based storage dispatch.
+#   It is retained as a diagnostic / cautionary baseline that demonstrates
+#   what happens when peak-shaving heuristics are used without reserving
+#   emergency storage capacity for scarcity events.
+#
+# Key diagnostic finding: the priority-2 proactive discharge rule fires at
+# 25% of all hours (net load ≥ Q0.75) and depletes SOC to zero before every
+# shortage event.  Priority-1 emergency discharge fires zero times in
+# practice.  M1 LOLH is therefore insensitive to storage size.
+#
+# RA-1b (planned) will add an emergency SOC reserve floor to fix this.
+# Do not use RA-1a / M1 results as the primary RA estimate for a paper
+# unless the intention is to illustrate heuristic failure.
+#
 # ── DispatchResult (shared across M1/M2/M3) ───────────────────────────────
 
 """

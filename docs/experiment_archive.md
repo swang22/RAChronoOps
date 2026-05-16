@@ -50,12 +50,12 @@ Scripts: `scripts/00_get_rts_gmlc_data.jl`, `scripts/01_build_single_zone_rts.jl
 ## 2. Load-scaling calibration
 
 **Motivation:** The baseline RTS-GMLC system (load_scale = 1.00) is
-well-provisioned relative to its thermal capacity.  M3 (full-year ED LP)
-produced near-zero LOLH at baseline, making it impossible to distinguish
-between dispatch strategies.  A calibrated stress case was needed.
+well-provisioned relative to its thermal capacity.  RA-3 / M3 (full-year
+ED LP) produced near-zero LOLH at baseline, making it impossible to
+distinguish between dispatch strategies.  A calibrated stress case was needed.
 
 **Method:** Load timeseries scaled by a uniform multiplier α while holding
-generation and storage fixed.  M3 was used as the reliability benchmark
+generation and storage fixed.  RA-3 / M3 was used as the reliability benchmark
 because it represents an upper bound on achievable reliability for a given
 dispatch strategy.
 
@@ -103,12 +103,12 @@ Outputs: `results/load_scaling/load_scaling_calibration.csv`,
 
 All 12 cases run at `load_scale = 1.20`.  Storage power varies over
 {5%, 10%, 20%} of peak load; duration over {2, 4, 8, 12} hours.
-M1 and M3 were compared.
+RA-1a / M1 and RA-3 / M3 were compared.
 
 Script: `scripts/10_run_storage_matrix.jl`.
 Output: `results/storage_matrix/storage_matrix_results.csv`.
 
-**Finding:** M1 produced identical LOLH and EUE across all 12 storage
+**Finding:** RA-1a / M1 produced identical LOLH and EUE across all 12 storage
 configurations, despite widely varying storage parameters.  This was
 initially flagged as an anomaly requiring investigation (see Section 4).
 
@@ -122,7 +122,7 @@ Outputs: `results/storage_validation/selected_storage_validation_results.csv`,
 `results/storage_validation/selected_storage_validation_errors.csv`,
 `results/storage_validation/selected_storage_validation_summary.txt`.
 
-**Key M3 benchmark findings (50 scenarios, load_scale = 1.20):**
+**Key RA-3 / M3 benchmark findings (50 scenarios, load_scale = 1.20):**
 
 | Case | Storage | M3 LOLH (h/yr) | M3 EUE (MWh) | M3 EUE CI95 |
 |------|---------|----------------|--------------|-------------|
@@ -133,7 +133,7 @@ Outputs: `results/storage_validation/selected_storage_validation_results.csv`,
 | p20_d2 | 1,966 MW / 2h | 4.90 | 2,889 | ±37.8% |
 | p20_d4 | 1,966 MW / 4h | 0.30 | 215 | ±126.0% |
 
-M1 LOLH was 96.48 h/yr uniformly across all six cases (see Section 4).
+RA-1a / M1 LOLH was 96.48 h/yr uniformly across all six cases (see Section 4).
 
 **Interpretation:**
 
@@ -205,8 +205,8 @@ Storage capacity is read correctly from each case's `storage.csv`.  The
 physical dispatch differs (P2 volumes differ 4×), but the reliability
 impact is identical because storage is always empty during shortage.
 
-The identical M1 LOLH = 96.48 h/yr across all six 50-scenario validation
-cases is the same failure mode at larger N.
+The identical RA-1a / M1 LOLH = 96.48 h/yr across all six 50-scenario
+validation cases is the same failure mode at larger N.
 
 ### Implication for research design
 
@@ -227,10 +227,10 @@ This motivates:
 | Script | Purpose | Output folder | Status |
 |--------|---------|---------------|--------|
 | `scripts/09_calibrate_load_scaling.jl` | Scan load scale factors; find calibrated stress case | `results/load_scaling/` | Diagnostic — completed |
-| `scripts/10_run_storage_matrix.jl` | Run M1 + M3 across 12 storage configurations at load_scale=1.20 | `results/storage_matrix/` | Diagnostic — completed |
+| `scripts/10_run_storage_matrix.jl` | Run RA-1a / M1 + RA-3 / M3 across 12 storage configurations at load_scale=1.20 | `results/storage_matrix/` | Diagnostic — completed |
 | `scripts/11_debug_storage_cases.jl` | Investigate EUE anomaly between p10_d4 and p20_d2 | `results/storage_debug/` | Diagnostic — completed |
 | `scripts/12_run_selected_storage_validation.jl` | 50-scenario re-validation of six selected storage cases | `results/storage_validation/` | Diagnostic — completed |
-| `scripts/13_debug_m1_storage_sensitivity.jl` | Classify M1 dispatch actions; diagnose why M1 is insensitive to storage size | `results/m1_debug/` | Diagnostic — completed |
+| `scripts/13_debug_m1_storage_sensitivity.jl` | Classify RA-1a / M1 dispatch actions; diagnose why RA-1a / M1 is insensitive to storage size | `results/m1_debug/` | Diagnostic — completed |
 
 All scripts above belong to the **completed diagnostic phase**.  They are
 preserved for reproducibility but are not part of the main forward experiment

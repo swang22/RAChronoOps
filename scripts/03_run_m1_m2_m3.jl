@@ -2,7 +2,12 @@
 # 03_run_m1_m2_m3.jl
 #
 # Loads processed single-zone data, runs selected models (default: M1, M3),
-# and writes results to a unique timestamped folder:
+# and writes results to a unique timestamped folder.
+#
+# Method labels:
+#   M1  = RA-1a: naive peak-shaving chronological heuristic (cautionary baseline)
+#   M2  = rolling-window LP (diagnostic only — too slow for broad experiments)
+#   M3  = RA-3: full-year ED LP benchmark (~360 s/scenario)
 #
 #   results/runs/run_YYYYMMDD_HHMMSS/
 #     aggregate_metrics.csv      — one row per model (+ Monte Carlo CI columns)
@@ -20,7 +25,7 @@
 #   julia --project=. scripts/03_run_m1_m2_m3.jl --models M1,M3 --n-scenarios 20 --seed 42
 #   julia --project=. scripts/03_run_m1_m2_m3.jl --models M1,M2,M3 --n-scenarios 5 --seed 42
 #
-# Note: M2 (~354 s/scenario) is excluded from the default model set because it
+# Note: M2 (~360 s/scenario) is excluded from the default model set because it
 # is very slow on 8760-hour datasets.  Pass --models M1,M2,M3 only for small N.
 
 using Pkg

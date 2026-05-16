@@ -1,10 +1,11 @@
 #!/usr/bin/env julia
 # 06_smoke_test_m3_full_year.jl
 #
-# Full-year smoke test for M3 on the 8760-hour RTS single-zone dataset.
-# Loads processed data, asserts 8760 hours, generates exactly 1 outage
-# scenario (base_case.yaml seed), runs M3, and prints reliability metrics.
-# Exits with a clear message if M3 fails.
+# Full-year smoke test for M3 (RA-3: full-year ED LP benchmark) on the
+# 8760-hour RTS single-zone dataset.  Loads processed data, asserts 8760
+# hours, generates exactly 1 outage scenario (base_case.yaml seed), runs
+# RA-3 / M3, and prints reliability metrics.  Exits with a clear message
+# if M3 fails.
 #
 # Usage:
 #   julia --project=. scripts/06_smoke_test_m3_full_year.jl
