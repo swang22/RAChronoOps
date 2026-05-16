@@ -60,22 +60,50 @@ function parse_cli(args::Vector{String})
     return kw
 end
 
-# ── detect Priority-1 fire: any hour where storage_discharge > 0 AND there
-#    was a pre-storage shortfall (i.e. load > thermal + VRE).
-#    We can infer P1 fire hours from the result: if load_shed[h] == 0 and
-#    storage_discharge[h] > 0 and net_supply[h] < load[h], it was emergency.
-#    Simpler proxy: P1 fires whenever shortfall_pre > 0 AND storage_discharge > 0.
-#    We do not store shortfall_pre in DispatchResult, but any scenario where
-#    load_shed > 0 implies P1 was at least attempted. We proxy with:
-#      p1_fired = any(r.load_shed .> 1e-9 for r in results)
-#    A more direct check: load_shed > 0 means even P1 couldn't cover fully;
-#    storage_discharge > 0 while load_shed == 0 *may* be P1 or P2.
-#    We count "P1 eligible" as scenarios that had any load shedding or any
-#    storage discharge during shortage periods. Use conservative proxy:
-#    p1_fire_count = number of scenarios with any storage discharge AND any load shed.
-function count_p1_fires(results::Vector{DispatchResult})::Int
-    count(r -> any(r.load_shed .> 1e-9) && any(r.storage_discharge .> 1e-9),
-          results)
+# ── count Priority-1 emergency discharge fires ────────────────────────────
+#
+# Recomputes the pre-storage shortfall hour-by-hour from the raw availability
+# matrix, avoiding the false-positive proxy of "any load_shed AND any discharge".
+#
+# An hour h in scenario s is a Priority-1 fire when:
+#   shortfall_pre_h > 1e-6  AND  result.storage_discharge[h] > 1e-6
+# where shortfall_pre_h = max(0, load_h - thermal_available_h - p_vre_h).
+#
+# Returns (p1_scenarios, total_p1_hours):
+#   p1_scenarios  — number of scenarios with at least one P1 discharge hour
+#   total_p1_hours — total count of P1 discharge hours across all scenarios
+function count_p1_fires(sys      ::SystemData,
+                         scenarios::ScenarioSet,
+                         results  ::Vector{DispatchResult})
+    therm     = thermal_generators(sys)
+    n_therm   = nrow(therm)
+    n_hours   = sys.n_hours
+    pmax      = Float64.(therm.pmax_mw)
+    wind_cap  = wind_capacity_mw(sys)
+    solar_cap = solar_capacity_mw(sys)
+    avail     = scenarios.availability
+
+    p1_scenarios   = 0
+    total_p1_hours = 0
+
+    for (s, r) in enumerate(results)
+        fired_this_scen = false
+        for h in 1:n_hours
+            therm_avail = 0.0
+            for g in 1:n_therm
+                therm_avail += pmax[g] * avail[s, g, h]
+            end
+            p_vre_h       = wind_cap * sys.wind_cf[h] + solar_cap * sys.solar_cf[h]
+            shortfall_pre = max(0.0, sys.load_mw[h] - therm_avail - p_vre_h)
+            if shortfall_pre > 1e-6 && r.storage_discharge[h] > 1e-6
+                total_p1_hours += 1
+                fired_this_scen = true
+            end
+        end
+        fired_this_scen && (p1_scenarios += 1)
+    end
+
+    return p1_scenarios, total_p1_hours
 end
 
 # ── main ──────────────────────────────────────────────────────────────────────
@@ -144,21 +172,22 @@ let
                 r_m1 = run_m1_rule_based(sys, scenarios, crn_cfg)
                 rt   = time() - t0
                 m_m1 = compute_metrics(r_m1, sys, crn_cfg)
-                p1_m1 = count_p1_fires(r_m1)
+                p1_scen_m1, p1_hrs_m1 = count_p1_fires(sys, scenarios, r_m1)
 
                 push!(results_rows, (
-                    case_name        = cname,
-                    model            = "M1",
-                    n_scenarios      = n_scenarios,
-                    seed             = seed,
-                    lolh_hours       = m_m1.lolh,
-                    eue_mwh          = m_m1.eue,
-                    neue_ppm         = m_m1.neue * 1e6,
+                    case_name         = cname,
+                    model             = "M1",
+                    n_scenarios       = n_scenarios,
+                    seed              = seed,
+                    lolh_hours        = m_m1.lolh,
+                    eue_mwh           = m_m1.eue,
+                    neue_ppm          = m_m1.neue * 1e6,
                     n_shortage_events = m_m1.n_shortage_events,
-                    max_shortfall_mw = m_m1.max_shortfall,
-                    cvar_eue_mwh     = m_m1.cvar_eue,
-                    p1_fire_scenarios = p1_m1,
-                    runtime_s        = round(rt, digits=1),
+                    max_shortfall_mw  = m_m1.max_shortfall,
+                    cvar_eue_mwh      = m_m1.cvar_eue,
+                    p1_fire_scenarios = p1_scen_m1,
+                    p1_fire_hours     = p1_hrs_m1,
+                    runtime_s         = round(rt, digits=1),
                 ))
                 @info "  M1:  LOLH=$(round(m_m1.lolh, digits=2)) h  " *
                       "EUE=$(round(m_m1.eue, digits=1)) MWh  " *
@@ -173,21 +202,22 @@ let
                 r_m1b = run_m1b_reserve_aware(sys, scenarios, m1b_cfg)
                 rt    = time() - t0
                 m_m1b = compute_metrics(r_m1b, sys, m1b_cfg)
-                p1_m1b = count_p1_fires(r_m1b)
+                p1_scen_m1b, p1_hrs_m1b = count_p1_fires(sys, scenarios, r_m1b)
 
                 push!(results_rows, (
-                    case_name        = cname,
-                    model            = "M1b",
-                    n_scenarios      = n_scenarios,
-                    seed             = seed,
-                    lolh_hours       = m_m1b.lolh,
-                    eue_mwh          = m_m1b.eue,
-                    neue_ppm         = m_m1b.neue * 1e6,
+                    case_name         = cname,
+                    model             = "M1b",
+                    n_scenarios       = n_scenarios,
+                    seed              = seed,
+                    lolh_hours        = m_m1b.lolh,
+                    eue_mwh           = m_m1b.eue,
+                    neue_ppm          = m_m1b.neue * 1e6,
                     n_shortage_events = m_m1b.n_shortage_events,
-                    max_shortfall_mw = m_m1b.max_shortfall,
-                    cvar_eue_mwh     = m_m1b.cvar_eue,
-                    p1_fire_scenarios = p1_m1b,
-                    runtime_s        = round(rt, digits=1),
+                    max_shortfall_mw  = m_m1b.max_shortfall,
+                    cvar_eue_mwh      = m_m1b.cvar_eue,
+                    p1_fire_scenarios = p1_scen_m1b,
+                    p1_fire_hours     = p1_hrs_m1b,
+                    runtime_s         = round(rt, digits=1),
                 ))
                 @info "  M1b: LOLH=$(round(m_m1b.lolh, digits=2)) h  " *
                       "EUE=$(round(m_m1b.eue, digits=1)) MWh  " *
@@ -204,18 +234,19 @@ let
                 m_m3 = compute_metrics(r_m3, sys, m3_cfg)
 
                 push!(results_rows, (
-                    case_name        = cname,
-                    model            = "M3",
-                    n_scenarios      = n_scenarios,
-                    seed             = seed,
-                    lolh_hours       = m_m3.lolh,
-                    eue_mwh          = m_m3.eue,
-                    neue_ppm         = m_m3.neue * 1e6,
+                    case_name         = cname,
+                    model             = "M3",
+                    n_scenarios       = n_scenarios,
+                    seed              = seed,
+                    lolh_hours        = m_m3.lolh,
+                    eue_mwh           = m_m3.eue,
+                    neue_ppm          = m_m3.neue * 1e6,
                     n_shortage_events = m_m3.n_shortage_events,
-                    max_shortfall_mw = m_m3.max_shortfall,
-                    cvar_eue_mwh     = m_m3.cvar_eue,
+                    max_shortfall_mw  = m_m3.max_shortfall,
+                    cvar_eue_mwh      = m_m3.cvar_eue,
                     p1_fire_scenarios = -1,    # not applicable to LP
-                    runtime_s        = round(rt, digits=1),
+                    p1_fire_hours     = -1,    # not applicable to LP
+                    runtime_s         = round(rt, digits=1),
                 ))
                 @info "  M3:  LOLH=$(round(m_m3.lolh, digits=2)) h  " *
                       "EUE=$(round(m_m3.eue, digits=1)) MWh  " *
@@ -258,12 +289,12 @@ let
             # ── table ─────────────────────────────────────────────────────
             println(io, "Aggregate reliability metrics")
             println(io, "-" ^ 72)
-            @printf io "  %-28s %-6s %10s %12s %14s\n" \
-                "Case" "Model" "LOLH (h)" "EUE (MWh)" "CVaR-EUE"
+            @printf(io, "  %-28s %-6s %10s %12s %14s\n",
+                "Case", "Model", "LOLH (h)", "EUE (MWh)", "CVaR-EUE")
             println(io, "  " * "-" ^ 68)
             for r in eachrow(df)
-                @printf io "  %-28s %-6s %10.2f %12.1f %14.1f\n" \
-                    r.case_name r.model r.lolh_hours r.eue_mwh r.cvar_eue_mwh
+                @printf(io, "  %-28s %-6s %10.2f %12.1f %14.1f\n",
+                    r.case_name, r.model, r.lolh_hours, r.eue_mwh, r.cvar_eue_mwh)
             end
             println(io)
 
@@ -302,8 +333,8 @@ let
                 direction = delta > 0.01 ? "↓ reduced by $(round(delta, digits=2)) h" :
                             delta < -0.01 ? "↑ increased by $(round(-delta, digits=2)) h" :
                             "unchanged (Δ < 0.01 h)"
-                @printf io "  %-28s  M1=%.2f h → M1b=%.2f h  %s\n" \
-                    cname lolh_m1 lolh_m1b direction
+                @printf(io, "  %-28s  M1=%.2f h → M1b=%.2f h  %s\n",
+                    cname, lolh_m1, lolh_m1b, direction)
             end
             println(io)
 
@@ -317,23 +348,27 @@ let
                     lolh_m1b = m1b_row[1, :lolh_hours]
                     lolh_m3  = m3_row[1,  :lolh_hours]
                     ratio    = lolh_m3 > 0.0 ? lolh_m1b / lolh_m3 : NaN
-                    @printf io "  %-28s  M1b=%.2f h  M3=%.2f h  ratio=%.2f\n" \
-                        cname lolh_m1b lolh_m3 ratio
+                    @printf(io, "  %-28s  M1b=%.2f h  M3=%.2f h  ratio=%.2f\n",
+                        cname, lolh_m1b, lolh_m3, ratio)
                 end
             else
                 println(io, "  RA-3 not run (--skip-m3 flag set or all M3 cases failed).")
             end
             println(io)
 
-            # ── Q4: does P1 fire under M1b? ───────────────────────────────
+            # ── Q4: does P1 fire under M1 and M1b? ───────────────────────
             println(io, "Q4. Does Priority-1 emergency discharge fire under RA-1b?")
+            println(io, "  (Exact count: hours where pre-storage shortfall > 0 AND discharge > 0)")
             for cname in case_names
-                m1b_row = filter(r -> r.case_name == cname && r.model == "M1b", df)
-                isempty(m1b_row) && continue
-                p1  = m1b_row[1, :p1_fire_scenarios]
-                n   = m1b_row[1, :n_scenarios]
-                @printf io "  %-28s  P1 proxy fired in %d / %d scenarios\n" \
-                    cname p1 n
+                for mlabel in ("M1", "M1b")
+                    mrow = filter(r -> r.case_name == cname && r.model == mlabel, df)
+                    isempty(mrow) && continue
+                    p1s = mrow[1, :p1_fire_scenarios]
+                    p1h = mrow[1, :p1_fire_hours]
+                    n   = mrow[1, :n_scenarios]
+                    @printf(io, "  %-28s  %-5s  Priority-1 fired in %d / %d scenarios and %d total hours\n",
+                        cname, mlabel, p1s, n, p1h)
+                end
             end
             println(io)
         end
@@ -361,11 +396,11 @@ let
 
     if !isempty(results_rows)
         df = DataFrame(results_rows)
-        @printf "  %-28s %-6s %10s %12s\n" "Case" "Model" "LOLH (h)" "EUE (MWh)"
+        @printf("  %-28s %-6s %10s %12s\n", "Case", "Model", "LOLH (h)", "EUE (MWh)")
         println("  " * "-" ^ 58)
         for r in eachrow(df)
-            @printf "  %-28s %-6s %10.2f %12.1f\n" \
-                r.case_name r.model r.lolh_hours r.eue_mwh
+            @printf("  %-28s %-6s %10.2f %12.1f\n",
+                r.case_name, r.model, r.lolh_hours, r.eue_mwh)
         end
     end
 
