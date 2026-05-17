@@ -1,0 +1,7 @@
+case_name,load_scale,wind_scale,solar_scale,storage_power_pct_peak,storage_duration_hours,storage_power_mw,storage_energy_mwh,peak_load_mw,annual_load_gwh,total_thermal_capacity_mw,total_wind_capacity_mw,total_solar_capacity_mw,total_vre_capacity_mw,vre_capacity_share_no_storage,available_wind_energy_gwh,available_solar_energy_gwh,available_vre_energy_gwh,available_vre_energy_share,vre_potential_curtailment_gwh,min_net_load_mw,n_hours_negative_net_load,notes
+VRE120_base,1.2,1.0,1.0,0.1,4,983.0,3932.0,9830.2,45073.59,8076.0,2507.9,2715.9,5223.8,0.3928,7128.37,5885.29,13013.66,0.2887,3.69,-403.1,23,"VRE baseline, calibrated load"
+VRE120_bal15,1.2,1.5,1.5,0.1,4,983.0,3932.0,9830.2,45073.59,8076.0,3761.8,4073.8,7835.6,0.4924,10692.42,8827.83,19520.24,0.4331,554.7,-2631.5,620,Balanced 1.5x VRE
+VRE120_bal20,1.2,2.0,2.0,0.1,4,983.0,3932.0,9830.2,45073.59,8076.0,5015.8,5431.8,10447.6,0.564,14256.75,11770.58,26027.33,0.5774,2337.03,-4874.5,1684,Balanced 2x VRE
+VRE120_bal30,1.2,3.0,3.0,0.1,4,983.0,3932.0,9830.2,45073.59,8076.0,7523.7,8147.7,15671.4,0.6599,21385.12,17655.87,39040.99,0.8662,9233.15,-9360.3,3492,Balanced 3x VRE
+VRE120_solar_hvy,1.2,1.0,3.0,0.1,4,983.0,3932.0,9830.2,45073.59,8076.0,2507.9,8147.7,10655.6,0.5689,7128.37,17655.87,24784.24,0.5499,2687.35,-4813.8,1717,"Solar-heavy (1x wind, 3x solar)"
+VRE120_wind_hvy,1.2,3.0,1.0,0.1,4,983.0,3932.0,9830.2,45073.59,8076.0,7523.7,2715.9,10239.6,0.5591,21385.12,5885.29,27270.41,0.605,4387.03,-5344.3,2221,"Wind-heavy (3x wind, 1x solar)"

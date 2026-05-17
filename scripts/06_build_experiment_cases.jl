@@ -78,6 +78,14 @@ const CASES = CaseDef[
     CaseDef("vre_balanced_2x", 1.00, 2.00, 2.00, 0.10,  4, "Balanced high VRE (2x wind, 2x solar)"),
     CaseDef("vre_solar_heavy", 1.00, 1.00, 3.00, 0.10,  4, "Solar-heavy (1x wind, 3x solar)"),
     CaseDef("vre_wind_heavy",  1.00, 3.00, 1.00, 0.10,  8, "Wind-heavy (3x wind, 1x solar)"),
+
+    # ── Phase 5: VRE penetration/profile experiment (load_scale=1.20, storage 10%/4h)
+    CaseDef("VRE120_base",      1.20, 1.0, 1.0, 0.10, 4, "VRE baseline, calibrated load"),
+    CaseDef("VRE120_bal15",     1.20, 1.5, 1.5, 0.10, 4, "Balanced 1.5x VRE"),
+    CaseDef("VRE120_bal20",     1.20, 2.0, 2.0, 0.10, 4, "Balanced 2x VRE"),
+    CaseDef("VRE120_bal30",     1.20, 3.0, 3.0, 0.10, 4, "Balanced 3x VRE"),
+    CaseDef("VRE120_solar_hvy", 1.20, 1.0, 3.0, 0.10, 4, "Solar-heavy (1x wind, 3x solar)"),
+    CaseDef("VRE120_wind_hvy",  1.20, 3.0, 1.0, 0.10, 4, "Wind-heavy (3x wind, 1x solar)"),
 ]
 
 # ── helpers ───────────────────────────────────────────────────────────────────
