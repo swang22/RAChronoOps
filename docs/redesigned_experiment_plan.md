@@ -68,7 +68,7 @@ computed inside each scenario.
 | Mathematical idea | Same three-priority rule as RA-1a, but priority 2 (proactive discharge) is suppressed when SOC < `reserve_fraction × total_energy`. The reserve floor keeps storage available for emergency (priority-1) use during outage events. |
 | Expected runtime | ~1 s/scenario (no LP). |
 | Role in paper | Practical improved heuristic. Tests whether a simple SOC guard is sufficient to recover most RA-3 accuracy. |
-| Implementation status | Scaffolded — placeholder file `src/models/M1bReserveAwareStorage.jl` and `configs/m1b.yaml` exist; function exported but throws until implemented (Phase B). |
+| Implementation status | **Implemented and validated** (Phase B complete). `src/models/M1bReserveAwareStorage.jl`, `configs/m1b.yaml`. Validation: `scripts/14_run_ra1b_validation.jl`; results in `results/ra1b_validation/`. Key finding: P1 fires in 10/10 scenarios; LOLH storage-sensitive; still 3–11× above M3 at reference cases — motivates RA-2. |
 
 ### RA-2 — Event-window LP dispatch
 
@@ -267,27 +267,24 @@ RA-2 differ.
 
 ## 8. Next implementation tasks
 
-### Task 1 — Implement RA-1b reserve-aware heuristic
+### Task 1 — Implement RA-1b reserve-aware heuristic ✓ COMPLETE
 
-**Scaffolding complete:** placeholder file `src/models/M1bReserveAwareStorage.jl`
-and config `configs/m1b.yaml` are committed.  `run_m1b_reserve_aware` is
-exported from `RAChronoOps` but throws until the dispatch loop is written.
+**Implemented** in `src/models/M1bReserveAwareStorage.jl`.  Config parameter
+`reserve_fraction = 0.50` added to `SimConfig`.  Validated in
+`scripts/14_run_ra1b_validation.jl` across three storage cases.
 
-**Where:** `src/models/M1bReserveAwareStorage.jl` (replace the throwing body).
+**Key validation results** (N=10, seed=42):
 
-**What to add:**
-- New config parameter `reserve_fraction` (default 0.50; i.e. reserve
-  50% of total energy for emergency use).
-- Priority-2 discharge is suppressed when `curr_soc < reserve_fraction
-  × total_energy`; equivalently, proactive discharge can only use energy
-  above `reserve_fraction × total_energy`.
-- All other logic unchanged.
+| Case | M1b LOLH | M3 LOLH | M1b/M3 | P1 fired |
+|------|:--------:|:-------:|:------:|:--------:|
+| p05_d4 | 93.6 h | 31.2 h | 3.0× | 10/10 scen |
+| p10_d4 | 88.7 h | 7.7 h | 11.5× | 10/10 scen |
+| p20_d4 | 78.2 h | 0.0 h | ∞ | 10/10 scen |
 
-**Validation:** run RA-1b on `storage120_p10_d4` (the reference case from
-the diagnostic phase) and confirm that priority-1 emergency discharge now
-fires, and that LOLH approaches (but remains above) the RA-3 benchmark.
-
-**Script:** `scripts/14_run_ra1b_validation.jl`.
+P1 emergency discharge fires in all scenarios (vs 0/10 under RA-1a).
+RA-1b preserves correct storage ranking; RA-1a is completely flat.
+Remaining 3–11× LOLH overestimation confirms that lookahead (RA-2) is needed.
+See `docs/ra1b_validation_memo.md` for full analysis and decision record.
 
 ---
 
@@ -385,5 +382,6 @@ confirmed.
 
 ---
 
-*Document version: initial design, pre-implementation.*
+*Document version: Phase B complete (RA-1b implemented and validated, 2026-05-16).*
 *Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
+*Link to RA-1b validation memo: [docs/ra1b_validation_memo.md](ra1b_validation_memo.md)*
