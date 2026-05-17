@@ -203,12 +203,16 @@ energy-shifting logic of an LP.
 
 ### 6a. Add M1c as additional simple baseline (immediate)
 
-Implement **M1c** — an emergency-only heuristic that suppresses *all* proactive discharging
-(no priority-2 or priority-3 storage operation) and only discharges to cover observed
-shortfalls (priority-1 only).  This tests the hypothesis that the M1b bias comes from
-proactive discharging depleting SOC before shortage events.
+Implement **M1c** — an emergency-only heuristic that suppresses all proactive discharging.
+M1c does not perform priority-2 peak-shaving discharge.  It still allows charging from
+surplus energy (priority-3) and discharges only to cover observed pre-storage shortfalls
+(priority-1 only).
 
-Then run a compact comparison of **M1, M1b, M1c, M2 (rm=1000/buf=48), and M3** on the
+M1c is not intended to be more accurate than M2.  It is a simple practice-oriented
+benchmark to test whether emergency-only storage dispatch can outperform reserve-aware
+peak-shaving heuristics (M1b) within the same N=20 scenario set.
+
+Then run a compact comparison of **M1 → M1b → M1c → M2 (rm=1000/buf=48) → M3** on the
 three priority cases at N=20.
 
 ### 6b. N=50 on VRE120_base (confidence interval tightening)

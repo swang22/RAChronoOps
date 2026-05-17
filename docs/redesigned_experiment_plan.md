@@ -461,7 +461,7 @@ before shortage events.
 
 **New model:** `src/models/M1cEmergencyOnlyStorage.jl`
 - Priority 1 (emergency discharge) only: discharge to cover shortfall.
-- No priority-2 proactive discharge, no priority-3 charging.
+- No priority-2 proactive discharge; priority-3 charging from surplus still allowed.
 - Simplest possible storage model; expected to over-deplete but with cleaner failure mode.
 
 **Script:** `scripts/21_run_m1c_comparison.jl` — compare M1, M1b, M1c, M2 (rm=1000/buf=48), M3
