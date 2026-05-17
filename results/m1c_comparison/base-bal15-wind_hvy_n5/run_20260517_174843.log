@@ -1,0 +1,84 @@
+┌ Info: M1c comparison
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:100
+┌ Info: n=5 | seed=42 | skip_m3=false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:101
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:102
+┌ Info: M2 config: rm=1000.0 buf=48
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:103
+┌ Info: Output: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_comparison\base-bal15-wind_hvy_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:104
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:184
+┌ Info:   running M1...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:192
+┌ Info:   M1:  LOLH=115.6 h  EUE=41846.4 MWh  (1.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:198
+┌ Info:   running M1b...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:207
+┌ Info:   M1b: LOLH=103.8 h  EUE=39203.6 MWh  (0.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:213
+┌ Info:   running M1c...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:222
+┌ Info:   M1c: LOLH=11.2 h  EUE=4707.4 MWh  (0.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:228
+┌ Info:   running M2_rm1000_b48...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:245
+┌ Info:   M2:  LOLH=11.2 h  EUE=4707.4 MWh  (4.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:251
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:261
+┌ Info:   M3:  LOLH=11.2 h  EUE=4707.4 MWh  (48.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:269
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_comparison\base-bal15-wind_hvy_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:278
+┌ Info: ── Case: VRE120_bal15 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:184
+┌ Info:   running M1...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:192
+┌ Info:   M1:  LOLH=63.8 h  EUE=21058.3 MWh  (0.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:198
+┌ Info:   running M1b...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:207
+┌ Info:   M1b: LOLH=48.6 h  EUE=17635.2 MWh  (0.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:213
+┌ Info:   running M1c...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:222
+┌ Info:   M1c: LOLH=3.6 h  EUE=698.6 MWh  (0.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:228
+┌ Info:   running M2_rm1000_b48...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:245
+┌ Info:   M2:  LOLH=3.4 h  EUE=698.6 MWh  (1.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:251
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:261
+┌ Info:   M3:  LOLH=3.6 h  EUE=698.6 MWh  (47.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:269
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_comparison\base-bal15-wind_hvy_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:278
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:184
+┌ Info:   running M1...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:192
+┌ Info:   M1:  LOLH=67.2 h  EUE=21202.4 MWh  (0.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:198
+┌ Info:   running M1b...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:207
+┌ Info:   M1b: LOLH=36.4 h  EUE=13798.6 MWh  (0.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:213
+┌ Info:   running M1c...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:222
+┌ Info:   M1c: LOLH=4.4 h  EUE=1113.2 MWh  (1.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:228
+┌ Info:   running M2_rm1000_b48...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:245
+┌ Info:   M2:  LOLH=3.8 h  EUE=1113.2 MWh  (1.7 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:251
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:261
+┌ Info:   M3:  LOLH=4.4 h  EUE=1113.2 MWh  (46.7 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:269
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_comparison\base-bal15-wind_hvy_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:278
+┌ Info: Total runtime: 163.1 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\21_run_m1c_comparison.jl:282
