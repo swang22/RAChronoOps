@@ -1,0 +1,72 @@
+┌ Info: RA-2 N=20 selected-params validation
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:112
+┌ Info: n=20 | seed=42 | skip_m3=false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:113
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:114
+┌ Info: RA-2 configs: [("M2_rm1000_b48", 1000.0, 48), ("M2_rm800_b24", 800.0, 24)]
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:115
+┌ Info: Output: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_n20_selected_params\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:116
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:209
+┌ Info:   running M1b...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:219
+┌ Info:   M1b: LOLH=83.55 h  EUE=28272.4 MWh  (1.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:225
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:237
+┌ Info:   M3:  LOLH=5.95 h  EUE=2479.2 MWh  (194.1 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:245
+┌ Info:   running M2_rm1000_b48 (rm=1000.0 buf=48)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:264
+┌ Info:   M2_rm1000_b48: LOLH=5.75 h  cov=30.2%  wins=4.2  LP_fails=0  (10.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:276
+┌ Info:   running M2_rm800_b24 (rm=800.0 buf=24)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:264
+┌ Info:   M2_rm800_b24: LOLH=5.65 h  cov=24.6%  wins=5.7  LP_fails=0  (5.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:276
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_n20_selected_params\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:304
+┌ Info: ── Case: VRE120_bal15 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:209
+┌ Info:   running M1b...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:219
+┌ Info:   M1b: LOLH=36.75 h  EUE=11608.5 MWh  (0.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:225
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:237
+┌ Info:   M3:  LOLH=1.35 h  EUE=360.1 MWh  (192.7 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:245
+┌ Info:   running M2_rm1000_b48 (rm=1000.0 buf=48)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:264
+┌ Info:   M2_rm1000_b48: LOLH=1.3 h  cov=29.3%  wins=4.0  LP_fails=0  (8.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:276
+┌ Info:   running M2_rm800_b24 (rm=800.0 buf=24)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:264
+┌ Info:   M2_rm800_b24: LOLH=1.25 h  cov=23.6%  wins=6.0  LP_fails=0  (5.2 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:276
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_n20_selected_params\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:304
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:209
+┌ Info:   running M1b...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:219
+┌ Info:   M1b: LOLH=25.0 h  EUE=8982.4 MWh  (0.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:225
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:237
+┌ Info:   M3:  LOLH=2.25 h  EUE=648.2 MWh  (187.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:245
+┌ Info:   running M2_rm1000_b48 (rm=1000.0 buf=48)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:264
+┌ Info:   M2_rm1000_b48: LOLH=1.95 h  cov=28.5%  wins=3.8  LP_fails=0  (8.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:276
+┌ Info:   running M2_rm800_b24 (rm=800.0 buf=24)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:264
+┌ Info:   M2_rm800_b24: LOLH=1.95 h  cov=22.5%  wins=6.8  LP_fails=0  (4.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:276
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_n20_selected_params\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:304
+┌ Info: Total runtime: 629.5 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\20_run_ra2_n20_selected_params.jl:308
