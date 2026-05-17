@@ -84,7 +84,7 @@ computed inside each scenario.
 | Attribute | Detail |
 |-----------|--------|
 | Mathematical idea | One 8760-hour storage dispatch LP per scenario (perfect foresight within the scenario). JuMP/HiGHS. Minimise load shedding subject to power balance, storage dynamics, and capacity limits. |
-| Expected runtime | ~360 s/scenario at N=50 (HiGHS). |
+| Expected runtime | ~9–10 s/scenario (Gurobi); ~360 s/scenario (HiGHS). |
 | Role in paper | Reliability benchmark. Upper bound on what a storage-aware sequential MC can achieve without unit commitment. |
 | Implementation status | Implemented (`src/models/M3EDDispatch.jl`). Out-of-memory fix applied. |
 
@@ -315,18 +315,35 @@ before Task 3.
 
 ---
 
-### Task 3 — Run RA-1a, RA-1b, RA-3 across VRE cases
+### Task 3 — Run RA-1a, RA-1b, RA-3 across VRE cases ✓ COMPLETE (N=5 sanity run)
 
-**Script:** `scripts/15_run_vre_experiment.jl`.
+**Script:** `scripts/16_run_vre_method_comparison.jl --n-scenarios 5 --seed 42`
 
-**Inputs:** six VRE cases (Task 2), N=20, seed=42.
+**Output:** `results/vre_method_comparison/` — results CSV, errors CSV,
+summary.txt.  See `docs/vre_method_comparison_memo.md` for full analysis.
 
-**Output:** `results/vre_experiment/vre_experiment_results.csv` with one
-row per (case, method), plus `vre_experiment_errors.csv` with error vs
-RA-3 and runtime ratios.
+**Key finding — non-monotonic operational-detail error:**
+The initial N=5 sweep shows that M1b absolute LOLH error vs M3 is *largest
+at low VRE penetration* (VRE120_base: +92.6 h) and shrinks at high VRE
+(VRE120_bal30: +11.8 h).  This is not because heuristics improve at high VRE;
+it is because high-VRE cases become near-reliable under M3 (M3 LOLH → 1 h),
+leaving little room for absolute error regardless of heuristic quality.
+Relative error (M1b/M3 ratio) remains 8–14× throughout.
 
-**Purpose:** answers RQ1, RQ2, and generates data for Figures 2–4 without
-RA-2 (which is not yet implemented).
+**Revised hypothesis:** Operational detail matters most when adequacy risk is
+governed by intertemporal energy management (storage depletion, renewable
+drought/ramp structure, scarcity-window timing).  The relationship between VRE
+penetration and operational-detail error is non-monotonic.
+
+**Runtime finding:** M3 with Gurobi runs ~9–10 s/scenario (vs ~360 s with
+HiGHS — ~35× speedup).  N=20 benchmark runs are now tractable (~3–4 min/case).
+
+**RA-2 priority cases** (ranked by M1b absolute LOLH error):
+1. `VRE120_base` (+92.6 h) — highest scarcity risk, largest absolute error
+2. `VRE120_bal15` (+45.0 h)
+3. `VRE120_wind_hvy` (+32.0 h) — multi-day wind variability hardest for heuristic
+
+**Next step:** Run N=20 on priority cases only; then implement RA-2.
 
 ---
 
@@ -382,6 +399,7 @@ confirmed.
 
 ---
 
-*Document version: Phase B complete (RA-1b implemented and validated, 2026-05-16).*
+*Document version: Phase C in progress (initial VRE sweep complete, 2026-05-17).*
 *Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
 *Link to RA-1b validation memo: [docs/ra1b_validation_memo.md](ra1b_validation_memo.md)*
+*Link to VRE method comparison memo: [docs/vre_method_comparison_memo.md](vre_method_comparison_memo.md)*
