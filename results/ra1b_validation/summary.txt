@@ -1,0 +1,45 @@
+========================================================================
+RA-1b Validation Summary
+Generated: 2026-05-16 23:00:41
+n_scenarios: 10  |  seed: 42
+========================================================================
+
+Aggregate reliability metrics
+------------------------------------------------------------------------
+  Case                         Model    LOLH (h)    EUE (MWh)       CVaR-EUE
+  --------------------------------------------------------------------
+  storage120_p05_d4            M1         100.50      34391.6        54383.2
+  storage120_p05_d4            M1b         93.60      32967.6        53006.9
+  storage120_p05_d4            M3          31.20      10972.7        25495.2
+  storage120_p10_d4            M1         100.50      34391.6        54383.2
+  storage120_p10_d4            M1b         88.70      31594.1        51633.4
+  storage120_p10_d4            M3           7.70       3245.4         9712.4
+  storage120_p20_d4            M1         100.50      34391.6        54383.2
+  storage120_p20_d4            M1b         78.20      28987.1        48883.6
+  storage120_p20_d4            M3           0.00          0.0            0.0
+
+Q1. Is RA-1b storage-sensitive?
+  YES — RA-1b LOLH varies by 15.4 h across cases (RA-1a range: 0.0 h).
+
+Q2. Does RA-1b reduce LOLH overestimation relative to RA-1a?
+  storage120_p05_d4             M1=100.50 h → M1b=93.60 h  ↓ reduced by 6.9 h
+  storage120_p10_d4             M1=100.50 h → M1b=88.70 h  ↓ reduced by 11.8 h
+  storage120_p20_d4             M1=100.50 h → M1b=78.20 h  ↓ reduced by 22.3 h
+
+Q3. How close is RA-1b LOLH to the RA-3 benchmark?
+  storage120_p05_d4             M1b=93.60 h  M3=31.20 h  ratio=3.00
+  storage120_p10_d4             M1b=88.70 h  M3=7.70 h  ratio=11.52
+  storage120_p20_d4             M1b=78.20 h  M3=0.00 h  ratio=NaN
+
+Q4. Does Priority-1 emergency discharge fire under RA-1b?
+  (Exact count: hours where pre-storage shortfall > 0 AND discharge > 0)
+  storage120_p05_d4             M1     Priority-1 fired in 0 / 10 scenarios and 0 total hours
+  storage120_p05_d4             M1b    Priority-1 fired in 10 / 10 scenarios and 90 total hours
+  storage120_p10_d4             M1     Priority-1 fired in 0 / 10 scenarios and 0 total hours
+  storage120_p10_d4             M1b    Priority-1 fired in 10 / 10 scenarios and 138 total hours
+  storage120_p20_d4             M1     Priority-1 fired in 0 / 10 scenarios and 0 total hours
+  storage120_p20_d4             M1b    Priority-1 fired in 10 / 10 scenarios and 240 total hours
+
+========================================================================
+Full results: ra1b_validation_results.csv
+Log:          run_20260516_194431.log
