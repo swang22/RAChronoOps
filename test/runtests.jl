@@ -2,6 +2,7 @@ using Test
 using RAChronoOps
 using DataFrames
 using Statistics
+using Random
 
 # ── Build synthetic test data (does not require external RTS files) ────────
 const PROJECT_ROOT  = joinpath(@__DIR__, "..")
@@ -63,4 +64,5 @@ end
     include("test_storage.jl")
     include("test_power_balance.jl")
     include("test_common_scenarios.jl")
+    include("test_metrics.jl")
 end

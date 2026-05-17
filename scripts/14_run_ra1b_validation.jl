@@ -175,19 +175,34 @@ let
                 p1_scen_m1, p1_hrs_m1 = count_p1_fires(sys, scenarios, r_m1)
 
                 push!(results_rows, (
-                    case_name         = cname,
-                    model             = "M1",
-                    n_scenarios       = n_scenarios,
-                    seed              = seed,
-                    lolh_hours        = m_m1.lolh,
-                    eue_mwh           = m_m1.eue,
-                    neue_ppm          = m_m1.neue * 1e6,
-                    n_shortage_events = m_m1.n_shortage_events,
-                    max_shortfall_mw  = m_m1.max_shortfall,
-                    cvar_eue_mwh      = m_m1.cvar_eue,
-                    p1_fire_scenarios = p1_scen_m1,
-                    p1_fire_hours     = p1_hrs_m1,
-                    runtime_s         = round(rt, digits=1),
+                    case_name                    = cname,
+                    model                        = "M1",
+                    n_scenarios                  = n_scenarios,
+                    seed                         = seed,
+                    lolh_hours                   = m_m1.lolh,
+                    lolp                         = m_m1.lolp,
+                    lolp_percent                 = 100.0 * m_m1.lolp,
+                    lole_days                    = m_m1.lole_days,
+                    eue_mwh                      = m_m1.eue,
+                    neue_ppm                     = m_m1.neue * 1e6,
+                    cvar_eue_mwh                 = m_m1.cvar_eue,
+                    p50_scenario_eue_mwh         = m_m1.p50_scenario_eue,
+                    p90_scenario_eue_mwh         = m_m1.p90_scenario_eue,
+                    p95_scenario_eue_mwh         = m_m1.p95_scenario_eue,
+                    p99_scenario_eue_mwh         = m_m1.p99_scenario_eue,
+                    n_shortage_events            = m_m1.n_shortage_events,
+                    mean_shortage_duration_h     = m_m1.mean_shortage_duration,
+                    max_shortage_duration_h      = m_m1.max_shortage_duration,
+                    p95_shortage_duration_h      = m_m1.p95_shortage_duration,
+                    max_shortfall_mw             = m_m1.max_shortfall,
+                    mean_shortfall_when_shedding_mw = m_m1.mean_shortfall_when_shedding,
+                    lolh_ci95_halfwidth          = m_m1.lolh_ci95_halfwidth,
+                    lolh_ci95_rel_halfwidth      = m_m1.lolh_ci95_rel_halfwidth,
+                    eue_ci95_halfwidth_mwh       = m_m1.eue_ci95_halfwidth,
+                    eue_ci95_rel_halfwidth       = m_m1.eue_ci95_rel_halfwidth,
+                    p1_fire_scenarios            = p1_scen_m1,
+                    p1_fire_hours                = p1_hrs_m1,
+                    runtime_s                    = round(rt, digits=1),
                 ))
                 @info "  M1:  LOLH=$(round(m_m1.lolh, digits=2)) h  " *
                       "EUE=$(round(m_m1.eue, digits=1)) MWh  " *
@@ -205,19 +220,34 @@ let
                 p1_scen_m1b, p1_hrs_m1b = count_p1_fires(sys, scenarios, r_m1b)
 
                 push!(results_rows, (
-                    case_name         = cname,
-                    model             = "M1b",
-                    n_scenarios       = n_scenarios,
-                    seed              = seed,
-                    lolh_hours        = m_m1b.lolh,
-                    eue_mwh           = m_m1b.eue,
-                    neue_ppm          = m_m1b.neue * 1e6,
-                    n_shortage_events = m_m1b.n_shortage_events,
-                    max_shortfall_mw  = m_m1b.max_shortfall,
-                    cvar_eue_mwh      = m_m1b.cvar_eue,
-                    p1_fire_scenarios = p1_scen_m1b,
-                    p1_fire_hours     = p1_hrs_m1b,
-                    runtime_s         = round(rt, digits=1),
+                    case_name                    = cname,
+                    model                        = "M1b",
+                    n_scenarios                  = n_scenarios,
+                    seed                         = seed,
+                    lolh_hours                   = m_m1b.lolh,
+                    lolp                         = m_m1b.lolp,
+                    lolp_percent                 = 100.0 * m_m1b.lolp,
+                    lole_days                    = m_m1b.lole_days,
+                    eue_mwh                      = m_m1b.eue,
+                    neue_ppm                     = m_m1b.neue * 1e6,
+                    cvar_eue_mwh                 = m_m1b.cvar_eue,
+                    p50_scenario_eue_mwh         = m_m1b.p50_scenario_eue,
+                    p90_scenario_eue_mwh         = m_m1b.p90_scenario_eue,
+                    p95_scenario_eue_mwh         = m_m1b.p95_scenario_eue,
+                    p99_scenario_eue_mwh         = m_m1b.p99_scenario_eue,
+                    n_shortage_events            = m_m1b.n_shortage_events,
+                    mean_shortage_duration_h     = m_m1b.mean_shortage_duration,
+                    max_shortage_duration_h      = m_m1b.max_shortage_duration,
+                    p95_shortage_duration_h      = m_m1b.p95_shortage_duration,
+                    max_shortfall_mw             = m_m1b.max_shortfall,
+                    mean_shortfall_when_shedding_mw = m_m1b.mean_shortfall_when_shedding,
+                    lolh_ci95_halfwidth          = m_m1b.lolh_ci95_halfwidth,
+                    lolh_ci95_rel_halfwidth      = m_m1b.lolh_ci95_rel_halfwidth,
+                    eue_ci95_halfwidth_mwh       = m_m1b.eue_ci95_halfwidth,
+                    eue_ci95_rel_halfwidth       = m_m1b.eue_ci95_rel_halfwidth,
+                    p1_fire_scenarios            = p1_scen_m1b,
+                    p1_fire_hours                = p1_hrs_m1b,
+                    runtime_s                    = round(rt, digits=1),
                 ))
                 @info "  M1b: LOLH=$(round(m_m1b.lolh, digits=2)) h  " *
                       "EUE=$(round(m_m1b.eue, digits=1)) MWh  " *
@@ -234,19 +264,34 @@ let
                 m_m3 = compute_metrics(r_m3, sys, m3_cfg)
 
                 push!(results_rows, (
-                    case_name         = cname,
-                    model             = "M3",
-                    n_scenarios       = n_scenarios,
-                    seed              = seed,
-                    lolh_hours        = m_m3.lolh,
-                    eue_mwh           = m_m3.eue,
-                    neue_ppm          = m_m3.neue * 1e6,
-                    n_shortage_events = m_m3.n_shortage_events,
-                    max_shortfall_mw  = m_m3.max_shortfall,
-                    cvar_eue_mwh      = m_m3.cvar_eue,
-                    p1_fire_scenarios = -1,    # not applicable to LP
-                    p1_fire_hours     = -1,    # not applicable to LP
-                    runtime_s         = round(rt, digits=1),
+                    case_name                    = cname,
+                    model                        = "M3",
+                    n_scenarios                  = n_scenarios,
+                    seed                         = seed,
+                    lolh_hours                   = m_m3.lolh,
+                    lolp                         = m_m3.lolp,
+                    lolp_percent                 = 100.0 * m_m3.lolp,
+                    lole_days                    = m_m3.lole_days,
+                    eue_mwh                      = m_m3.eue,
+                    neue_ppm                     = m_m3.neue * 1e6,
+                    cvar_eue_mwh                 = m_m3.cvar_eue,
+                    p50_scenario_eue_mwh         = m_m3.p50_scenario_eue,
+                    p90_scenario_eue_mwh         = m_m3.p90_scenario_eue,
+                    p95_scenario_eue_mwh         = m_m3.p95_scenario_eue,
+                    p99_scenario_eue_mwh         = m_m3.p99_scenario_eue,
+                    n_shortage_events            = m_m3.n_shortage_events,
+                    mean_shortage_duration_h     = m_m3.mean_shortage_duration,
+                    max_shortage_duration_h      = m_m3.max_shortage_duration,
+                    p95_shortage_duration_h      = m_m3.p95_shortage_duration,
+                    max_shortfall_mw             = m_m3.max_shortfall,
+                    mean_shortfall_when_shedding_mw = m_m3.mean_shortfall_when_shedding,
+                    lolh_ci95_halfwidth          = m_m3.lolh_ci95_halfwidth,
+                    lolh_ci95_rel_halfwidth      = m_m3.lolh_ci95_rel_halfwidth,
+                    eue_ci95_halfwidth_mwh       = m_m3.eue_ci95_halfwidth,
+                    eue_ci95_rel_halfwidth       = m_m3.eue_ci95_rel_halfwidth,
+                    p1_fire_scenarios            = -1,
+                    p1_fire_hours                = -1,
+                    runtime_s                    = round(rt, digits=1),
                 ))
                 @info "  M3:  LOLH=$(round(m_m3.lolh, digits=2)) h  " *
                       "EUE=$(round(m_m3.eue, digits=1)) MWh  " *
@@ -288,14 +333,20 @@ let
 
             # ── table ─────────────────────────────────────────────────────
             println(io, "Aggregate reliability metrics")
-            println(io, "-" ^ 72)
-            @printf(io, "  %-28s %-6s %10s %12s %14s\n",
-                "Case", "Model", "LOLH (h)", "EUE (MWh)", "CVaR-EUE")
-            println(io, "  " * "-" ^ 68)
+            println(io, "-" ^ 96)
+            @printf(io, "  %-28s %-6s %9s %7s %9s %12s %14s %12s %10s\n",
+                    "Case", "Model", "LOLH (h)", "LOLP%",
+                    "LOLE_d", "EUE (MWh)", "CVaR-EUE", "max_sf(MW)", "rt (s)")
+            println(io, "  " * "-" ^ 92)
             for r in eachrow(df)
-                @printf(io, "  %-28s %-6s %10.2f %12.1f %14.1f\n",
-                    r.case_name, r.model, r.lolh_hours, r.eue_mwh, r.cvar_eue_mwh)
+                @printf(io, "  %-28s %-6s %9.2f %7.4f %9.2f %12.1f %14.1f %12.1f %10.1f\n",
+                        r.case_name, r.model,
+                        r.lolh_hours, r.lolp_percent,
+                        r.lole_days, r.eue_mwh,
+                        r.cvar_eue_mwh, r.max_shortfall_mw, r.runtime_s)
             end
+            println(io, "  Full CSV outputs include event-duration metrics, " *
+                        "scenario-EUE quantiles, and Monte Carlo confidence intervals.")
             println(io)
 
             # ── Q1: storage sensitivity ───────────────────────────────────

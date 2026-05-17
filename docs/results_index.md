@@ -138,16 +138,17 @@ committed here because they are small (N=5 scenarios).
 
 ---
 
-## 7. Future redesigned VRE experiments
+## 7. VRE method comparison
 
-**Folder:** `results/vre_method_comparison/`  *(planned)*
+**Folder:** `results/vre_method_comparison/`
 
-**Intended files:**
+**Files:**
 - `vre_case_summary.csv` — one row per VRE case; system-level penetration metrics
   computed at case-build time (see column list below).  Independent of dispatch method.
-- `vre_method_comparison_results.csv` — one row per (VRE case, method); LOLH, EUE, runtime
+- `vre_method_comparison_results.csv` — one row per (VRE case, method); full metric suite
 - `vre_method_comparison_errors.csv` — error vs RA-3 benchmark, runtime ratio per (case, method)
-- `accuracy_runtime_frontier.csv` — aggregated accuracy × runtime statistics for Figure 4
+- `summary.txt` — auto-generated Q1–Q5 narrative and runtime table
+- `accuracy_runtime_frontier.csv` — aggregated accuracy × runtime statistics for Figure 4 *(planned)*
 
 **`vre_case_summary.csv` columns:**
 
@@ -171,14 +172,29 @@ committed here because they are small (N=5 scenarios).
 | `negative_net_load_hours` | Hours where net load < 0 |
 | `vre_exceeds_load_hours` | Hours where wind\_avail\_h + solar\_avail\_h > load\_h |
 
-**Scripts:** `scripts/15_run_vre_experiment.jl`, `scripts/17_run_vre_all_methods.jl`
+**`vre_method_comparison_results.csv` columns** (per-method reliability metrics):
 
-**Status:** Planned (Phase D).  Will contain the main experiment results
-comparing RA-1a, RA-1b, RA-2, and RA-3 across six VRE penetration/profile
-cases.
+| Group | Columns |
+|-------|---------|
+| ID / case metadata | `case_name`, `model`, `n_scenarios`, `seed`, `load_scale`, `wind_scale`, `solar_scale`, `available_vre_energy_share`, `vre_capacity_share_no_storage`, `vre_capacity_share_incl_storage`, `negative_net_load_hours`, `vre_exceeds_load_hours`, `net_load_peak_mw` |
+| Frequency | `lolh_hours`, `lolp`, `lolp_percent`, `lole_days` |
+| Energy | `eue_mwh`, `neue_ppm` |
+| Event structure | `n_shortage_events`, `mean_shortage_duration_h`, `max_shortage_duration_h`, `p95_shortage_duration_h` |
+| Severity | `max_shortfall_mw`, `mean_shortfall_when_shedding_mw` |
+| Tail risk | `p50_scenario_eue_mwh`, `p90_scenario_eue_mwh`, `p95_scenario_eue_mwh`, `p99_scenario_eue_mwh`, `cvar_eue_mwh` |
+| MC uncertainty | `lolh_ci95_halfwidth`, `lolh_ci95_rel_halfwidth`, `eue_ci95_halfwidth_mwh`, `eue_ci95_rel_halfwidth` |
+| Storage heuristic | `p1_fire_scenarios`, `p1_fire_hours` |
+| Run info | `runtime_s`, `status`, `error_message` |
 
-**Commit policy:** Commit summary and error CSVs; do not commit per-scenario
-dispatch files.
+**Scripts:** `scripts/15_summarize_vre_cases.jl` (builds `vre_case_summary.csv`),
+`scripts/16_run_vre_method_comparison.jl` (runs methods, writes all other files)
+
+**Status:** Initial N=5 sanity run complete (Phase C); N=20 priority-case runs planned
+after RA-2 implementation.  See `docs/vre_method_comparison_memo.md` for analysis.
+
+**Commit policy:** Commit `vre_case_summary.csv`, `vre_method_comparison_results.csv`,
+`vre_method_comparison_errors.csv`, and `summary.txt`.  Do not commit per-scenario
+dispatch files or log files.
 
 ---
 

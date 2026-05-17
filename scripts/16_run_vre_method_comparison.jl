@@ -165,31 +165,48 @@ let
 
         # helper to build a full result NamedTuple
         function make_row(model, metrics, rt, p1_scen, p1_hrs, status, errmsg)
+            m = metrics
+            nan = NaN
             return (
-                case_name                      = cname,
-                model                          = model,
-                n_scenarios                    = n_scenarios,
-                seed                           = seed,
-                load_scale                     = vmeta.load_scale,
-                wind_scale                     = vmeta.wind_scale,
-                solar_scale                    = vmeta.solar_scale,
-                available_vre_energy_share     = vmeta.available_vre_energy_share,
-                vre_capacity_share_no_storage  = vmeta.vre_capacity_share_no_storage,
-                vre_capacity_share_incl_storage= vmeta.vre_capacity_share_incl_storage,
-                negative_net_load_hours        = vmeta.negative_net_load_hours,
-                vre_exceeds_load_hours         = vmeta.vre_exceeds_load_hours,
-                net_load_peak_mw               = vmeta.net_load_peak_mw,
-                lolh_hours                     = isnothing(metrics) ? NaN : metrics.lolh,
-                eue_mwh                        = isnothing(metrics) ? NaN : metrics.eue,
-                neue_ppm                       = isnothing(metrics) ? NaN : metrics.neue * 1e6,
-                cvar_eue_mwh                   = isnothing(metrics) ? NaN : metrics.cvar_eue,
-                n_shortage_events              = isnothing(metrics) ? NaN : metrics.n_shortage_events,
-                max_shortfall_mw               = isnothing(metrics) ? NaN : metrics.max_shortfall,
-                p1_fire_scenarios              = p1_scen,
-                p1_fire_hours                  = p1_hrs,
-                runtime_s                      = round(rt; digits=1),
-                status                         = status,
-                error_message                  = errmsg,
+                case_name                       = cname,
+                model                           = model,
+                n_scenarios                     = n_scenarios,
+                seed                            = seed,
+                load_scale                      = vmeta.load_scale,
+                wind_scale                      = vmeta.wind_scale,
+                solar_scale                     = vmeta.solar_scale,
+                available_vre_energy_share      = vmeta.available_vre_energy_share,
+                vre_capacity_share_no_storage   = vmeta.vre_capacity_share_no_storage,
+                vre_capacity_share_incl_storage = vmeta.vre_capacity_share_incl_storage,
+                negative_net_load_hours         = vmeta.negative_net_load_hours,
+                vre_exceeds_load_hours          = vmeta.vre_exceeds_load_hours,
+                net_load_peak_mw                = vmeta.net_load_peak_mw,
+                lolh_hours                      = isnothing(m) ? nan : m.lolh,
+                lolp                            = isnothing(m) ? nan : m.lolp,
+                lolp_percent                    = isnothing(m) ? nan : 100.0 * m.lolp,
+                lole_days                       = isnothing(m) ? nan : m.lole_days,
+                eue_mwh                         = isnothing(m) ? nan : m.eue,
+                neue_ppm                        = isnothing(m) ? nan : m.neue * 1e6,
+                cvar_eue_mwh                    = isnothing(m) ? nan : m.cvar_eue,
+                p50_scenario_eue_mwh            = isnothing(m) ? nan : m.p50_scenario_eue,
+                p90_scenario_eue_mwh            = isnothing(m) ? nan : m.p90_scenario_eue,
+                p95_scenario_eue_mwh            = isnothing(m) ? nan : m.p95_scenario_eue,
+                p99_scenario_eue_mwh            = isnothing(m) ? nan : m.p99_scenario_eue,
+                n_shortage_events               = isnothing(m) ? nan : m.n_shortage_events,
+                mean_shortage_duration_h        = isnothing(m) ? nan : m.mean_shortage_duration,
+                max_shortage_duration_h         = isnothing(m) ? nan : m.max_shortage_duration,
+                p95_shortage_duration_h         = isnothing(m) ? nan : m.p95_shortage_duration,
+                max_shortfall_mw                = isnothing(m) ? nan : m.max_shortfall,
+                mean_shortfall_when_shedding_mw = isnothing(m) ? nan : m.mean_shortfall_when_shedding,
+                lolh_ci95_halfwidth             = isnothing(m) ? nan : m.lolh_ci95_halfwidth,
+                lolh_ci95_rel_halfwidth         = isnothing(m) ? nan : m.lolh_ci95_rel_halfwidth,
+                eue_ci95_halfwidth_mwh          = isnothing(m) ? nan : m.eue_ci95_halfwidth,
+                eue_ci95_rel_halfwidth          = isnothing(m) ? nan : m.eue_ci95_rel_halfwidth,
+                p1_fire_scenarios               = p1_scen,
+                p1_fire_hours                   = p1_hrs,
+                runtime_s                       = round(rt; digits=1),
+                status                          = status,
+                error_message                   = errmsg,
             )
         end
 
@@ -272,21 +289,45 @@ let
             for mlabel in ("M1", "M1b")
                 mrow = filter(r -> r.case_name == cname && r.model == mlabel && r.status == "ok", ok_df)
                 isempty(mrow) && continue
-                m_lolh = mrow[1, :lolh_hours]
-                m_eue  = mrow[1, :eue_mwh]
-                m_rt   = mrow[1, :runtime_s]
+                safe_rel(method_val, bench_val) =
+                    bench_val > 0.0 ? (method_val - bench_val) / bench_val : NaN
+
                 push!(error_comparison_rows, (
-                    case_name          = cname,
-                    method             = mlabel,
-                    m3_lolh_hours      = m3_lolh,
-                    method_lolh_hours  = m_lolh,
-                    lolh_error_h       = m_lolh - m3_lolh,
-                    lolh_rel_error     = m3_lolh > 0.0 ? (m_lolh - m3_lolh) / m3_lolh : NaN,
-                    m3_eue_mwh         = m3_eue,
-                    method_eue_mwh     = m_eue,
-                    eue_error_mwh      = m_eue - m3_eue,
-                    eue_rel_error      = m3_eue > 0.0 ? (m_eue - m3_eue) / m3_eue : NaN,
-                    runtime_ratio_vs_m3= m3_rt > 0.0 ? m3_rt / m_rt : NaN,
+                    case_name                          = cname,
+                    method                             = mlabel,
+                    m3_lolh_hours                      = m3_row[1, :lolh_hours],
+                    method_lolh_hours                  = mrow[1, :lolh_hours],
+                    lolh_error_h                       = mrow[1, :lolh_hours] - m3_row[1, :lolh_hours],
+                    lolh_rel_error                     = safe_rel(mrow[1, :lolh_hours],   m3_row[1, :lolh_hours]),
+                    m3_lolp                            = m3_row[1, :lolp],
+                    method_lolp                        = mrow[1, :lolp],
+                    lolp_error                         = mrow[1, :lolp] - m3_row[1, :lolp],
+                    m3_lole_days                       = m3_row[1, :lole_days],
+                    method_lole_days                   = mrow[1, :lole_days],
+                    lole_days_error                    = mrow[1, :lole_days] - m3_row[1, :lole_days],
+                    m3_eue_mwh                         = m3_row[1, :eue_mwh],
+                    method_eue_mwh                     = mrow[1, :eue_mwh],
+                    eue_error_mwh                      = mrow[1, :eue_mwh] - m3_row[1, :eue_mwh],
+                    eue_rel_error                      = safe_rel(mrow[1, :eue_mwh], m3_row[1, :eue_mwh]),
+                    m3_neue_ppm                        = m3_row[1, :neue_ppm],
+                    method_neue_ppm                    = mrow[1, :neue_ppm],
+                    neue_ppm_error                     = mrow[1, :neue_ppm] - m3_row[1, :neue_ppm],
+                    neue_rel_error                     = safe_rel(mrow[1, :neue_ppm], m3_row[1, :neue_ppm]),
+                    m3_cvar_eue_mwh                    = m3_row[1, :cvar_eue_mwh],
+                    method_cvar_eue_mwh                = mrow[1, :cvar_eue_mwh],
+                    cvar_eue_error_mwh                 = mrow[1, :cvar_eue_mwh] - m3_row[1, :cvar_eue_mwh],
+                    cvar_eue_rel_error                 = safe_rel(mrow[1, :cvar_eue_mwh], m3_row[1, :cvar_eue_mwh]),
+                    m3_n_shortage_events               = m3_row[1, :n_shortage_events],
+                    method_n_shortage_events           = mrow[1, :n_shortage_events],
+                    n_shortage_events_error            = mrow[1, :n_shortage_events] - m3_row[1, :n_shortage_events],
+                    m3_max_shortfall_mw                = m3_row[1, :max_shortfall_mw],
+                    method_max_shortfall_mw            = mrow[1, :max_shortfall_mw],
+                    max_shortfall_error_mw             = mrow[1, :max_shortfall_mw] - m3_row[1, :max_shortfall_mw],
+                    m3_mean_shortfall_mw               = m3_row[1, :mean_shortfall_when_shedding_mw],
+                    method_mean_shortfall_mw           = mrow[1, :mean_shortfall_when_shedding_mw],
+                    mean_shortfall_error_mw            = mrow[1, :mean_shortfall_when_shedding_mw] - m3_row[1, :mean_shortfall_when_shedding_mw],
+                    runtime_ratio_vs_m3                = m3_row[1, :runtime_s] > 0.0 ?
+                                                         m3_row[1, :runtime_s] / mrow[1, :runtime_s] : NaN,
                 ))
             end
         end
@@ -312,15 +353,19 @@ let
         else
             # ── main results table ─────────────────────────────────────────────
             println(io, "Aggregate reliability metrics")
-            println(io, "-" ^ 80)
-            @printf(io, "  %-20s %-5s %8s %8s %12s %14s\n",
-                    "Case", "Model", "LOLH(h)", "EUE(MWh)", "vre_e_shr", "neg_NL_h")
-            println(io, "  " * "-" ^ 72)
+            println(io, "-" ^ 100)
+            @printf(io, "  %-20s %-5s %8s %7s %7s %10s %10s %10s %8s\n",
+                    "Case", "Model", "LOLH(h)", "LOLP%", "LOLE_d",
+                    "EUE(MWh)", "CVaR-EUE", "MaxSF(MW)", "rt(s)")
+            println(io, "  " * "-" ^ 94)
             for r in eachrow(ok_df)
-                @printf(io, "  %-20s %-5s %8.2f %8.1f %12.4f %14d\n",
-                        r.case_name, r.model, r.lolh_hours, r.eue_mwh,
-                        r.available_vre_energy_share, r.negative_net_load_hours)
+                @printf(io, "  %-20s %-5s %8.2f %7.3f %7.2f %10.1f %10.1f %10.1f %8.1f\n",
+                        r.case_name, r.model,
+                        r.lolh_hours, 100.0 * r.lolp, r.lole_days,
+                        r.eue_mwh, r.cvar_eue_mwh, r.max_shortfall_mw, r.runtime_s)
             end
+            println(io, "  Note: Full CSV outputs include event-duration metrics, " *
+                        "scenario-EUE quantiles, and Monte Carlo confidence intervals.")
             println(io)
 
             # ── Q1: does M1b improve over M1? ─────────────────────────────────
@@ -438,14 +483,19 @@ let
     println("=" ^ 90)
 
     if !isempty(results_rows)
-        @printf("  %-20s %-5s %10s %12s %12s %10s\n",
-                "Case", "Model", "LOLH (h)", "EUE (MWh)", "vre_e_shr", "runtime_s")
-        println("  " * "-" ^ 74)
+        @printf("  %-20s %-5s %8s %7s %7s %10s %10s %10s %8s\n",
+                "Case", "Model", "LOLH(h)", "LOLP%", "LOLE_d",
+                "EUE(MWh)", "CVaR-EUE", "MaxSF(MW)", "rt(s)")
+        println("  " * "-" ^ 94)
         for r in eachrow(ok_df)
-            @printf("  %-20s %-5s %10.2f %12.1f %12.4f %10.1f\n",
-                    r.case_name, r.model, r.lolh_hours, r.eue_mwh,
-                    r.available_vre_energy_share, r.runtime_s)
+            @printf("  %-20s %-5s %8.2f %7.3f %7.2f %10.1f %10.1f %10.1f %8.1f\n",
+                    r.case_name, r.model,
+                    r.lolh_hours, 100.0 * r.lolp, r.lole_days,
+                    r.eue_mwh, r.cvar_eue_mwh, r.max_shortfall_mw, r.runtime_s)
         end
+        println()
+        println("  Note: Full CSV outputs include event-duration metrics, " *
+                "scenario-EUE quantiles, and Monte Carlo confidence intervals.")
     end
 
     println("=" ^ 90)

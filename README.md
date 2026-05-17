@@ -340,6 +340,63 @@ Storage is the primary energy-limited resource.  Load shedding is allowed
 at a configurable VOLL (default \$10,000/MWh).  Unit commitment is
 introduced only in RA-4 via HOPE.
 
+## Reliability metric taxonomy
+
+All implemented methods compute a common set of metrics stored in `MetricsResult`
+(see `src/metrics/ReliabilityMetrics.jl`).
+
+### Frequency of shortfall
+
+| Metric | Field | Definition |
+|--------|-------|-----------|
+| LOLH | `lolh` | Mean loss-of-load hours per year (h/yr) |
+| LOLP | `lolp` | Loss-of-load probability = LOLH / n\_hours |
+| LOLE days | `lole_days` | Mean days per year with ≥ 1 shortage hour |
+
+### Energy not served
+
+| Metric | Field | Definition |
+|--------|-------|-----------|
+| EUE | `eue` | Expected unserved energy (MWh/yr) |
+| nEUE | `neue` | EUE / annual load energy (fraction; report in ppm = × 10⁶) |
+
+### Shortage event structure
+
+| Metric | Field | Definition |
+|--------|-------|-----------|
+| Event count | `n_shortage_events` | Mean number of distinct contiguous shortage events per scenario |
+| Mean duration | `mean_shortage_duration` | Mean event duration (h) |
+| Max duration | `max_shortage_duration` | Maximum event duration across all scenarios (h) |
+| p95 duration | `p95_shortage_duration` | 95th percentile of event duration pooled across scenarios (h) |
+
+### Shortfall severity
+
+| Metric | Field | Definition |
+|--------|-------|-----------|
+| Max shortfall | `max_shortfall` | Maximum single-hour load shed across all scenario-hours (MW) |
+| Mean shortfall | `mean_shortfall_when_shedding` | Mean load shed conditional on shed > 0 (MW) |
+
+### Tail risk (scenario distribution)
+
+| Metric | Field | Definition |
+|--------|-------|-----------|
+| p50/p90/p95/p99 EUE | `p{q}_scenario_eue` | Percentiles of the per-scenario EUE distribution (MWh) |
+| CVaR-EUE | `cvar_eue` | Mean of the top 5% of per-scenario EUEs (MWh) |
+
+### Monte Carlo uncertainty
+
+| Metric | Field | Definition |
+|--------|-------|-----------|
+| LOLH CI95 | `lolh_ci95_halfwidth` | 1.96 × std(per-scenario LOLH) / √N (h) |
+| EUE CI95 | `eue_ci95_halfwidth` | 1.96 × std(per-scenario EUE) / √N (MWh) |
+| Relative CIs | `*_ci95_rel_halfwidth` | Half-width / mean; `NaN` when mean = 0 |
+
+Primary summary tables show **LOLH, LOLP %, LOLE days, EUE, CVaR-EUE, max shortfall,
+and runtime**.  Full CSV outputs include event-duration metrics, scenario-EUE quantiles,
+and Monte Carlo confidence intervals.
+
+---
+
 ## Repository layout
 
 ```

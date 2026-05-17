@@ -63,8 +63,11 @@ export run_m2_rolling_window
 export run_m3_ed_dispatch
 
 export MetricsResult, compute_metrics
-export compute_lolh, compute_eue, compute_neue
-export compute_shortage_events, compute_cvar, aggregate_metrics
+export compute_lolh, compute_lolp, compute_lole_days
+export compute_eue, compute_neue
+export compute_shortage_events, compute_shortfall_severity
+export compute_ci95, compute_quantile, compute_cvar
+export aggregate_metrics
 
 export ExperimentResult, ModelResults, run_experiment
 export build_dispatch_df, build_gen_dispatch_df, build_scenario_metrics_df

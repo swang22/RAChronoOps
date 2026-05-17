@@ -174,6 +174,29 @@ accuracy advantage is confirmed on priority cases.
 
 ---
 
+---
+
+## 6. Expanded metric outputs
+
+The results CSV (`vre_method_comparison_results.csv`) includes the full
+reliability metric suite beyond LOLH and EUE:
+
+| Group | Fields |
+|-------|--------|
+| Frequency | `lolh_hours`, `lolp`, `lolp_percent`, `lole_days` |
+| Energy | `eue_mwh`, `neue_ppm` |
+| Event structure | `n_shortage_events`, `mean_shortage_duration_h`, `max_shortage_duration_h`, `p95_shortage_duration_h` |
+| Severity | `max_shortfall_mw`, `mean_shortfall_when_shedding_mw` |
+| Tail risk | `p50/p90/p95/p99_scenario_eue_mwh`, `cvar_eue_mwh` |
+| MC uncertainty | `lolh_ci95_halfwidth`, `lolh_ci95_rel_halfwidth`, `eue_ci95_halfwidth_mwh`, `eue_ci95_rel_halfwidth` |
+
+The error table (`vre_method_comparison_errors.csv`) computes M1 and M1b
+vs M3 differences for all primary metrics.  Relative errors use `NaN` when
+the M3 benchmark value is zero to avoid division artefacts in near-zero LOLH
+cases.
+
+---
+
 *Generated from `results/vre_method_comparison/summary.txt`,
 `vre_method_comparison_results.csv`, and `vre_method_comparison_errors.csv`.*
 *All runs use common random numbers (shared `ScenarioSet`, seed=42).*

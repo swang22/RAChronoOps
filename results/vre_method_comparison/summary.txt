@@ -1,96 +1,67 @@
 ================================================================================
 VRE Method Comparison Summary
-Generated: 2026-05-17 02:05:18
-n_scenarios: 5  |  seed: 42  |  skip_m3: false
+Generated: 2026-05-17 02:56:04
+n_scenarios: 3  |  seed: 42  |  skip_m3: true
 ================================================================================
 
 Aggregate reliability metrics
---------------------------------------------------------------------------------
-  Case                 Model  LOLH(h) EUE(MWh)    vre_e_shr       neg_NL_h
-  ------------------------------------------------------------------------
-  VRE120_base          M1      115.60  41846.4       0.2887             23
-  VRE120_base          M1b     103.80  39203.6       0.2887             23
-  VRE120_base          M3       11.20   4707.4       0.2887             23
-  VRE120_bal15         M1       63.80  21058.3       0.4331            620
-  VRE120_bal15         M1b      48.60  17635.2       0.4331            620
-  VRE120_bal15         M3        3.60    698.6       0.4331            620
-  VRE120_bal20         M1       45.00  14922.0       0.5774           1684
-  VRE120_bal20         M1b      26.40  10770.1       0.5774           1684
-  VRE120_bal20         M3        2.40    282.4       0.5774           1684
-  VRE120_bal30         M1       31.20  10290.7       0.8662           3492
-  VRE120_bal30         M1b      12.80   5856.1       0.8662           3492
-  VRE120_bal30         M3        1.00     82.6       0.8662           3492
-  VRE120_solar_hvy     M1       53.40  19229.1       0.5499           1717
-  VRE120_solar_hvy     M1b      26.20  12335.4       0.5499           1717
-  VRE120_solar_hvy     M3        2.80    236.4       0.5499           1717
-  VRE120_wind_hvy      M1       67.20  21202.4       0.6050           2221
-  VRE120_wind_hvy      M1b      36.40  13798.6       0.6050           2221
-  VRE120_wind_hvy      M3        4.40   1113.2       0.6050           2221
+----------------------------------------------------------------------------------------------------
+  Case                 Model  LOLH(h)   LOLP%  LOLE_d   EUE(MWh)   CVaR-EUE  MaxSF(MW)    rt(s)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base          M1      107.00   1.221   28.00    35119.1    40276.9     1060.6      0.7
+  VRE120_base          M1b      94.67   1.081   24.00    32369.3    37527.1     1060.6      0.3
+  VRE120_bal15         M1       57.67   0.658   21.00    17821.0    19992.3      959.8      0.2
+  VRE120_bal15         M1b      42.00   0.479   15.33    14090.8    16262.1      959.8      0.1
+  VRE120_bal20         M1       40.67   0.464   18.33    12736.9    14330.8      881.9      0.1
+  VRE120_bal20         M1b      22.33   0.255   10.00     8371.5    10387.7      870.4      0.1
+  VRE120_bal30         M1       28.33   0.323   14.33     8889.3     9895.2      821.5      0.4
+  VRE120_bal30         M1b      10.33   0.118    4.00     4106.9     5836.9      780.5      0.1
+  VRE120_solar_hvy     M1       49.67   0.567   23.00    16640.7    18359.3     1003.3      0.1
+  VRE120_solar_hvy     M1b      23.33   0.266    9.67     9952.6    12525.0      993.9      0.1
+  VRE120_wind_hvy      M1       61.00   0.696   19.67    17905.1    20296.4      930.1      0.1
+  VRE120_wind_hvy      M1b      32.33   0.369    9.00    11356.5    13622.0      930.1      0.1
+  Note: Full CSV outputs include event-duration metrics, scenario-EUE quantiles, and Monte Carlo confidence intervals.
 
 Q1. Does RA-1b improve over RA-1a across VRE cases?
-  VRE120_base           M1=115.60 h  M1b=103.80 h  ↓ improved 11.8 h
-  VRE120_bal15          M1=63.80 h  M1b=48.60 h  ↓ improved 15.2 h
-  VRE120_bal20          M1=45.00 h  M1b=26.40 h  ↓ improved 18.6 h
-  VRE120_bal30          M1=31.20 h  M1b=12.80 h  ↓ improved 18.4 h
-  VRE120_solar_hvy      M1=53.40 h  M1b=26.20 h  ↓ improved 27.2 h
-  VRE120_wind_hvy       M1=67.20 h  M1b=36.40 h  ↓ improved 30.8 h
+  VRE120_base           M1=107.00 h  M1b=94.67 h  ↓ improved 12.33 h
+  VRE120_bal15          M1=57.67 h  M1b=42.00 h  ↓ improved 15.67 h
+  VRE120_bal20          M1=40.67 h  M1b=22.33 h  ↓ improved 18.33 h
+  VRE120_bal30          M1=28.33 h  M1b=10.33 h  ↓ improved 18.0 h
+  VRE120_solar_hvy      M1=49.67 h  M1b=23.33 h  ↓ improved 26.33 h
+  VRE120_wind_hvy       M1=61.00 h  M1b=32.33 h  ↓ improved 28.67 h
 
 Q2. Does RA-1b remain biased high relative to RA-3?
-  VRE120_base           M1b=103.80 h  M3=11.20 h  error=+92.60 h (9.3x)
-  VRE120_bal15          M1b=48.60 h  M3=3.60 h  error=+45.00 h (13.5x)
-  VRE120_bal20          M1b=26.40 h  M3=2.40 h  error=+24.00 h (11.0x)
-  VRE120_bal30          M1b=12.80 h  M3=1.00 h  error=+11.80 h (12.8x)
-  VRE120_solar_hvy      M1b=26.20 h  M3=2.80 h  error=+23.40 h (9.4x)
-  VRE120_wind_hvy       M1b=36.40 h  M3=4.40 h  error=+32.00 h (8.3x)
+  RA-3 not run.
 
 Q3. Does method error increase with VRE penetration?
-  VRE120_base           vre_e_shr=0.2887  neg_NL_h=  23  lolh_err=+92.60 h
-  VRE120_bal15          vre_e_shr=0.4331  neg_NL_h= 620  lolh_err=+45.00 h
-  VRE120_bal20          vre_e_shr=0.5774  neg_NL_h=1684  lolh_err=+24.00 h
-  VRE120_bal30          vre_e_shr=0.8662  neg_NL_h=3492  lolh_err=+11.80 h
-  VRE120_solar_hvy      vre_e_shr=0.5499  neg_NL_h=1717  lolh_err=+23.40 h
-  VRE120_wind_hvy       vre_e_shr=0.6050  neg_NL_h=2221  lolh_err=+32.00 h
+  RA-3 not run — cannot compute errors.
 
 Q4. Are solar-heavy and wind-heavy cases different?
-  VRE120_solar_hvy      M1     LOLH=53.40 h  EUE=19229.1 MWh
-  VRE120_solar_hvy      M1b    LOLH=26.20 h  EUE=12335.4 MWh
-  VRE120_solar_hvy      M3     LOLH=2.80 h  EUE=236.4 MWh
-  VRE120_wind_hvy       M1     LOLH=67.20 h  EUE=21202.4 MWh
-  VRE120_wind_hvy       M1b    LOLH=36.40 h  EUE=13798.6 MWh
-  VRE120_wind_hvy       M3     LOLH=4.40 h  EUE=1113.2 MWh
+  VRE120_solar_hvy      M1     LOLH=49.67 h  EUE=16640.7 MWh
+  VRE120_solar_hvy      M1b    LOLH=23.33 h  EUE=9952.6 MWh
+  VRE120_wind_hvy       M1     LOLH=61.00 h  EUE=17905.1 MWh
+  VRE120_wind_hvy       M1b    LOLH=32.33 h  EUE=11356.5 MWh
 
 Q5. Which VRE cases should be prioritised for RA-2 (event-window LP)?
-  (ranked by M1b absolute LOLH error vs M3, largest first)
-  1. VRE120_base           lolh_err=+92.60 h  m3=11.20 h  m1b=103.80 h
-  2. VRE120_bal15          lolh_err=+45.00 h  m3=3.60 h  m1b=48.60 h
-  3. VRE120_wind_hvy       lolh_err=+32.00 h  m3=4.40 h  m1b=36.40 h
-  4. VRE120_bal20          lolh_err=+24.00 h  m3=2.40 h  m1b=26.40 h
-  5. VRE120_solar_hvy      lolh_err=+23.40 h  m3=2.80 h  m1b=26.20 h
-  6. VRE120_bal30          lolh_err=+11.80 h  m3=1.00 h  m1b=12.80 h
+  RA-3 not run — cannot rank cases.
 
 Runtime summary
 ----------------------------------------
-  VRE120_base           M1     0.8 s
-  VRE120_base           M1b    0.4 s
-  VRE120_base           M3     49.3 s
-  VRE120_bal15          M1     0.3 s
-  VRE120_bal15          M1b    0.2 s
-  VRE120_bal15          M3     46.1 s
-  VRE120_bal20          M1     0.3 s
-  VRE120_bal20          M1b    0.3 s
-  VRE120_bal20          M3     46.1 s
-  VRE120_bal30          M1     0.2 s
-  VRE120_bal30          M1b    0.2 s
-  VRE120_bal30          M3     44.1 s
-  VRE120_solar_hvy      M1     0.2 s
-  VRE120_solar_hvy      M1b    0.2 s
-  VRE120_solar_hvy      M3     45.0 s
-  VRE120_wind_hvy       M1     0.2 s
-  VRE120_wind_hvy       M1b    0.6 s
-  VRE120_wind_hvy       M3     45.8 s
-  Total wall time: 289.8 s
+  VRE120_base           M1     0.7 s
+  VRE120_base           M1b    0.3 s
+  VRE120_bal15          M1     0.2 s
+  VRE120_bal15          M1b    0.1 s
+  VRE120_bal20          M1     0.1 s
+  VRE120_bal20          M1b    0.1 s
+  VRE120_bal30          M1     0.4 s
+  VRE120_bal30          M1b    0.1 s
+  VRE120_solar_hvy      M1     0.1 s
+  VRE120_solar_hvy      M1b    0.1 s
+  VRE120_wind_hvy       M1     0.1 s
+  VRE120_wind_hvy       M1b    0.1 s
+  Total wall time: 8.7 s
 
 ================================================================================
 Full results: vre_method_comparison_results.csv
 Error table:  vre_method_comparison_errors.csv
-Log:          run_20260517_020020.log
+Log:          run_20260517_025549.log

@@ -198,28 +198,79 @@ These statistics are computed at case-build time and stored in
 
 ### Per-run reliability metrics
 
-| Metric | Definition |
-|--------|-----------|
-| LOLH | Loss-of-load hours per year (mean across scenarios) |
-| EUE | Expected unserved energy (MWh/yr, mean across scenarios) |
-| nEUE | Normalised EUE (EUE ÷ annual load energy, ppm) |
-| CVaR-EUE | 95th-percentile conditional value-at-risk of scenario EUE |
-| n\_shortage\_events | Mean number of distinct shortage events per scenario |
-| max\_shortfall\_mw | Mean peak shortfall per scenario (MW) |
-| p95\_event\_duration | 95th percentile of shortage event duration (hours) |
-| runtime\_s | Wall-clock time (seconds) |
+#### Frequency of shortfall
+
+| Metric | Field name | Definition |
+|--------|-----------|-----------|
+| LOLH | `lolh` | Loss-of-load hours per year (mean across scenarios) |
+| LOLP | `lolp` | Loss-of-load probability = LOLH / n\_hours |
+| LOLE days | `lole_days` | Mean days per year with ≥ 1 shortage hour (24-hour windows) |
+
+#### Energy not served
+
+| Metric | Field name | Definition |
+|--------|-----------|-----------|
+| EUE | `eue` | Expected unserved energy (MWh/yr, mean across scenarios) |
+| nEUE | `neue` | Normalised EUE = EUE / annual load energy (fraction; ×10⁶ for ppm) |
+
+#### Shortage event structure
+
+| Metric | Field name | Definition |
+|--------|-----------|-----------|
+| Event count | `n_shortage_events` | Mean number of distinct contiguous shortage events per scenario |
+| Mean duration | `mean_shortage_duration` | Mean duration of shortage events (hours) |
+| Max duration | `max_shortage_duration` | Maximum shortage event duration across all scenarios (hours) |
+| p95 duration | `p95_shortage_duration` | 95th percentile of event duration pooled across all scenarios (hours) |
+
+#### Shortfall severity
+
+| Metric | Field name | Definition |
+|--------|-----------|-----------|
+| Max shortfall | `max_shortfall` | Maximum single-hour load shed across all scenario-hours (MW) |
+| Mean shortfall | `mean_shortfall_when_shedding` | Mean load shed conditioned on shed > 0 (MW) |
+
+#### Tail risk (scenario distribution)
+
+| Metric | Field name | Definition |
+|--------|-----------|-----------|
+| p50 scenario EUE | `p50_scenario_eue` | 50th percentile of per-scenario EUE (MWh) |
+| p90 scenario EUE | `p90_scenario_eue` | 90th percentile of per-scenario EUE (MWh) |
+| p95 scenario EUE | `p95_scenario_eue` | 95th percentile of per-scenario EUE (MWh) |
+| p99 scenario EUE | `p99_scenario_eue` | 99th percentile of per-scenario EUE (MWh) |
+| CVaR-EUE | `cvar_eue` | Conditional value-at-risk of EUE at 95% (mean of top 5% of scenario EUEs, MWh) |
+
+#### Monte Carlo uncertainty
+
+| Metric | Field name | Definition |
+|--------|-----------|-----------|
+| LOLH CI95 half-width | `lolh_ci95_halfwidth` | 1.96 × std(per-scenario LOLH) / √N (hours) |
+| LOLH CI95 relative | `lolh_ci95_rel_halfwidth` | CI95 half-width / mean LOLH (NaN when mean = 0) |
+| EUE CI95 half-width | `eue_ci95_halfwidth` | 1.96 × std(per-scenario EUE) / √N (MWh) |
+| EUE CI95 relative | `eue_ci95_rel_halfwidth` | CI95 half-width / mean EUE (NaN when mean = 0) |
+
+#### Runtime
+
+| Metric | Field name | Definition |
+|--------|-----------|-----------|
+| Runtime | `runtime_s` | Wall-clock time for all scenarios (seconds) |
 
 ### Accuracy vs RA-3 benchmark
 
 | Metric | Formula |
 |--------|---------|
-| EUE\_error\_mwh | EUE\_method − EUE\_RA3 |
-| EUE\_rel\_error | (EUE\_method − EUE\_RA3) / EUE\_RA3 |
 | LOLH\_error\_h | LOLH\_method − LOLH\_RA3 |
-| LOLH\_rel\_error | (LOLH\_method − LOLH\_RA3) / LOLH\_RA3 |
-| runtime\_ratio | runtime\_method / runtime\_RA3 |
+| LOLH\_rel\_error | (LOLH\_method − LOLH\_RA3) / LOLH\_RA3 (NaN when RA3 = 0) |
+| EUE\_error\_mwh | EUE\_method − EUE\_RA3 |
+| EUE\_rel\_error | (EUE\_method − EUE\_RA3) / EUE\_RA3 (NaN when RA3 = 0) |
+| LOLP\_error | LOLP\_method − LOLP\_RA3 |
+| LOLE\_days\_error | LOLE\_days\_method − LOLE\_days\_RA3 |
+| nEUE\_rel\_error | (nEUE\_method − nEUE\_RA3) / nEUE\_RA3 (NaN when RA3 = 0) |
+| CVaR-EUE\_rel\_error | (CVaR\_method − CVaR\_RA3) / CVaR\_RA3 (NaN when RA3 = 0) |
+| runtime\_ratio | runtime\_RA3 / runtime\_method (how many times faster than M3) |
 
-These error metrics will be the primary outcome for Figures 2–4.
+These error metrics are the primary outcome for Figures 2–4.  All relative
+errors use `NaN` when the benchmark value is zero (high-VRE near-zero-LOLH
+cases) to avoid spurious division artefacts.
 
 ---
 
