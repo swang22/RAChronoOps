@@ -1,0 +1,46 @@
+┌ Info: Shortage pattern comparison | n=5 | seed=42
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:132
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:133
+┌ Info: Shed threshold: 0.001 MW
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:134
+┌ Info: ── VRE120_base ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:148
+┌ Info:   M2...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:154
+┌ Info:   M2 done (3.7 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:157
+┌ Info:   M3 (may be slow)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:160
+┌ Info:   M3 done (48.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:163
+┌ Info:   VRE120_base done: 5 scenarios compared
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:229
+┌ Info: ── VRE120_bal15 ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:148
+┌ Info:   M2...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:154
+┌ Info:   M2 done (0.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:157
+┌ Info:   M3 (may be slow)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:160
+┌ Info:   M3 done (48.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:163
+┌ Info:   VRE120_bal15 done: 5 scenarios compared
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:229
+┌ Info: ── VRE120_wind_hvy ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:148
+┌ Info:   M2...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:154
+┌ Info:   M2 done (1.2 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:157
+┌ Info:   M3 (may be slow)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:160
+┌ Info:   M3 done (46.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:163
+┌ Info:   VRE120_wind_hvy done: 5 scenarios compared
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:229
+┌ Info: Pattern CSV  → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_pattern_debug\base-bal15-wind_hvy_n5\shortage_pattern_comparison.csv  (15 rows)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:241
+┌ Info: Detail CSV   → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_pattern_debug\base-bal15-wind_hvy_n5\shortage_hour_detail.csv  (113 rows)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\18_compare_m2_m3_shortage_patterns.jl:242
