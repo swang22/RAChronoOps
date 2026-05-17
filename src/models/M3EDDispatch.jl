@@ -10,7 +10,7 @@
 # a higher-fidelity benchmark for selected stress periods where UC constraints
 # may materially affect feasibility.
 #
-# Runtime: ~360 s/scenario on the 8760-hour RTS-GMLC dataset (HiGHS solver).
+# Runtime: ~360 s/scenario with HiGHS; ~10–30 s/scenario with Gurobi.
 #
 # ── Full-year economic dispatch LP (per scenario) ─────────────────────────
 #
@@ -95,10 +95,8 @@ function run_m3_ed_dispatch(
         # availability matrix for this scenario: A[g, h]
         A = Int8.(view(availability, s, :, :))   # n_therm × T
 
-        mdl = Model(HiGHS.Optimizer)
+        mdl = Model(Gurobi.Optimizer)
         set_silent(mdl)
-        set_optimizer_attribute(mdl, "presolve", "on")
-        set_optimizer_attribute(mdl, "parallel", "on")
 
         # ── decision variables ────────────────────────────────────────────
         @variable(mdl, p[1:n_therm, 1:T]     >= 0.0)

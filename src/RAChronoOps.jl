@@ -9,6 +9,7 @@ using Distributions
 using JuMP
 import MathOptInterface as MOI
 using HiGHS
+using Gurobi
 using Logging
 
 # ── include order respects forward references ──────────────────────────────
