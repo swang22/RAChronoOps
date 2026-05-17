@@ -1,0 +1,66 @@
+┌ Info: RA-1b validation | n_scenarios=10 | seed=42
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:129
+┌ Info: Cases: storage120_p05_d4, storage120_p10_d4, storage120_p20_d4
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:130
+┌ Info: Skip M3: false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:131
+┌ Info: ── Case: storage120_p05_d4 ──────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:150
+┌ Info:   storage: 1 units | 492.0 MW / 1968.0 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:159
+┌ Info:   generating 10 scenarios (seed=42)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:165
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:170
+┌ Info:   M1:  LOLH=100.5 h  EUE=34391.6 MWh  (1.0s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:192
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:200
+┌ Info:   M1b: LOLH=93.6 h  EUE=32967.6 MWh  (0.6s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:222
+┌ Info:   running M3 (RA-3, full-year ED LP) — may be slow...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:230
+┌ Info:   M3:  LOLH=31.2 h  EUE=10972.7 MWh  (3871.7s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:251
+┌ Info: ── Case: storage120_p10_d4 ──────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:150
+┌ Info:   storage: 1 units | 983.0 MW / 3932.0 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:159
+┌ Info:   generating 10 scenarios (seed=42)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:165
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:170
+┌ Info:   M1:  LOLH=100.5 h  EUE=34391.6 MWh  (1.6s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:192
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:200
+┌ Info:   M1b: LOLH=88.7 h  EUE=31594.1 MWh  (0.4s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:222
+┌ Info:   running M3 (RA-3, full-year ED LP) — may be slow...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:230
+┌ Info:   M3:  LOLH=7.7 h  EUE=3245.4 MWh  (3948.7s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:251
+┌ Info: ── Case: storage120_p20_d4 ──────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:150
+┌ Info:   storage: 1 units | 1966.0 MW / 7864.0 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:159
+┌ Info:   generating 10 scenarios (seed=42)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:165
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:170
+┌ Info:   M1:  LOLH=100.5 h  EUE=34391.6 MWh  (0.5s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:192
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:200
+┌ Info:   M1b: LOLH=78.2 h  EUE=28987.1 MWh  (0.5s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:222
+┌ Info:   running M3 (RA-3, full-year ED LP) — may be slow...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:230
+┌ Info:   M3:  LOLH=0.0 h  EUE=0.0 MWh  (3934.3s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:251
+┌ Info: Results → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra1b_validation\ra1b_validation_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:271
+┌ Info: Errors  → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra1b_validation\ra1b_validation_errors.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:272
+┌ Info: Summary → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra1b_validation\summary.txt
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\14_run_ra1b_validation.jl:389
