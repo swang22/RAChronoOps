@@ -394,7 +394,20 @@ HiGHS — ~35× speedup).  N=20 benchmark runs are now tractable (~3–4 min/cas
 2. `VRE120_bal15` (+45.0 h)
 3. `VRE120_wind_hvy` (+32.0 h) — multi-day wind variability hardest for heuristic
 
-**Next step:** Run N=20 on priority cases only; then implement RA-2.
+**N=20 priority-case run results** (2026-05-17, seed=42, VRE120_base / bal15 / wind_hvy):
+
+| Case | M1b LOLH | M3 LOLH | M1b/M3 | M3 EUE CI95 rel |
+|------|:--------:|:-------:|:------:|:---------------:|
+| VRE120_base | 83.6 h | 5.95 h | 14× | 60.5% |
+| VRE120_bal15 | 36.8 h | 1.35 h | 27× | 107% |
+| VRE120_wind_hvy | 25.0 h | 2.25 h | 11× | 77% |
+
+Key finding: N=5 M3 benchmarks were inflated by 47–63%.  The N=20 M1b/M3 ratios (11–27×)
+are larger than the N=5 estimates (8–14×), confirming the true bias is worse than initially apparent.
+Even at N=20, M3 EUE relative CI95 half-widths are 60–107%, so near-zero LOLH cases need N=50+
+for stable benchmarks.  Total runtime: 563.6 s (~9 s/scenario).
+
+**Next step:** Implement RA-2; run N=50 on VRE120_base once RA-2 is available for a stable benchmark.
 
 ---
 

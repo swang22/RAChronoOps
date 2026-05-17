@@ -1,0 +1,66 @@
+================================================================================
+VRE Method Comparison Summary
+Generated: 2026-05-17 03:11:18
+n_scenarios: 20  |  seed: 42  |  skip_m3: false
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+Output subdir: base-bal15-wind_hvy_n20
+================================================================================
+
+Aggregate reliability metrics
+----------------------------------------------------------------------------------------------------
+  Case                 Model  LOLH(h)   LOLP%  LOLE_d   EUE(MWh)   CVaR-EUE  MaxSF(MW)    rt(s)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base          M1       95.40   1.089   25.30    31017.1    51937.3     1000.4      1.5
+  VRE120_base          M1b      83.55   0.954   21.25    28272.4    49454.9     1000.2      1.0
+  VRE120_base          M3        5.95   0.068    1.75     2479.2     9782.9      461.1    187.4
+  VRE120_bal15         M1       51.20   0.584   19.15    14923.6    25914.2      837.3      1.4
+  VRE120_bal15         M1b      36.75   0.420   12.75    11608.5    22951.9      808.4      1.1
+  VRE120_bal15         M3        1.35   0.015    0.50      360.1     2722.0      148.0    182.2
+  VRE120_wind_hvy      M1       52.40   0.598   17.40    15801.1    26871.1      889.3      2.2
+  VRE120_wind_hvy      M1b      25.00   0.285    7.25     8982.4    20155.2      826.7      0.9
+  VRE120_wind_hvy      M3        2.25   0.026    0.75      648.2     3528.4      225.5    175.0
+  Note: Full CSV outputs include event-duration metrics, scenario-EUE quantiles, and Monte Carlo confidence intervals.
+
+Q1. Does RA-1b improve over RA-1a across VRE cases?
+  VRE120_base           M1=95.40 h  M1b=83.55 h  ↓ improved 11.85 h
+  VRE120_bal15          M1=51.20 h  M1b=36.75 h  ↓ improved 14.45 h
+  VRE120_wind_hvy       M1=52.40 h  M1b=25.00 h  ↓ improved 27.4 h
+
+Q2. Does RA-1b remain biased high relative to RA-3?
+  VRE120_base           M1b=83.55 h  M3=5.95 h  error=+77.60 h (14.0x)
+  VRE120_bal15          M1b=36.75 h  M3=1.35 h  error=+35.40 h (27.2x)
+  VRE120_wind_hvy       M1b=25.00 h  M3=2.25 h  error=+22.75 h (11.1x)
+
+Q3. Does method error increase with VRE penetration?
+  VRE120_base           vre_e_shr=0.2887  neg_NL_h=  23  lolh_err=+77.60 h
+  VRE120_bal15          vre_e_shr=0.4331  neg_NL_h= 620  lolh_err=+35.40 h
+  VRE120_wind_hvy       vre_e_shr=0.6050  neg_NL_h=2221  lolh_err=+22.75 h
+
+Q4. Are solar-heavy and wind-heavy cases different?
+  VRE120_wind_hvy       M1     LOLH=52.40 h  EUE=15801.1 MWh
+  VRE120_wind_hvy       M1b    LOLH=25.00 h  EUE=8982.4 MWh
+  VRE120_wind_hvy       M3     LOLH=2.25 h  EUE=648.2 MWh
+
+Q5. Which VRE cases should be prioritised for RA-2 (event-window LP)?
+  (ranked by M1b absolute LOLH error vs M3, largest first)
+  1. VRE120_base           lolh_err=+77.60 h  m3=5.95 h  m1b=83.55 h
+  2. VRE120_bal15          lolh_err=+35.40 h  m3=1.35 h  m1b=36.75 h
+  3. VRE120_wind_hvy       lolh_err=+22.75 h  m3=2.25 h  m1b=25.00 h
+
+Runtime summary
+----------------------------------------
+  VRE120_base           M1     1.5 s
+  VRE120_base           M1b    1.0 s
+  VRE120_base           M3     187.4 s
+  VRE120_bal15          M1     1.4 s
+  VRE120_bal15          M1b    1.1 s
+  VRE120_bal15          M3     182.2 s
+  VRE120_wind_hvy       M1     2.2 s
+  VRE120_wind_hvy       M1b    0.9 s
+  VRE120_wind_hvy       M3     175.0 s
+  Total wall time: 563.6 s
+
+================================================================================
+Full results: vre_method_comparison_results.csv
+Error table:  vre_method_comparison_errors.csv
+Log:          run_20260517_030146.log

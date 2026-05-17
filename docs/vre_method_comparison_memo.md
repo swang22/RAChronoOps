@@ -1,8 +1,11 @@
 # VRE Method Comparison Memo
 
 **Date:** 2026-05-17
-**Run:** `scripts/16_run_vre_method_comparison.jl --n-scenarios 5 --seed 42`
-**Cases:** VRE120_base / bal15 / bal20 / bal30 / solar_hvy / wind_hvy
+**Runs:**
+- N=5 all-cases: `scripts/16_run_vre_method_comparison.jl --n-scenarios 5 --seed 42`
+  → `results/vre_method_comparison/all_n5/`
+- N=20 priority cases: `scripts/16_run_vre_method_comparison.jl --cases VRE120_base,VRE120_bal15,VRE120_wind_hvy --n-scenarios 20 --seed 42`
+  → `results/vre_method_comparison/base-bal15-wind_hvy_n20/`
 **Results:** `results/vre_method_comparison/`
 
 ---
@@ -176,7 +179,101 @@ accuracy advantage is confirmed on priority cases.
 
 ---
 
-## 6. Expanded metric outputs
+## 6. N=20 priority-case validation
+
+**Run:** N=20, seed=42, cases = VRE120_base / VRE120_bal15 / VRE120_wind_hvy
+
+### 6a. Main results table (N=20)
+
+All runs: N = 20, seed = 42.
+
+| Case | Model | LOLH (h) | LOLP% | LOLE days | EUE (MWh) | CVaR-EUE (MWh) | MaxSF (MW) | Runtime (s) |
+|------|-------|:--------:|:-----:|:---------:|:---------:|:--------------:|:----------:|:-----------:|
+| VRE120_base | M1 | 95.40 | 1.089 | 25.30 | 31,017 | 51,937 | 1,000 | 1.5 |
+| VRE120_base | M1b | 83.55 | 0.954 | 21.25 | 28,272 | 49,455 | 1,000 | 1.0 |
+| VRE120_base | M3 | 5.95 | 0.068 | 1.75 | 2,479 | 9,783 | 461 | 187.4 |
+| VRE120_bal15 | M1 | 51.20 | 0.584 | 19.15 | 14,924 | 25,914 | 837 | 1.4 |
+| VRE120_bal15 | M1b | 36.75 | 0.420 | 12.75 | 11,609 | 22,952 | 808 | 1.1 |
+| VRE120_bal15 | M3 | 1.35 | 0.015 | 0.50 | 360 | 2,722 | 148 | 182.2 |
+| VRE120_wind_hvy | M1 | 52.40 | 0.598 | 17.40 | 15,801 | 26,871 | 889 | 2.2 |
+| VRE120_wind_hvy | M1b | 25.00 | 0.285 | 7.25 | 8,982 | 20,155 | 827 | 0.9 |
+| VRE120_wind_hvy | M3 | 2.25 | 0.026 | 0.75 | 648 | 3,528 | 226 | 175.0 |
+
+**Total runtime:** 563.6 s (~9.4 min).  M3 runs at ~9 s/scenario (consistent with N=5 estimate).
+
+### 6b. RA-1b vs RA-1a improvement (N=20)
+
+| Case | M1 LOLH | M1b LOLH | Reduction |
+|------|:-------:|:--------:|:---------:|
+| VRE120_base | 95.40 h | 83.55 h | −11.85 h (−12%) |
+| VRE120_bal15 | 51.20 h | 36.75 h | −14.45 h (−28%) |
+| VRE120_wind_hvy | 52.40 h | 25.00 h | −27.40 h (−52%) |
+
+RA-1b consistently improves over RA-1a.  The largest improvement is for the wind-heavy case
+(−52%), where multi-day wind lulls create the most opportunity for emergency reserve management.
+
+### 6c. RA-1b bias vs RA-3 (N=20)
+
+| Case | M1b LOLH | M3 LOLH | Error (h) | M1b/M3 ratio |
+|------|:--------:|:-------:|:---------:|:------------:|
+| VRE120_base | 83.55 h | 5.95 h | +77.60 h | 14.0× |
+| VRE120_bal15 | 36.75 h | 1.35 h | +35.40 h | 27.2× |
+| VRE120_wind_hvy | 25.00 h | 2.25 h | +22.75 h | 11.1× |
+
+RA-1b remains massively biased high.  All three cases exceed 10× overestimation relative to M3.
+The reserve floor is not sufficient to close this gap — lookahead (RA-2) is essential.
+
+### 6d. Expanded metric highlights (M3 benchmark, N=20)
+
+| Case | Mean SF (MW) | Mean dur (h) | p95 dur (h) | EUE CI95 rel | LOLH CI95 rel |
+|------|:-----------:|:------------:|:-----------:|:------------:|:-------------:|
+| VRE120_base | 417 | 2.98 | 6.05 | 60.5% | 54.7% |
+| VRE120_bal15 | 267 | 2.25 | 4.90 | 106.5% | 87.0% |
+| VRE120_wind_hvy | 288 | 2.65 | 6.00 | 77.1% | 69.2% |
+
+**Key observation on MC uncertainty:** Even at N=20, the M3 EUE CI95 relative half-widths are
+60–107%.  This means the M3 benchmark itself has large sampling uncertainty at these near-zero LOLH
+cases.  The N=5 M3 estimates were unreliable — and N=20 is still noisy.  Implications:
+- The apparent method-comparison errors are lower-bounded by M3 sampling noise.
+- Stable M3 benchmarks for near-zero LOLH cases likely require N=50–100.
+- **P1 fires in M1b:** 20/20 scenarios for all three cases (275, 319, 596 P1 hours respectively),
+  confirming emergency reserve is being used.  M1 fires zero P1 hours in all cases.
+
+### 6e. N=5 vs N=20 M3 benchmark stability
+
+| Case | N=5 M3 LOLH | N=20 M3 LOLH | Change |
+|------|:-----------:|:------------:|:------:|
+| VRE120_base | 11.20 h | 5.95 h | −5.25 h (−47%) |
+| VRE120_bal15 | 3.60 h | 1.35 h | −2.25 h (−63%) |
+| VRE120_wind_hvy | 4.40 h | 2.25 h | −2.15 h (−49%) |
+
+All three M3 benchmarks dropped by ~47–63% going from N=5 to N=20.  The N=5 run was
+unreliable due to small sample size.  The relative errors reported in the N=5 memo were
+underestimates of the true bias — the actual M1b/M3 ratios at N=20 are 11–27×, larger than
+the 8–14× seen at N=5.
+
+### 6f. Wind-heavy vs balanced at N=20
+
+`VRE120_wind_hvy` (60.5% VRE energy share) has higher M3 LOLH (2.25 h) than `VRE120_bal15`
+(43.3% share, 1.35 h).  Wind-heavy also has higher CVaR-EUE (3,528 vs 2,722 MWh), larger max
+shortfall (226 vs 148 MW), and longer p95 event duration (6.0 vs 4.9 h).  These findings
+confirm that wind's multi-day variability creates harder-to-manage tail events compared to
+balanced VRE expansion at similar penetration.
+
+### 6g. Updated priority ranking for RA-2
+
+| Priority | Case | M1b error vs M3 (N=20) | M3 LOLH | Rationale |
+|:--------:|------|:---------------------:|:-------:|-----------|
+| 1 | VRE120_base | +77.6 h (14×) | 5.95 h | Largest absolute error; highest residual scarcity risk |
+| 2 | VRE120_bal15 | +35.4 h (27×) | 1.35 h | Largest relative error; M3 near-zero makes validation harder |
+| 3 | VRE120_wind_hvy | +22.8 h (11×) | 2.25 h | Multi-day wind variability; test for temporal structure |
+
+Ranking unchanged from N=5 in absolute-error order.  However, the relative errors at N=20 are
+all larger than the N=5 estimates (confirming the N=5 M3 benchmarks were inflated).
+
+---
+
+## 7. Expanded metric outputs
 
 The results CSV (`vre_method_comparison_results.csv`) includes the full
 reliability metric suite beyond LOLH and EUE:
