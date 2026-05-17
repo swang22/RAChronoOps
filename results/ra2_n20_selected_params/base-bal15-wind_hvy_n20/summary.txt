@@ -1,0 +1,171 @@
+================================================================================
+RA-2 N=20 Selected-Parameter Validation Summary
+Generated: 2026-05-17 16:34:56
+n_scenarios: 20  |  seed: 42
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+RA-2 configs: M2_rm1000_b48 (rm=1000 buf=48), M2_rm800_b24 (rm=800 buf=24)
+================================================================================
+
+Aggregate reliability metrics
+----------------------------------------------------------------------------------------------------
+  Case                   Model  LOLH(h)   LOLP%  LOLE_d   EUE(MWh)   CVaR-EUE  MaxSF(MW)    rt(s)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1b                       83.55   0.954   21.25    28272.4    49454.9     1000.2      1.4
+  VRE120_bal15           M1b                       36.75   0.420   12.75    11608.5    22951.9      808.4      0.9
+  VRE120_wind_hvy        M1b                       25.00   0.285    7.25     8982.4    20155.2      826.7      0.9
+  VRE120_base            M2_rm1000_b48              5.75   0.066    1.75     2479.2     9782.9      534.7     10.5
+  VRE120_bal15           M2_rm1000_b48              1.30   0.015    0.50      360.1     2722.0      152.7      8.6
+  VRE120_wind_hvy        M2_rm1000_b48              1.95   0.022    0.75      648.2     3528.4      289.0      8.9
+  VRE120_base            M2_rm800_b24               5.65   0.064    1.75     2479.2     9782.9      512.1      5.3
+  VRE120_bal15           M2_rm800_b24               1.25   0.014    0.50      360.1     2722.0      174.4      5.2
+  VRE120_wind_hvy        M2_rm800_b24               1.95   0.022    0.75      648.2     3528.4      295.3      4.9
+  VRE120_base            M3                         5.95   0.068    1.75     2479.2     9782.9      461.1    194.1
+  VRE120_bal15           M3                         1.35   0.015    0.50      360.1     2722.0      148.0    192.7
+  VRE120_wind_hvy        M3                         2.25   0.026    0.75      648.2     3528.4      225.5    187.9
+
+Event-structure and severity metrics
+----------------------------------------------------------------------------------------------------
+  Case                   Model                    n_evts mean_dur  p95_dur  MaxSF(MW) MeanSF(MW)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1b                        22.7     3.68     8.00     1000.2      338.4
+  VRE120_bal15           M1b                        13.2     2.78     5.00      808.4      315.9
+  VRE120_wind_hvy        M1b                         8.1     3.09     6.00      826.7      359.3
+  VRE120_base            M2_rm1000_b48               2.9     1.98     5.00      534.7      431.2
+  VRE120_bal15           M2_rm1000_b48               0.7     2.00     4.80      152.7      277.0
+  VRE120_wind_hvy        M2_rm1000_b48               1.1     1.86     3.00      289.0      332.4
+  VRE120_base            M2_rm800_b24                3.1     1.82     4.00      512.1      438.8
+  VRE120_bal15           M2_rm800_b24                0.7     1.92     4.20      174.4      288.1
+  VRE120_wind_hvy        M2_rm800_b24                1.0     1.95     4.10      295.3      332.4
+  VRE120_base            M3                          2.0     2.98     6.05      461.1      416.7
+  VRE120_bal15           M3                          0.6     2.25     4.90      148.0      266.7
+  VRE120_wind_hvy        M3                          0.8     2.65     6.00      225.5      288.1
+
+Monte Carlo uncertainty (M3 benchmark)
+--------------------------------------------------------------------------------
+  Case                      LOLH_CI95   LOLH_CI95%     EUE_CI95    EUE_CI95%
+  --------------------------------------------------------------------------
+  VRE120_base                   3.253        54.7%       1500.0        60.5%
+  VRE120_bal15                  1.175        87.0%        383.5       106.5%
+  VRE120_wind_hvy               1.557        69.2%        499.7        77.1%
+
+Method error vs M3 benchmark
+----------------------------------------------------------------------------------------------------
+  Case                   Method                   M3_LOLH Meth_LOLH     err_h   rel_err%     M3_EUE    EUE_err
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1b                         5.95     83.55    +77.60   +1304.2%     2479.2 +25793.2353
+  VRE120_base            M2_rm1000_b48               5.95      5.75     -0.20      -3.4%     2479.2    -0.0000
+  VRE120_base            M2_rm800_b24                5.95      5.65     -0.30      -5.0%     2479.2    +0.0000
+  VRE120_bal15           M1b                         1.35     36.75    +35.40   +2622.2%      360.1 +11248.4667
+  VRE120_bal15           M2_rm1000_b48               1.35      1.30     -0.05      -3.7%      360.1    +0.0000
+  VRE120_bal15           M2_rm800_b24                1.35      1.25     -0.10      -7.4%      360.1    +0.0000
+  VRE120_wind_hvy        M1b                         2.25     25.00    +22.75   +1011.1%      648.2 +8334.1410
+  VRE120_wind_hvy        M2_rm1000_b48               2.25      1.95     -0.30     -13.3%      648.2    +0.0000
+  VRE120_wind_hvy        M2_rm800_b24                2.25      1.95     -0.30     -13.3%      648.2    +0.0000
+
+Extended error metrics (M2 configs only)
+----------------------------------------------------------------------------------------------------
+  Case                   Method                  CVaR_err  LOLE_err MaxSF_err       cov%     n_wins  lp_fail
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M2_rm1000_b48              +0.00     +0.00    +73.68       30.2        4.2        0
+  VRE120_base            M2_rm800_b24               +0.00     +0.00    +51.06       24.6        5.7        0
+  VRE120_bal15           M2_rm1000_b48              +0.00     +0.00     +4.63       29.3        4.0        0
+  VRE120_bal15           M2_rm800_b24               +0.00     +0.00    +26.32       23.6        6.0        0
+  VRE120_wind_hvy        M2_rm1000_b48              +0.00     +0.00    +63.50       28.5        3.8        0
+  VRE120_wind_hvy        M2_rm800_b24               +0.00     +0.00    +69.80       22.5        6.8        0
+
+Runtime and speedup vs M3
+--------------------------------------------------------------------------------
+  Case                   Method                      rt(s)   M3_rt(s)      speedup
+  --------------------------------------------------------------------------
+  VRE120_base            M1b                           1.4      194.1       138.7x
+  VRE120_base            M2_rm1000_b48                10.5      194.1        18.5x
+  VRE120_base            M2_rm800_b24                  5.3      194.1        36.6x
+  VRE120_bal15           M1b                           0.9      192.7       214.1x
+  VRE120_bal15           M2_rm1000_b48                 8.6      192.7        22.4x
+  VRE120_bal15           M2_rm800_b24                  5.2      192.7        37.1x
+  VRE120_wind_hvy        M1b                           0.9      187.9       208.8x
+  VRE120_wind_hvy        M2_rm1000_b48                 8.9      187.9        21.1x
+  VRE120_wind_hvy        M2_rm800_b24                  4.9      187.9        38.3x
+
+================================================================================
+Research questions
+================================================================================
+
+Q1. Does RA-2 still match M3 EUE at N=20?
+
+  Max |M2 EUE - M3 EUE| across all configs/cases: 0.000000 MWh
+  → YES. EUE is matched to machine precision for all RA-2 configurations.
+    The LP power-balance equality constraint makes EUE invariant to parameter choice.
+
+Q2. Does RA-2 match M3 LOLH better than M1b?
+
+  VRE120_base:
+    M1b: LOLH=83.55 h  err=+77.60 h (abs=77.60 h)
+    M2_rm1000_b48          LOLH= 5.75 h  err=-0.20 h (abs=0.20 h)  ↓ better by 77.40 h
+    M2_rm800_b24           LOLH= 5.65 h  err=-0.30 h (abs=0.30 h)  ↓ better by 77.30 h
+
+  VRE120_bal15:
+    M1b: LOLH=36.75 h  err=+35.40 h (abs=35.40 h)
+    M2_rm1000_b48          LOLH= 1.30 h  err=-0.05 h (abs=0.05 h)  ↓ better by 35.35 h
+    M2_rm800_b24           LOLH= 1.25 h  err=-0.10 h (abs=0.10 h)  ↓ better by 35.30 h
+
+  VRE120_wind_hvy:
+    M1b: LOLH=25.00 h  err=+22.75 h (abs=22.75 h)
+    M2_rm1000_b48          LOLH= 1.95 h  err=-0.30 h (abs=0.30 h)  ↓ better by 22.45 h
+    M2_rm800_b24           LOLH= 1.95 h  err=-0.30 h (abs=0.30 h)  ↓ better by 22.45 h
+
+Q3. Which setting is better for LOLH accuracy: rm=1000/buf=48 or rm=800/buf=24?
+
+  VRE120_base:  best=M2_rm1000_b48 (err=-0.20 h, abs=0.20 h)
+           vs M2_rm800_b24   (err=-0.30 h, abs=0.30 h)  Δ=0.10 h
+  VRE120_bal15:  best=M2_rm1000_b48 (err=-0.05 h, abs=0.05 h)
+           vs M2_rm800_b24   (err=-0.10 h, abs=0.10 h)  Δ=0.05 h
+  VRE120_wind_hvy:  best=M2_rm1000_b48 (err=-0.30 h, abs=0.30 h)
+           vs M2_rm800_b24   (err=-0.30 h, abs=0.30 h)  Δ=0.00 h
+
+  M2_rm1000_b48: mean abs LOLH error = 0.183 h  mean rt = 9.3 s
+  M2_rm800_b24: mean abs LOLH error = 0.233 h  mean rt = 5.1 s
+
+Q4. Which setting is better for runtime and window coverage?
+
+  M2_rm1000_b48:
+    Mean runtime: 9.3 s  |  Mean speedup: 20.7x  |  Mean coverage: 29.3%  |  Mean windows: 4.0
+  M2_rm800_b24:
+    Mean runtime: 5.1 s  |  Mean speedup: 37.3x  |  Mean coverage: 23.6%  |  Mean windows: 6.2
+
+Q5. Does wind-heavy remain harder than balanced VRE at N=20?
+
+  VRE120_wind_hvy (M3):  LOLH=2.25 h  CVaR-EUE=3528.4 MWh  MaxSF=225.5 MW  p95_dur=6.00 h
+  VRE120_bal15 (M3):  LOLH=1.35 h  CVaR-EUE=2722.0 MWh  MaxSF=148.0 MW  p95_dur=4.90 h
+
+Q6. Are M3 confidence intervals still wide at N=20?
+
+  VRE120_base (M3):  LOLH CI95 rel = 54.7%  |  EUE CI95 rel = 60.5%
+  VRE120_bal15 (M3):  LOLH CI95 rel = 87.0%  |  EUE CI95 rel = 106.5%
+  VRE120_wind_hvy (M3):  LOLH CI95 rel = 69.2%  |  EUE CI95 rel = 77.1%
+
+  Max M3 LOLH CI95 rel = 87.0%  → CIs are still wide at N=20.
+  Near-zero LOLH cases are particularly noisy; N=20 benchmarks
+  should be treated as provisional.
+
+Q7. Which RA-2 parameter setting should be used as the main paper result?
+
+  Recommendation: M2_rm1000_b48 (rm=1000, buf=48)
+  Mean LOLH abs error: 0.183 h  |  Mean runtime: 9.3 s  |  Mean speedup: 20.7x
+
+  Runner-up:  M2_rm800_b24  mean err=0.233 h  mean rt=5.1 s
+  Note: The two configs are close in accuracy (<0.2 h difference).
+  If runtime is a concern, the lower-coverage config may be preferred.
+
+Q8. Should we run N=50 for a final selected case?
+
+  YES — largest M3 LOLH CI95 rel = 87.0% (VRE120_bal15).
+  N=20 benchmarks for near-zero LOLH cases are not stable.
+  Recommended: run N=50 on VRE120_base (highest M3 LOLH, lowest noise)
+  for a definitive method-comparison result.
+
+Total runtime: 629.5 s
+================================================================================
+Files: ra2_n20_selected_params_results.csv
+       ra2_n20_selected_params_errors.csv
+       ra2_n20_selected_params_window_diags.csv

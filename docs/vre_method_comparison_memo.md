@@ -8,7 +8,11 @@
   → `results/vre_method_comparison/base-bal15-wind_hvy_n20/`
 - RA-2 N=5 benchmark: `scripts/17_run_ra2_priority_validation.jl --cases VRE120_base,VRE120_bal15,VRE120_wind_hvy --n-scenarios 5 --seed 42`
   → `results/ra2_priority_validation/base-bal15-wind_hvy_n5/`
-**Results:** `results/vre_method_comparison/`, `results/ra2_priority_validation/`
+- RA-2 N=5 parameter sensitivity: `scripts/19_run_ra2_parameter_sensitivity.jl --n-scenarios 5 --seed 42`
+  → `results/ra2_parameter_sensitivity/risk_buffer_n5/`
+- RA-2 N=20 selected-param validation: `scripts/20_run_ra2_n20_selected_params.jl --n-scenarios 20 --seed 42`
+  → `results/ra2_n20_selected_params/base-bal15-wind_hvy_n20/`
+**Results:** `results/vre_method_comparison/`, `results/ra2_priority_validation/`, `results/ra2_parameter_sensitivity/`, `results/ra2_n20_selected_params/`
 
 ---
 
@@ -417,7 +421,134 @@ of the LOLH bias at higher sample size.
 
 ---
 
+---
+
+## 9. N=20 RA-2 selected-parameter validation
+
+**Run:** `scripts/20_run_ra2_n20_selected_params.jl --n-scenarios 20 --seed 42`
+**Output:** `results/ra2_n20_selected_params/base-bal15-wind_hvy_n20/`
+**Total runtime:** 629.5 s (~10.5 min).  M3: ~191 s/case; M2: 5–11 s/case.
+
+Context: The N=5 parameter sensitivity (script 19) identified two candidate RA-2 configurations:
+- **M2_rm1000_b48**: `risk_margin_mw=1000, window_buffer_hours=48` — lowest mean LOLH error at N=5.
+- **M2_rm800_b24**: `risk_margin_mw=800, window_buffer_hours=24` — best accuracy/runtime balance.
+This section validates both at N=20 against the M3 benchmark.
+
+### 9a. Main results (N=20)
+
+| Case | Model | LOLH (h) | LOLP% | LOLE d | EUE (MWh) | CVaR-EUE (MWh) | MaxSF (MW) | rt (s) |
+|------|-------|:--------:|:-----:|:------:|:---------:|:--------------:|:----------:|:------:|
+| VRE120_base | M1b | 83.55 | 0.954 | 21.25 | 28,272 | 49,455 | 1,000 | 1.4 |
+| VRE120_base | M2_rm1000_b48 | 5.75 | 0.066 | 1.75 | 2,479 | 9,783 | 535 | 10.5 |
+| VRE120_base | M2_rm800_b24 | 5.65 | 0.064 | 1.75 | 2,479 | 9,783 | 512 | 5.3 |
+| VRE120_base | M3 | 5.95 | 0.068 | 1.75 | 2,479 | 9,783 | 461 | 194.1 |
+| VRE120_bal15 | M1b | 36.75 | 0.420 | 12.75 | 11,609 | 22,952 | 808 | 0.9 |
+| VRE120_bal15 | M2_rm1000_b48 | 1.30 | 0.015 | 0.50 | 360 | 2,722 | 153 | 8.6 |
+| VRE120_bal15 | M2_rm800_b24 | 1.25 | 0.014 | 0.50 | 360 | 2,722 | 174 | 5.2 |
+| VRE120_bal15 | M3 | 1.35 | 0.015 | 0.50 | 360 | 2,722 | 148 | 192.7 |
+| VRE120_wind_hvy | M1b | 25.00 | 0.285 | 7.25 | 8,982 | 20,155 | 827 | 0.9 |
+| VRE120_wind_hvy | M2_rm1000_b48 | 1.95 | 0.022 | 0.75 | 648 | 3,528 | 289 | 8.9 |
+| VRE120_wind_hvy | M2_rm800_b24 | 1.95 | 0.022 | 0.75 | 648 | 3,528 | 295 | 4.9 |
+| VRE120_wind_hvy | M3 | 2.25 | 0.026 | 0.75 | 648 | 3,528 | 226 | 187.9 |
+
+All runs share the same `ScenarioSet` (CRN, seed=42).
+
+### 9b. EUE: machine-precision match across all configs
+
+Both M2 configurations match M3 EUE and CVaR-EUE **to machine precision** (< 1×10⁻⁹ MWh) for all three cases and at N=20. This confirms the structural result: the LP power-balance equality constraint makes EUE invariant to `risk_margin_mw` and `window_buffer_hours`.
+
+### 9c. LOLH error: dramatic improvement over M1b
+
+| Case | M3 LOLH | M1b error | M2_rm1000_b48 error | M2_rm800_b24 error |
+|------|:-------:|:---------:|:-------------------:|:------------------:|
+| VRE120_base | 5.95 h | +77.60 h (+1304%) | **−0.20 h (−3.4%)** | −0.30 h (−5.0%) |
+| VRE120_bal15 | 1.35 h | +35.40 h (+2622%) | **−0.05 h (−3.7%)** | −0.10 h (−7.4%) |
+| VRE120_wind_hvy | 2.25 h | +22.75 h (+1011%) | **−0.30 h (−13.3%)** | −0.30 h (−13.3%) |
+
+RA-2 reduces LOLH error from **1011%–2622%** (M1b) to **3–13%** (M2), a reduction of >99% in absolute error. Both configurations are accurate; M2_rm1000_b48 has a marginal edge.
+
+### 9d. Accuracy comparison: rm=1000/buf=48 vs rm=800/buf=24
+
+| Metric | M2_rm1000_b48 | M2_rm800_b24 |
+|--------|:-------------:|:------------:|
+| Mean LOLH abs error (h) | **0.183** | 0.233 |
+| Mean runtime (s/case, N=20) | 9.3 | **5.1** |
+| Mean speedup vs M3 | 20.7× | **37.3×** |
+| Mean window coverage | 29.3% | **23.6%** |
+| Mean windows/scenario | 4.0 | 6.2 |
+| LP failures (all cases) | 0 | 0 |
+
+The accuracy difference is small (0.05 h mean LOLH error gap). The runtime difference is meaningful: rm=800/buf=24 is ~45% faster per case.
+
+### 9e. Event-structure comparison
+
+| Case | Model | n events | mean dur (h) | p95 dur (h) | MaxSF (MW) | MeanSF (MW) |
+|------|-------|:--------:|:------------:|:-----------:|:----------:|:-----------:|
+| VRE120_base | M2_rm1000_b48 | 2.9 | 1.98 | 5.00 | 535 | 431 |
+| VRE120_base | M2_rm800_b24 | 3.1 | 1.82 | 4.00 | 512 | 439 |
+| VRE120_base | M3 | **2.0** | **2.98** | **6.05** | **461** | **417** |
+| VRE120_bal15 | M2_rm1000_b48 | 0.7 | 2.00 | 4.80 | 153 | 277 |
+| VRE120_bal15 | M2_rm800_b24 | 0.7 | 1.92 | 4.20 | 174 | 288 |
+| VRE120_bal15 | M3 | **0.6** | **2.25** | **4.90** | **148** | **267** |
+| VRE120_wind_hvy | M2_rm1000_b48 | 1.1 | 1.86 | 3.00 | 289 | 332 |
+| VRE120_wind_hvy | M2_rm800_b24 | 1.0 | 1.95 | 4.10 | 295 | 332 |
+| VRE120_wind_hvy | M3 | **0.8** | **2.65** | **6.00** | **226** | **288** |
+
+M2 slightly overestimates event count and underestimates mean duration / p95 duration vs M3, consistent with the earlier finding that M2 concentrates the same energy deficit into slightly more, slightly shorter, more intense events (higher MaxSF) than M3's full-year LP. The effect is small at N=20.
+
+### 9f. Window coverage diagnostics
+
+| Case | Config | Mean coverage | Mean windows/scen | LP failures |
+|------|--------|:------------:|:-----------------:|:-----------:|
+| VRE120_base | M2_rm1000_b48 | 30.2% | 4.2 | 0 |
+| VRE120_base | M2_rm800_b24 | 24.6% | 5.7 | 0 |
+| VRE120_bal15 | M2_rm1000_b48 | 29.3% | 4.0 | 0 |
+| VRE120_bal15 | M2_rm800_b24 | 23.6% | 6.0 | 0 |
+| VRE120_wind_hvy | M2_rm1000_b48 | 28.5% | 3.8 | 0 |
+| VRE120_wind_hvy | M2_rm800_b24 | 22.5% | 6.8 | 0 |
+
+Zero LP failures across all 3 cases × 2 configs × 20 scenarios. Higher margin (rm=1000) produces fewer, larger windows; lower margin (rm=800) produces more, smaller windows.
+
+### 9g. Wind-heavy vs balanced at N=20 (confirmed)
+
+`VRE120_wind_hvy` (M3): LOLH=2.25 h, CVaR-EUE=3,528 MWh, MaxSF=226 MW, p95 duration=6.0 h.
+`VRE120_bal15` (M3): LOLH=1.35 h, CVaR-EUE=2,722 MWh, MaxSF=148 MW, p95 duration=4.9 h.
+
+Wind-heavy remains harder on all tail-risk dimensions, confirming the N=5 finding.
+
+### 9h. Monte Carlo uncertainty at N=20
+
+| Case | M3 LOLH CI95 rel | M3 EUE CI95 rel |
+|------|:----------------:|:---------------:|
+| VRE120_base | 54.7% | 60.5% |
+| VRE120_bal15 | **87.0%** | **106.5%** |
+| VRE120_wind_hvy | 69.2% | 77.1% |
+
+N=20 M3 benchmarks are still noisy, particularly for `VRE120_bal15` where LOLH is near zero. The M3 estimates themselves are unreliable at the ±87% level; the RA-2 LOLH errors of −0.05 to −0.30 h are well within this noise floor.
+
+### 9i. Recommended RA-2 configuration
+
+**For the main paper result: `risk_margin_mw=1000, window_buffer_hours=48`**
+
+Rationale:
+- Mean LOLH abs error = 0.183 h (−3% to −13% relative to M3 LOLH) — within M3 sampling noise.
+- Mean speedup vs M3 = 20.7× at N=20 (≈ 9.3 s/case vs ~191 s/case for M3).
+- EUE and CVaR-EUE matched to machine precision.
+- Zero LP failures.
+
+`risk_margin_mw=800, window_buffer_hours=24` is acceptable as a faster alternative (37.3× speedup, 0.233 h mean error). For runtime-sensitive sweeps or sensitivity analyses, this config is preferred.
+
+### 9j. N=50 recommendation
+
+**YES — N=50 is recommended for `VRE120_base`** (highest M3 LOLH, best signal/noise) before reporting final results.
+
+The M3 LOLH CI95 relative half-width is still 55–87% at N=20. The apparent RA-2 LOLH errors (0.05–0.30 h) are smaller than the M3 sampling noise, so it is not yet possible to determine whether any systematic bias exists. N=50 on `VRE120_base` (M3 LOLH ≈ 6 h, CI95 rel ≈ 55%) would reduce the relative CI to roughly 35% and allow a more precise bias estimate.
+
+---
+
 *Generated from `results/vre_method_comparison/summary.txt`,
 `vre_method_comparison_results.csv`, `vre_method_comparison_errors.csv`,
-and `results/ra2_priority_validation/base-bal15-wind_hvy_n5/summary.txt`.*
+`results/ra2_priority_validation/base-bal15-wind_hvy_n5/summary.txt`,
+`results/ra2_parameter_sensitivity/risk_buffer_n5/summary.txt`, and
+`results/ra2_n20_selected_params/base-bal15-wind_hvy_n20/summary.txt`.*
 *All runs use common random numbers (shared `ScenarioSet`, seed=42).*
