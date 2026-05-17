@@ -1,0 +1,150 @@
+================================================================================
+M1c Emergency-Only Heuristic Comparison Summary
+Generated: 2026-05-17 17:51:30
+n_scenarios: 5  |  seed: 42
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+M2 config: rm=1000  buf=48  min_len=24  merge_gap=24
+================================================================================
+
+Aggregate reliability metrics
+----------------------------------------------------------------------------------------------------
+  Case                   Model                   LOLH(h)   LOLP%  LOLE_d   EUE(MWh)   CVaR-EUE  MaxSF(MW)    rt(s)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1                       115.60   1.320   28.40    41846.4    54383.2     1148.7      1.0
+  VRE120_bal15           M1                        63.80   0.728   22.60    21058.3    26724.4     1044.0      0.3
+  VRE120_wind_hvy        M1                        67.20   0.767   21.60    21202.4    28366.5     1034.6      0.3
+  VRE120_base            M1b                      103.80   1.185   24.60    39203.6    51633.4     1148.7      0.4
+  VRE120_bal15           M1b                       48.60   0.555   16.40    17635.2    22994.2     1044.0      0.4
+  VRE120_wind_hvy        M1b                       36.40   0.416    9.60    13798.6    20642.7     1034.3      0.3
+  VRE120_base            M1c                       11.20   0.128    3.60     4707.4     9712.4      871.6      0.4
+  VRE120_bal15           M1c                        3.60   0.041    1.40      698.6     2164.0      267.9      0.5
+  VRE120_wind_hvy        M1c                        4.40   0.050    1.60     1113.2     2792.6      416.7      1.3
+  VRE120_base            M2_rm1000_b48             11.20   0.128    3.60     4707.4     9712.4      986.5      4.0
+  VRE120_bal15           M2_rm1000_b48              3.40   0.039    1.40      698.6     2164.0      375.4      1.9
+  VRE120_wind_hvy        M2_rm1000_b48              3.80   0.043    1.60     1113.2     2792.6      508.7      1.7
+  VRE120_base            M3                        11.20   0.128    3.60     4707.4     9712.4      871.6     48.5
+  VRE120_bal15           M3                         3.60   0.041    1.40      698.6     2164.0      267.9     47.4
+  VRE120_wind_hvy        M3                         4.40   0.050    1.60     1113.2     2792.6      416.7     46.7
+
+Event-structure and severity metrics
+----------------------------------------------------------------------------------------------------
+  Case                   Model                    n_evts mean_dur  p95_dur  MaxSF(MW) MeanSF(MW)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1                         30.2     3.83     8.00     1148.7      362.0
+  VRE120_bal15           M1                         23.0     2.77     6.00     1044.0      330.1
+  VRE120_wind_hvy        M1                         23.8     2.82     6.10     1034.6      315.5
+  VRE120_base            M1b                        26.0     3.99     8.00     1148.7      377.7
+  VRE120_bal15           M1b                        16.8     2.89     6.00     1044.0      362.9
+  VRE120_wind_hvy        M1b                        11.4     3.19     7.00     1034.3      379.1
+  VRE120_base            M1c                         4.4     2.55     5.00      871.6      420.3
+  VRE120_bal15           M1c                         1.6     2.25     4.00      267.9      194.1
+  VRE120_wind_hvy        M1c                         1.8     2.44     5.00      416.7      253.0
+  VRE120_base            M2_rm1000_b48               6.0     1.87     4.00      986.5      420.3
+  VRE120_bal15           M2_rm1000_b48               1.8     1.89     3.60      375.4      205.5
+  VRE120_wind_hvy        M2_rm1000_b48               2.2     1.73     3.00      508.7      292.9
+  VRE120_base            M3                          4.4     2.55     5.00      871.6      420.3
+  VRE120_bal15           M3                          1.6     2.25     4.00      267.9      194.1
+  VRE120_wind_hvy        M3                          1.8     2.44     5.00      416.7      253.0
+
+Monte Carlo uncertainty (M3 benchmark)
+--------------------------------------------------------------------------------
+  Case                      LOLH_CI95   LOLH_CI95%     EUE_CI95    EUE_CI95%
+  --------------------------------------------------------------------------
+  VRE120_base                   6.968        62.2%       3051.0        64.8%
+  VRE120_bal15                  3.593        99.8%        854.1       122.2%
+  VRE120_wind_hvy               3.949        89.8%        991.8        89.1%
+
+Method error vs M3 benchmark
+----------------------------------------------------------------------------------------------------
+  Case                   Method                   M3_LOLH Meth_LOLH     err_h   rel_err%     M3_EUE    EUE_err
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1                         11.20    115.60   +104.40    +932.1%     4707.4 +37138.9491
+  VRE120_base            M1b                        11.20    103.80    +92.60    +826.8%     4707.4 +34496.1152
+  VRE120_base            M1c                        11.20     11.20     +0.00      +0.0%     4707.4    +0.0000
+  VRE120_base            M2_rm1000_b48              11.20     11.20     +0.00      +0.0%     4707.4    +0.0000
+  VRE120_bal15           M1                          3.60     63.80    +60.20   +1672.2%      698.6 +20359.6799
+  VRE120_bal15           M1b                         3.60     48.60    +45.00   +1250.0%      698.6 +16936.6069
+  VRE120_bal15           M1c                         3.60      3.60     +0.00      +0.0%      698.6    +0.0000
+  VRE120_bal15           M2_rm1000_b48               3.60      3.40     -0.20      -5.6%      698.6    +0.0000
+  VRE120_wind_hvy        M1                          4.40     67.20    +62.80   +1427.3%     1113.2 +20089.2212
+  VRE120_wind_hvy        M1b                         4.40     36.40    +32.00    +727.3%     1113.2 +12685.4251
+  VRE120_wind_hvy        M1c                         4.40      4.40     +0.00      +0.0%     1113.2    +0.0000
+  VRE120_wind_hvy        M2_rm1000_b48               4.40      3.80     -0.60     -13.6%     1113.2    +0.0000
+
+Runtime and speedup vs M3
+--------------------------------------------------------------------------------
+  Case                   Method                      rt(s)   M3_rt(s)      speedup
+  --------------------------------------------------------------------------
+  VRE120_base            M1                            1.0       48.5        48.5x
+  VRE120_base            M1b                           0.4       48.5       121.2x
+  VRE120_base            M1c                           0.4       48.5       121.2x
+  VRE120_base            M2_rm1000_b48                 4.0       48.5        12.1x
+  VRE120_bal15           M1                            0.3       47.4       158.2x
+  VRE120_bal15           M1b                           0.4       47.4       118.6x
+  VRE120_bal15           M1c                           0.5       47.4        94.9x
+  VRE120_bal15           M2_rm1000_b48                 1.9       47.4        25.0x
+  VRE120_wind_hvy        M1                            0.3       46.7       155.6x
+  VRE120_wind_hvy        M1b                           0.3       46.7       155.6x
+  VRE120_wind_hvy        M1c                           1.3       46.7        35.9x
+  VRE120_wind_hvy        M2_rm1000_b48                 1.7       46.7        27.5x
+
+================================================================================
+Research questions
+================================================================================
+
+Q1. Does M1c outperform M1 and M1b on LOLH accuracy?
+
+  VRE120_base:
+    M1     LOLH= 115.60 h  err=+104.40 h  abs=104.40 h  (932.1%)
+    M1b    LOLH= 103.80 h  err= +92.60 h  abs=92.60 h  (826.8%)
+    M1c    LOLH=  11.20 h  err=  +0.00 h  abs=0.00 h  (0.0%)
+    → M1c abs error 0.00 h vs M1b 92.60 h vs M1 104.40 h: M1c < M1b: YES
+
+  VRE120_bal15:
+    M1     LOLH=  63.80 h  err= +60.20 h  abs=60.20 h  (1672.2%)
+    M1b    LOLH=  48.60 h  err= +45.00 h  abs=45.00 h  (1250.0%)
+    M1c    LOLH=   3.60 h  err=  +0.00 h  abs=0.00 h  (0.0%)
+    → M1c abs error 0.00 h vs M1b 45.00 h vs M1 60.20 h: M1c < M1b: YES
+
+  VRE120_wind_hvy:
+    M1     LOLH=  67.20 h  err= +62.80 h  abs=62.80 h  (1427.3%)
+    M1b    LOLH=  36.40 h  err= +32.00 h  abs=32.00 h  (727.3%)
+    M1c    LOLH=   4.40 h  err=  +0.00 h  abs=0.00 h  (0.0%)
+    → M1c abs error 0.00 h vs M1b 32.00 h vs M1 62.80 h: M1c < M1b: YES
+
+Q2. Is M1c closer to M3 than M1b (mean absolute LOLH error)?
+
+  M1                     mean abs LOLH error = 75.800 h  mean rt = 0.5 s
+  M1b                    mean abs LOLH error = 56.533 h  mean rt = 0.4 s
+  M1c                    mean abs LOLH error = 0.000 h  mean rt = 0.7 s
+  M2_rm1000_b48          mean abs LOLH error = 0.267 h  mean rt = 2.5 s
+
+Q3. Does M1c overestimate or underestimate LOLH relative to M3?
+
+  VRE120_base: M1c underestimates by +0.00 h (+0.0%)
+  VRE120_bal15: M1c underestimates by +0.00 h (+0.0%)
+  VRE120_wind_hvy: M1c underestimates by +0.00 h (+0.0%)
+  Mean signed error: +0.000 h
+  → M1c shows no systematic LOLH bias.
+
+Q4. How close is M1c to M2 (event-window LP)?
+
+  VRE120_base:  M1c err=0.00 h  M2 err=0.00 h  gap=0.00 h
+  VRE120_bal15:  M1c err=0.00 h  M2 err=0.20 h  gap=-0.20 h
+  VRE120_wind_hvy:  M1c err=0.00 h  M2 err=0.60 h  gap=-0.60 h
+
+Q5. Does emergency-only dispatch work better in wind-heavy or balanced cases?
+
+  VRE120_wind_hvy:  M1c LOLH=4.40 h  err=+0.00 h (0.0%)
+  VRE120_bal15:  M1c LOLH=3.60 h  err=+0.00 h (0.0%)
+
+Q6. Should M1c appear in the main paper table or only the appendix?
+
+  Mean abs LOLH error:  M1b=56.53 h  M1c=0.00 h  M2=0.27 h
+  → M1c outperforms M1b: recommend including in main paper table.
+    M1c extends the baseline ladder and strengthens the M2 justification.
+
+Total runtime: 163.1 s
+================================================================================
+Files: m1c_comparison_results.csv
+       m1c_comparison_errors.csv
