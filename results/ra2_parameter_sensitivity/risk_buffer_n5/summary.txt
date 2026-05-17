@@ -1,0 +1,157 @@
+================================================================================
+RA-2 Parameter Sensitivity Summary
+Generated: 2026-05-17 15:49:37
+n_scenarios: 5  |  seed: 42
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+Grid: risk_margin_mw=[300.0, 500.0, 800.0, 1000.0]  window_buffer_hours=[24, 48]
+Fixed: min_window_length=24 h  merge_gap=24 h
+================================================================================
+
+Full M2 results vs M3 benchmark
+------------------------------------------------------------------------------------------
+  Case              risk_mw  buf  M2_LOLH  M3_LOLH  LOLH_err     M2_EUE     M3_EUE
+  ------------------------------------------------------------------------------------
+  VRE120_base           300   24    11.40    11.20     +0.20     4707.4     4707.4
+  VRE120_base           300   48    12.00    11.20     +0.80     4707.4     4707.4
+  VRE120_base           500   24     9.60    11.20     -1.60     4707.4     4707.4
+  VRE120_base           500   48    12.40    11.20     +1.20     4707.4     4707.4
+  VRE120_base           800   24    10.60    11.20     -0.60     4707.4     4707.4
+  VRE120_base           800   48    11.40    11.20     +0.20     4707.4     4707.4
+  VRE120_base          1000   24    10.60    11.20     -0.60     4707.4     4707.4
+  VRE120_base          1000   48    11.20    11.20     +0.00     4707.4     4707.4
+  VRE120_bal15          300   24     3.20     3.60     -0.40      698.6      698.6
+  VRE120_bal15          300   48     3.20     3.60     -0.40      698.6      698.6
+  VRE120_bal15          500   24     3.00     3.60     -0.60      698.6      698.6
+  VRE120_bal15          500   48     3.40     3.60     -0.20      698.6      698.6
+  VRE120_bal15          800   24     3.20     3.60     -0.40      698.6      698.6
+  VRE120_bal15          800   48     3.40     3.60     -0.20      698.6      698.6
+  VRE120_bal15         1000   24     3.00     3.60     -0.60      698.6      698.6
+  VRE120_bal15         1000   48     3.40     3.60     -0.20      698.6      698.6
+  VRE120_wind_hvy       300   24     3.40     4.40     -1.00     1113.2     1113.2
+  VRE120_wind_hvy       300   48     3.80     4.40     -0.60     1113.2     1113.2
+  VRE120_wind_hvy       500   24     3.40     4.40     -1.00     1113.2     1113.2
+  VRE120_wind_hvy       500   48     4.40     4.40     +0.00     1113.2     1113.2
+  VRE120_wind_hvy       800   24     4.20     4.40     -0.20     1113.2     1113.2
+  VRE120_wind_hvy       800   48     3.60     4.40     -0.80     1113.2     1113.2
+  VRE120_wind_hvy      1000   24     3.60     4.40     -0.80     1113.2     1113.2
+  VRE120_wind_hvy      1000   48     3.80     4.40     -0.60     1113.2     1113.2
+
+Q1. Which parameter combination minimizes LOLH absolute error vs M3?
+
+  VRE120_base:
+    Best: risk_margin=1000 MW  buffer=48 h  M2=11.20 h  M3=11.20 h  err=+0.00 h (+0.0%)
+    Default (rm=500, buf=24): err=-1.60 h (-14.3%)  improvement=1.60 h
+
+  VRE120_bal15:
+    Best: risk_margin=500 MW  buffer=48 h  M2=3.40 h  M3=3.60 h  err=-0.20 h (-5.6%)
+    Default (rm=500, buf=24): err=-0.60 h (-16.7%)  improvement=0.40 h
+
+  VRE120_wind_hvy:
+    Best: risk_margin=500 MW  buffer=48 h  M2=4.40 h  M3=4.40 h  err=+0.00 h (+0.0%)
+    Default (rm=500, buf=24): err=-1.00 h (-22.7%)  improvement=1.00 h
+
+Q2. Which combination preserves EUE accuracy?
+
+  Max absolute EUE error across all combos/cases: 0.000000 MWh
+  → EUE is matched to machine precision for ALL parameter combinations.
+    (RA-2 window LP enforces exact power-balance equality, so EUE is invariant
+     to risk_margin_mw and window_buffer_hours.)
+
+Q3. How does window coverage change with risk_margin_mw and buffer?
+
+  Case              risk_mw  buf       cov%  mean_wins  lp_fails
+  ----------------------------------------------------------------
+  VRE120_base           300   24       17.0        6.2         0
+  VRE120_base           300   48       20.8        3.6         0
+  VRE120_base           500   24       19.4        6.0         0
+  VRE120_base           500   48       22.9        3.8         0
+  VRE120_base           800   24       23.9        5.6         0
+  VRE120_base           800   48       27.1        4.4         0
+  VRE120_base          1000   24       26.8        6.0         0
+  VRE120_base          1000   48       30.1        4.6         0
+  VRE120_bal15          300   24       15.5        6.4         0
+  VRE120_bal15          300   48       19.3        4.0         0
+  VRE120_bal15          500   24       18.3        6.0         0
+  VRE120_bal15          500   48       22.0        3.8         0
+  VRE120_bal15          800   24       22.9        5.6         0
+  VRE120_bal15          800   48       26.1        4.0         0
+  VRE120_bal15         1000   24       25.3        6.2         0
+  VRE120_bal15         1000   48       28.8        4.0         0
+  VRE120_wind_hvy       300   24       14.0        7.0         0
+  VRE120_wind_hvy       300   48       18.0        4.4         0
+  VRE120_wind_hvy       500   24       17.3        6.8         0
+  VRE120_wind_hvy       500   48       21.2        4.0         0
+  VRE120_wind_hvy       800   24       22.1        6.0         0
+  VRE120_wind_hvy       800   48       25.6        3.8         0
+  VRE120_wind_hvy      1000   24       24.3        6.8         0
+  VRE120_wind_hvy      1000   48       28.2        4.0         0
+
+Q4. Runtime / accuracy tradeoff:
+
+  Case              risk_mw  buf  M2_rt(s)  speedup_vs_M3  LOLH_err_h  LOLH_err%
+  ----------------------------------------------------------------------------
+  VRE120_base           300   24       2.6          19.1x       +0.20      1.8%
+  VRE120_base           300   48       1.5          33.1x       +0.80      7.1%
+  VRE120_base           500   24       1.8          27.5x       -1.60    -14.3%
+  VRE120_base           500   48       1.2          41.3x       +1.20     10.7%
+  VRE120_base           800   24       1.6          31.0x       -0.60     -5.4%
+  VRE120_base           800   48       1.5          33.1x       +0.20      1.8%
+  VRE120_base          1000   24       1.4          35.4x       -0.60     -5.4%
+  VRE120_base          1000   48       2.0          24.8x       +0.00      0.0%
+  VRE120_bal15          300   24       0.8          59.3x       -0.40    -11.1%
+  VRE120_bal15          300   48       1.0          47.4x       -0.40    -11.1%
+  VRE120_bal15          500   24       1.8          26.3x       -0.60    -16.7%
+  VRE120_bal15          500   48       1.3          36.5x       -0.20     -5.6%
+  VRE120_bal15          800   24       1.6          29.6x       -0.40    -11.1%
+  VRE120_bal15          800   48       1.6          29.6x       -0.20     -5.6%
+  VRE120_bal15         1000   24       1.4          33.9x       -0.60    -16.7%
+  VRE120_bal15         1000   48       2.0          23.7x       -0.20     -5.6%
+  VRE120_wind_hvy       300   24       0.7          65.5x       -1.00    -22.7%
+  VRE120_wind_hvy       300   48       1.9          24.1x       -0.60    -13.6%
+  VRE120_wind_hvy       500   24       0.9          51.0x       -1.00    -22.7%
+  VRE120_wind_hvy       500   48       1.5          30.6x       +0.00      0.0%
+  VRE120_wind_hvy       800   24       1.1          41.7x       -0.20     -4.5%
+  VRE120_wind_hvy       800   48       1.6          28.7x       -0.80    -18.2%
+  VRE120_wind_hvy      1000   24       1.3          35.3x       -0.80    -18.2%
+  VRE120_wind_hvy      1000   48       2.0          22.9x       -0.60    -13.6%
+
+Q5. Does risk_margin_mw=800 improve the M3-only missed-hour problem?
+    (Comparing LOLH absolute error at rm=500,buf=24 vs rm=800,buf=24)
+
+  VRE120_base:
+    rm=500: err=-1.60 h (abs=1.60 h)  rm=800: err=-0.60 h (abs=0.60 h)  ↓ improved by 1.00 h
+  VRE120_bal15:
+    rm=500: err=-0.60 h (abs=0.60 h)  rm=800: err=-0.40 h (abs=0.40 h)  ↓ improved by 0.20 h
+  VRE120_wind_hvy:
+    rm=500: err=-1.00 h (abs=1.00 h)  rm=800: err=-0.20 h (abs=0.20 h)  ↓ improved by 0.80 h
+
+Q6. Recommended default RA-2 parameters for the next N=20 validation:
+
+  Ranking by mean LOLH absolute error across all cases (lower = better):
+
+  Rank   risk_mw   buf  mean_err_h  mean_rt(s)  mean_speedup      cov%
+  ----------------------------------------------------------------
+     1      1000    48       0.267         2.0         23.8x     29.0
+     2       800    24       0.400         1.4         34.1x     23.0
+     3       800    48       0.400         1.6         30.5x     26.3
+     4       500    48       0.467         1.3         36.1x     22.0
+     5       300    24       0.533         1.4         48.0x     15.5
+     6       300    48       0.600         1.5         34.9x     19.4
+     7      1000    24       0.667         1.4         34.9x     25.5
+     8       500    24       1.067         1.5         35.0x     18.3
+
+  Recommended: risk_margin_mw=1000  window_buffer_hours=48
+  Mean LOLH abs error: 0.267 h  |  Mean runtime: 2.0 s  |  Mean speedup vs M3: 23.8x
+  Mean window coverage: 29.0%
+
+  Caveats:
+  - N=5 results have wide confidence intervals (~47–63% above N=20 values).
+  - EUE is invariant to parameter choice; LOLH ranking may shift at N=20.
+  - Runtime advantage may decrease as coverage grows with larger margins.
+  - Validate recommended parameters at N=20 before adopting as default.
+
+Total runtime: 186.6 s
+================================================================================
+Files: ra2_parameter_sensitivity_results.csv
+       ra2_parameter_sensitivity_errors.csv
+       ra2_parameter_sensitivity_window_diags.csv
