@@ -74,10 +74,10 @@ computed inside each scenario.
 
 | Attribute | Detail |
 |-----------|--------|
-| Mathematical idea | Screen each scenario for risk windows: hours where (thermal available capacity + VRE) falls within a margin of load. Merge nearby risk hours into contiguous windows with a buffer. Solve a storage dispatch LP only inside each window. Use heuristic dispatch outside windows. |
-| Expected runtime | Target: 5–20 s/scenario (much less than RA-3 at ~360 s/scenario). |
+| Mathematical idea | Screen each scenario for risk windows: hours where (thermal available capacity + VRE) falls within a margin of load. Merge nearby risk hours into contiguous windows with a buffer. Solve a storage dispatch LP only inside each window. Use RA-1b heuristic dispatch outside windows. |
+| Expected runtime | 5–10 s/case at N=20 (measured); 20–37× speedup vs M3 (Gurobi). |
 | Role in paper | Proposed hybrid method. Tests whether accuracy close to RA-3 is achievable by solving LPs only near scarcity events. |
-| Implementation status | Planned (Phase C). |
+| Implementation status | **Implemented and validated at N=20** (Phase C complete). `src/models/M2EventWindowLP.jl`. Recommended config: `risk_margin_mw=1000, window_buffer_hours=48`. EUE matches M3 to machine precision; LOLH within 0.18 h mean error. See `docs/ra2_n20_validation_memo.md`. |
 
 ### RA-3 / M3 — Full-year economic dispatch LP benchmark
 
@@ -411,38 +411,100 @@ for stable benchmarks.  Total runtime: 563.6 s (~9 s/scenario).
 
 ---
 
-### Task 4 — Implement RA-2 event-window LP
+### Task 4 — Implement and validate RA-2 event-window LP ✓ COMPLETE
 
-**Where:** new file `src/models/M2EventWindowLP.jl`
-(replaces the current rolling-window M2).
+**Implemented** in `src/models/M2EventWindowLP.jl`.  Config parameters added to `SimConfig`:
+`risk_margin_mw`, `window_buffer_hours`, `min_window_length_hours`, `merge_gap_hours`.
 
-**Algorithm sketch:**
+**Algorithm:**
+1. Compute hourly margin: `margin[h] = thermal_avail[h] + vre[h] − load[h]`
+2. Flag risk hours where `margin[h] < risk_margin_mw`.
+3. Expand by `window_buffer_hours` on each side, merge (gap ≤ `merge_gap_hours`), enforce `min_window_length_hours`.
+4. Solve a JuMP/HiGHS LP for each window (min VOLL × load_shed, s.t. power balance and storage dynamics).
+5. Use RA-1b heuristic outside windows.
 
-1. For each scenario, compute the hourly margin:
-   `margin[h] = thermal_available[h] + vre[h] - load[h]`
-2. Flag risk hours: `margin[h] < risk_margin_mw` (config parameter,
-   e.g. `risk_margin_mw = 500.0`).
-3. Expand each risk hour by a buffer (`window_buffer_hours`, e.g. 6 h
-   before and after).
-4. Merge overlapping expanded windows.
-5. Solve a storage dispatch LP for each window (minimise load shed,
-   subject to storage dynamics and power balance, with SOC boundary
-   conditions passed from the heuristic baseline outside the window).
-6. Outside windows: use RA-1b heuristic dispatch.
+**Validation scripts:**
+- `scripts/17_run_ra2_priority_validation.jl` — N=5 M3-benchmark validation
+- `scripts/18_compare_m2_m3_shortage_patterns.jl` — shortage-hour pattern diagnosis
+- `scripts/19_run_ra2_parameter_sensitivity.jl` — N=5 parameter sensitivity (rm × buf grid)
+- `scripts/20_run_ra2_n20_selected_params.jl` — N=20 selected-parameter validation ✓
 
-**Config parameters:** `risk_margin_mw`, `window_buffer_hours`.
+**N=20 selected-parameter validation results** (2026-05-17, seed=42; commit `ab63f99`):
 
-**Script:** `scripts/16_run_ra2_validation.jl` — single-case sanity check
-before broad sweep.
+| Config | Mean LOLH abs err | Mean runtime | Mean speedup vs M3 | Mean coverage | LP failures |
+|--------|:-----------------:|:------------:|:------------------:|:-------------:|:-----------:|
+| rm=1000 / buf=48 | **0.183 h** | 9.3 s | 20.7× | 29.3% | 0 |
+| rm=800 / buf=24 | 0.233 h | **5.1 s** | **37.3×** | 23.6% | 0 |
+
+EUE and CVaR-EUE match M3 to machine precision (< 10⁻⁹ MWh) for **both** configurations and
+all three priority cases.  M1b LOLH errors (+1000%–+2600%) are reduced to −3% to −13% by RA-2.
+
+**Key finding:** The remaining RA-2 LOLH underestimation (−0.05 to −0.30 h) is smaller in
+magnitude than the M3 CI95 half-widths (0.94–1.57 h) at N=20.  The apparent bias cannot
+be distinguished from sampling noise with 20 scenarios.
+
+**Recommended main-paper configuration:** `risk_margin_mw=1000, window_buffer_hours=48`.
+**Runtime-efficient alternative:** `risk_margin_mw=800, window_buffer_hours=24`.
+
+See `docs/ra2_n20_validation_memo.md` for full analysis and decision record.
 
 ---
 
-### Task 5 — Rerun selected VRE cases with RA-2
+### Task 5 — Add M1c baseline and run compact 5-method comparison
 
-**Script:** extend `scripts/15_run_vre_experiment.jl` to include RA-2, or
-create `scripts/17_run_vre_all_methods.jl`.
+**Status:** Next immediate task.
 
-**Purpose:** answers RQ3, RQ4; completes data for all four main figures.
+**Motivation:** M1b overestimates LOLH by 1000%–2600% despite the SOC reserve floor.
+Adding M1c (emergency-only: no proactive dispatch, only priority-1 emergency discharge)
+isolates whether the M1b bias originates from proactive discharging depleting storage
+before shortage events.
+
+**New model:** `src/models/M1cEmergencyOnlyStorage.jl`
+- Priority 1 (emergency discharge) only: discharge to cover shortfall.
+- No priority-2 proactive discharge, no priority-3 charging.
+- Simplest possible storage model; expected to over-deplete but with cleaner failure mode.
+
+**Script:** `scripts/21_run_m1c_comparison.jl` — compare M1, M1b, M1c, M2 (rm=1000/buf=48), M3
+on VRE120_base, VRE120_bal15, VRE120_wind_hvy at N=20, seed=42.
+
+**Purpose:** Fully characterise the M1 family before the VRE sweep; provides a cleaner
+baseline ladder (M1 → M1b → M1c → M2 → M3) for Figure 2.
+
+---
+
+### Task 6 — N=50 on VRE120_base (CI tightening)
+
+**Status:** Pending; run after Task 5.
+
+**Purpose:** M3 LOLH CI95 relative half-width at N=20 is 54.7% for VRE120_base.
+N=50 reduces this to approximately 35%, enabling a definitive quantification of
+any residual RA-2 LOLH bias.  Recommended before reporting final paper results.
+
+**Script:** `scripts/20_run_ra2_n20_selected_params.jl --n-scenarios 50 --seed 42 --cases VRE120_base`
+
+---
+
+### Task 7 — VRE sweep with RA-2 (longer term)
+
+**Status:** Future; after Tasks 5–6 are complete.
+
+**Script:** extend `scripts/16_run_vre_method_comparison.jl` to include RA-2, or
+create `scripts/22_run_vre_all_methods.jl`.
+
+**Purpose:** extends RQ3 and RQ4 across all six VRE cases; completes data for
+Figures 2–4.
+
+---
+
+### Task 8 — HOPE UC/PCM stress-week validation (future)
+
+**When:** after VRE sweep results are available and the paper framing is confirmed.
+
+**Approach:**
+1. Extract stress weeks from RA-3 dispatch on the highest-stress VRE case.
+2. Export as HOPE input via `ExportHOPECase.jl`.
+3. Run HOPE with `unit_commitment = 1`.
+4. Compare ED (RA-3) vs UC (RA-4) reliability.
 
 ---
 
@@ -463,7 +525,8 @@ confirmed.
 
 ---
 
-*Document version: Phase C in progress (initial VRE sweep complete, 2026-05-17).*
+*Document version: Phase C complete — RA-2 N=20 validation done (2026-05-17).*
 *Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
 *Link to RA-1b validation memo: [docs/ra1b_validation_memo.md](ra1b_validation_memo.md)*
 *Link to VRE method comparison memo: [docs/vre_method_comparison_memo.md](vre_method_comparison_memo.md)*
+*Link to RA-2 N=20 validation memo: [docs/ra2_n20_validation_memo.md](ra2_n20_validation_memo.md)*
