@@ -18,6 +18,12 @@ Base.@kwdef struct SimConfig
     lookahead_hours::Int              = 24
     epsilon_cycling::Float64          = 1e-3  # small cost on charge+discharge
 
+    # ── RA-2 event-window LP ──────────────────────────────────────────────
+    risk_margin_mw::Float64           = 500.0  # flag hours where thermal+VRE-load < this
+    window_buffer_hours::Int          = 24     # hours added each side of a risk hour
+    min_window_length_hours::Int      = 24     # expand short windows to at least this
+    merge_gap_hours::Int              = 24     # merge windows separated by ≤ this gap
+
     # ── M3 full-year ED ───────────────────────────────────────────────────
     cyclic_soc::Bool                  = true
     storage_cycling_cost::Float64     = 0.01  # $/MWh to deter simultaneous c/d

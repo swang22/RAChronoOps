@@ -65,4 +65,5 @@ end
     include("test_power_balance.jl")
     include("test_common_scenarios.jl")
     include("test_metrics.jl")
+    include("test_ra2.jl")
 end

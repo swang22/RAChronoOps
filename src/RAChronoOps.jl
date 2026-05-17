@@ -30,8 +30,9 @@ include("scenarios/SequentialOutages.jl")
 
 # 5. models (M1 defines DispatchResult; M1b/M2/M3 reuse it)
 include("models/M1RuleBasedStorage.jl")
-include("models/M1bReserveAwareStorage.jl")   # RA-1b placeholder — not yet implemented
+include("models/M1bReserveAwareStorage.jl")
 include("models/M2RollingWindow.jl")
+include("models/M2EventWindowLP.jl")
 include("models/M3EDDispatch.jl")
 
 # 6. metrics (defines MetricsResult + individual metric functions)
@@ -58,8 +59,10 @@ export generate_scenarios
 
 export DispatchResult
 export run_m1_rule_based
-export run_m1b_reserve_aware   # RA-1b placeholder — throws until implemented
+export run_m1b_reserve_aware
 export run_m2_rolling_window
+export run_m2_event_window_lp, run_m2_with_diagnostics, Ra2ScenarioDiag
+export build_risk_windows
 export run_m3_ed_dispatch
 
 export MetricsResult, compute_metrics

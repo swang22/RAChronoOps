@@ -1,0 +1,45 @@
+================================================================================
+RA-2 Priority Validation Summary
+Generated: 2026-05-17 13:30:21
+n_scenarios: 5  |  seed: 42  |  skip_m3: true
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+================================================================================
+
+Aggregate reliability metrics
+----------------------------------------------------------------------------------------------------
+  Case                 Model  LOLH(h)   LOLP%  LOLE_d   EUE(MWh)   CVaR-EUE  MaxSF(MW)    rt(s)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base          M1b     103.80   1.185   24.60    39203.6    51633.4     1148.7      0.8
+  VRE120_base          M2        9.60   0.110    3.60     4707.4     9712.4     1001.7      3.2
+  VRE120_bal15         M1b      48.60   0.555   16.40    17635.2    22994.2     1044.0      0.2
+  VRE120_bal15         M2        3.00   0.034    1.40      698.6     2164.0      381.6      1.2
+  VRE120_wind_hvy      M1b      36.40   0.416    9.60    13798.6    20642.7     1034.3      0.2
+  VRE120_wind_hvy      M2        3.40   0.039    1.60     1113.2     2792.6      579.2      1.1
+
+  Note: RA-2 window diagnostics are in ra2_window_diags.csv
+
+Q3. RA-2 window coverage (fraction of scenario-hours in LP windows):
+  VRE120_base           coverage=19.4%  mean_windows=6.0  mean_risk_h=278  lp_failures=0
+  VRE120_bal15          coverage=18.3%  mean_windows=6.0  mean_risk_h=175  lp_failures=0
+  VRE120_wind_hvy       coverage=17.3%  mean_windows=6.8  mean_risk_h=180  lp_failures=0
+
+Q4. LP failure rate:
+  Total LP windows solved: 94  |  Failures: 0  |  Rate: 0.000%
+
+Q5. Runtime comparison:
+  VRE120_base           M1b    0.8 s
+  VRE120_base           M2     3.2 s
+  VRE120_bal15          M1b    0.2 s
+  VRE120_bal15          M2     1.2 s
+  VRE120_wind_hvy       M1b    0.2 s
+  VRE120_wind_hvy       M2     1.1 s
+
+Runtime summary
+----------------------------------------
+  Total wall time: 11.6 s
+
+================================================================================
+Full results: ra2_validation_results.csv
+Error table:  ra2_validation_errors.csv
+Window diags: ra2_window_diags.csv
+Log:          run_20260517_133022.log
