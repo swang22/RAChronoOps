@@ -1,0 +1,132 @@
+┌ Info: RA-2 parameter sensitivity | n=5 | seed=42 | skip_m3=false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:111
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:112
+┌ Info: Grid: risk_margin_mw=[300.0, 500.0, 800.0, 1000.0]  window_buffer_hours=[24, 48]
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:113
+┌ Info: Fixed: min_window_length=24 h  merge_gap=24 h
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:114
+┌ Info: Output: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_parameter_sensitivity\risk_buffer_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:115
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:162
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:172
+┌ Info:   M3:  LOLH=11.2 h  EUE=4707.4 MWh  (49.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:180
+┌ Info:   running M2 [rm300_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm300_buf24]: LOLH=11.4 h  cov=17.0%  wins=6.2  LP_fails=0  (2.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm300_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm300_buf48]: LOLH=12.0 h  cov=20.8%  wins=3.6  LP_fails=0  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm500_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm500_buf24]: LOLH=9.6 h  cov=19.4%  wins=6.0  LP_fails=0  (1.8 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm500_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm500_buf48]: LOLH=12.4 h  cov=22.9%  wins=3.8  LP_fails=0  (1.2 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm800_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm800_buf24]: LOLH=10.6 h  cov=23.9%  wins=5.6  LP_fails=0  (1.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm800_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm800_buf48]: LOLH=11.4 h  cov=27.1%  wins=4.4  LP_fails=0  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm1000_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm1000_buf24]: LOLH=10.6 h  cov=26.8%  wins=6.0  LP_fails=0  (1.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm1000_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm1000_buf48]: LOLH=11.2 h  cov=30.1%  wins=4.6  LP_fails=0  (2.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_parameter_sensitivity\risk_buffer_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:236
+┌ Info: ── Case: VRE120_bal15 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:162
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:172
+┌ Info:   M3:  LOLH=3.6 h  EUE=698.6 MWh  (47.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:180
+┌ Info:   running M2 [rm300_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm300_buf24]: LOLH=3.2 h  cov=15.5%  wins=6.4  LP_fails=0  (0.8 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm300_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm300_buf48]: LOLH=3.2 h  cov=19.3%  wins=4.0  LP_fails=0  (1.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm500_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm500_buf24]: LOLH=3.0 h  cov=18.3%  wins=6.0  LP_fails=0  (1.8 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm500_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm500_buf48]: LOLH=3.4 h  cov=22.0%  wins=3.8  LP_fails=0  (1.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm800_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm800_buf24]: LOLH=3.2 h  cov=22.9%  wins=5.6  LP_fails=0  (1.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm800_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm800_buf48]: LOLH=3.4 h  cov=26.1%  wins=4.0  LP_fails=0  (1.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm1000_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm1000_buf24]: LOLH=3.0 h  cov=25.3%  wins=6.2  LP_fails=0  (1.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm1000_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm1000_buf48]: LOLH=3.4 h  cov=28.8%  wins=4.0  LP_fails=0  (2.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_parameter_sensitivity\risk_buffer_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:236
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:162
+┌ Info:   running M3 (RA-3, full-year ED LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:172
+┌ Info:   M3:  LOLH=4.4 h  EUE=1113.2 MWh  (45.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:180
+┌ Info:   running M2 [rm300_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm300_buf24]: LOLH=3.4 h  cov=14.0%  wins=7.0  LP_fails=0  (0.7 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm300_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm300_buf48]: LOLH=3.8 h  cov=18.0%  wins=4.4  LP_fails=0  (1.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm500_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm500_buf24]: LOLH=3.4 h  cov=17.3%  wins=6.8  LP_fails=0  (0.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm500_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm500_buf48]: LOLH=4.4 h  cov=21.2%  wins=4.0  LP_fails=0  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm800_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm800_buf24]: LOLH=4.2 h  cov=22.1%  wins=6.0  LP_fails=0  (1.1 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm800_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm800_buf48]: LOLH=3.6 h  cov=25.6%  wins=3.8  LP_fails=0  (1.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm1000_buf24]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm1000_buf24]: LOLH=3.6 h  cov=24.3%  wins=6.8  LP_fails=0  (1.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   running M2 [rm1000_buf48]...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:200
+┌ Info:   M2[rm1000_buf48]: LOLH=3.8 h  cov=28.2%  wins=4.0  LP_fails=0  (2.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:210
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_parameter_sensitivity\risk_buffer_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:236
+┌ Info: Total runtime: 186.6 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\19_run_ra2_parameter_sensitivity.jl:240
