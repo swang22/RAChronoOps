@@ -1,0 +1,177 @@
+==============================================================================
+M2 vs M3 Shortage Pattern Diagnostic
+Generated: 2026-05-17 15:12:07
+n_scenarios: 5  |  seed: 42  |  shed_threshold: 0.001 MW
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+==============================================================================
+
+Per-scenario shortage hour breakdown
+------------------------------------------------------------------------------------------
+  Case             Scen   M2_h   M3_h     Δh  Comm_h  M2only  M3only
+  ------------------------------------------------------------------------------------
+  VRE120_base         1      5      6     -1       4       1       2
+  VRE120_base         2      4      6     -2       3       1       3
+  VRE120_base         3      7      6     +1       2       5       4
+  VRE120_base         4     13     14     -1      10       3       4
+  VRE120_base         5     19     24     -5      16       3       8
+  VRE120_bal15        1      1      1     +0       1       0       0
+  VRE120_bal15        2      1      1     +0       0       1       1
+  VRE120_bal15        3      0      0     +0       0       0       0
+  VRE120_bal15        4      6      7     -1       6       0       1
+  VRE120_bal15        5      7      9     -2       6       1       3
+  VRE120_wind_hvy     1      1      2     -1       1       0       1
+  VRE120_wind_hvy     2      1      2     -1       0       1       2
+  VRE120_wind_hvy     3      0      0     +0       0       0       0
+  VRE120_wind_hvy     4      6      7     -1       6       0       1
+  VRE120_wind_hvy     5      9     11     -2       8       1       3
+
+Per-scenario EUE breakdown (MWh)
+----------------------------------------------------------------------------------------------------
+  Case             Scen     M2_EUE     M3_EUE   EUE_diff    Comm_M2     M2only     M3only
+  ----------------------------------------------------------------------------------------------
+  VRE120_base         1    1779.48    1779.48  +0.000000    1507.93     271.55     681.47
+  VRE120_base         2    2522.27    2522.27  +0.000000    1890.23     632.04    1241.87
+  VRE120_base         3    2519.04    2519.04  -0.000000    1463.73    1055.30    1417.22
+  VRE120_base         4    7004.09    7004.09  -0.000000    4586.09    2418.01    2288.01
+  VRE120_base         5    9712.36    9712.36  +0.000000    8216.30    1496.06    3429.61
+  VRE120_bal15        1      36.21      36.21  +0.000000      36.21       0.00       0.00
+  VRE120_bal15        2      47.35      47.35  +0.000000       0.00      47.35      47.35
+  VRE120_bal15        3       0.00       0.00  +0.000000       0.00       0.00       0.00
+  VRE120_bal15        4    1245.61    1245.61  -0.000000    1245.61       0.00     606.57
+  VRE120_bal15        5    2163.99    2163.99  +0.000000    1802.96     361.03    1010.60
+  VRE120_wind_hvy     1     514.14     514.14  +0.000000     514.14       0.00     248.52
+  VRE120_wind_hvy     2     537.14     537.14  +0.000000       0.00     537.14     537.14
+  VRE120_wind_hvy     3       0.00       0.00  +0.000000       0.00       0.00       0.00
+  VRE120_wind_hvy     4    1722.01    1722.01  +0.000000    1722.01       0.00     573.39
+  VRE120_wind_hvy     5    2792.63    2792.63  +0.000000    2634.83     157.80    1657.24
+
+Case-level aggregates (means across scenarios)
+----------------------------------------------------------------------------------------------------
+  Case               M2_h   M3_h     Δh  Comm_h  M2only  M3only  M2only_MW  M3only_MW
+  ----------------------------------------------------------------------------------------------
+  VRE120_base         9.6   11.2   -1.6     7.0     2.6     4.2     483.87     421.94
+  VRE120_bal15        3.0    3.6   -0.6     2.6     0.4     1.0      81.68     198.16
+  VRE120_wind_hvy     3.4    4.4   -1.0     3.0     0.4     1.4     138.99     328.58
+
+Q1. Does M2 match M3 EUE by reallocating shortage energy across fewer hours?
+
+  VRE120_base:
+    Mean EUE: M2=4707.45  M3=4707.45  diff=-0.000000 MWh
+    M2 EUE breakdown:  common=3532.86 MWh (75.0%)  m2_only=1174.59 MWh (25.0%)
+    M3 EUE at common:  2895.81 MWh  (M2 excess at common: +637.04 MWh)
+    M3-only EUE:       1811.63 MWh  M2-only EUE: 1174.59 MWh
+
+  VRE120_bal15:
+    Mean EUE: M2=698.63  M3=698.63  diff=+0.000000 MWh
+    M2 EUE breakdown:  common=616.96 MWh (88.3%)  m2_only=81.68 MWh (11.7%)
+    M3 EUE at common:  365.73 MWh  (M2 excess at common: +251.23 MWh)
+    M3-only EUE:       332.90 MWh  M2-only EUE: 81.68 MWh
+
+  VRE120_wind_hvy:
+    Mean EUE: M2=1113.18  M3=1113.18  diff=+0.000000 MWh
+    M2 EUE breakdown:  common=974.20 MWh (87.5%)  m2_only=138.99 MWh (12.5%)
+    M3 EUE at common:  509.93 MWh  (M2 excess at common: +464.27 MWh)
+    M3-only EUE:       603.26 MWh  M2-only EUE: 138.99 MWh
+
+Q2. Are M2-only shortage hours larger (more intense) than M3-only hours?
+
+  VRE120_base:
+    M2-only hours intensity: 483.87 MW/h  |  M3-only hours intensity: 421.94 MW/h
+    Common hours intensity:  M2=542.21 MW/h  M3=423.30 MW/h
+    M2-only vs M3-only intensity ratio: 1.15x
+
+  VRE120_bal15:
+    M2-only hours intensity: 204.19 MW/h  |  M3-only hours intensity: 330.26 MW/h
+    Common hours intensity:  M2=108.86 MW/h  M3=66.99 MW/h
+    M2-only vs M3-only intensity ratio: 0.62x
+
+  VRE120_wind_hvy:
+    M2-only hours intensity: 347.47 MW/h  |  M3-only hours intensity: 410.72 MW/h
+    Common hours intensity:  M2=226.10 MW/h  M3=119.80 MW/h
+    M2-only vs M3-only intensity ratio: 0.85x
+
+Q3. Which cases/scenarios drive the LOLH difference?
+
+  VRE120_base      scen 5:  M2=19 h  M3=24 h  Δ=-5 h  (m2_only=3 h, m3_only=8 h)
+  VRE120_base      scen 2:  M2= 4 h  M3= 6 h  Δ=-2 h  (m2_only=1 h, m3_only=3 h)
+  VRE120_bal15     scen 5:  M2= 7 h  M3= 9 h  Δ=-2 h  (m2_only=1 h, m3_only=3 h)
+  VRE120_wind_hvy  scen 5:  M2= 9 h  M3=11 h  Δ=-2 h  (m2_only=1 h, m3_only=3 h)
+  VRE120_base      scen 1:  M2= 5 h  M3= 6 h  Δ=-1 h  (m2_only=1 h, m3_only=2 h)
+  VRE120_base      scen 4:  M2=13 h  M3=14 h  Δ=-1 h  (m2_only=3 h, m3_only=4 h)
+  VRE120_bal15     scen 4:  M2= 6 h  M3= 7 h  Δ=-1 h  (m2_only=0 h, m3_only=1 h)
+  VRE120_wind_hvy  scen 1:  M2= 1 h  M3= 2 h  Δ=-1 h  (m2_only=0 h, m3_only=1 h)
+  VRE120_wind_hvy  scen 2:  M2= 1 h  M3= 2 h  Δ=-1 h  (m2_only=1 h, m3_only=2 h)
+  VRE120_wind_hvy  scen 4:  M2= 6 h  M3= 7 h  Δ=-1 h  (m2_only=0 h, m3_only=1 h)
+  VRE120_base      scen 3:  M2= 7 h  M3= 6 h  Δ=+1 h  (m2_only=5 h, m3_only=4 h)
+
+Q4. Is the LOLH difference material for EUE or mainly an event-frequency artifact?
+
+  VRE120_base:
+    M3-only EUE fraction of total: 38.48%  (1811.63 MWh / 4707.45 MWh)
+    M2-only EUE fraction of total: 24.95%  (1174.59 MWh / 4707.45 MWh)
+    → EUE impact is non-trivial (≥5%); difference may affect CVaR/tail metrics.
+
+  VRE120_bal15:
+    M3-only EUE fraction of total: 47.65%  (332.90 MWh / 698.63 MWh)
+    M2-only EUE fraction of total: 11.69%  (81.68 MWh / 698.63 MWh)
+    → EUE impact is non-trivial (≥5%); difference may affect CVaR/tail metrics.
+
+  VRE120_wind_hvy:
+    M3-only EUE fraction of total: 54.19%  (603.26 MWh / 1113.18 MWh)
+    M2-only EUE fraction of total: 12.49%  (138.99 MWh / 1113.18 MWh)
+    → EUE impact is non-trivial (≥5%); difference may affect CVaR/tail metrics.
+
+M3-only shortage events (hours M2 misses; sorted by shed size)
+----------------------------------------------------------------------
+  Case             Scen  Hour      M3_MW      M2_MW
+  ----------------------------------------------------------------
+  VRE120_wind_hvy     5  4988   970.9196     0.0000
+  VRE120_base         4  5012   968.0900     0.0000
+  VRE120_base         5  5060   909.2913     0.0000
+  VRE120_base         3  5085   854.0680     0.0000
+  VRE120_base         4  5036   728.4516     0.0000
+  VRE120_base         5  5010   713.4237     0.0000
+  VRE120_base         5  4965   682.5207     0.0000
+  VRE120_bal15        5  4989   649.5664     0.0000
+  VRE120_base         2  4988   609.8230     0.0000
+  VRE120_bal15        4  4989   606.5664     0.0000
+  VRE120_base         2  5011   589.8082     0.0000
+  VRE120_wind_hvy     4  4988   573.3941     0.0000
+  VRE120_wind_hvy     5  4989   528.5164     0.0000
+  VRE120_base         1  4989   409.9164     0.0000
+  VRE120_base         5  5732   399.7710     0.0000
+  VRE120_base         4  4413   362.2312     0.0000
+  VRE120_bal15        5  5061   355.2514     0.0000
+  VRE120_base         3  4989   334.9164     0.0000
+  VRE120_base         5  5013   297.2360     0.0000
+  VRE120_wind_hvy     2  4989   273.5164     0.0000
+
+  Total M3-only events: 33  |  Max M3 shed: 970.9196 MW  |  Mean M3 shed: 416.3326 MW
+
+M2-only shortage events (hours M3 misses; sorted by shed size)
+----------------------------------------------------------------------
+  Case             Scen  Hour      M2_MW      M3_MW
+  ----------------------------------------------------------------
+  VRE120_base         5  5007   900.9398     0.0000
+  VRE120_base         4  5031   869.8557     0.0000
+  VRE120_base         4  5034   813.8990     0.0000
+  VRE120_base         4  5010   734.2509     0.0000
+  VRE120_base         2  5007   632.0443     0.0000
+  VRE120_wind_hvy     2  4987   537.1404     0.0000
+  VRE120_base         3  5079   459.8853     0.0000
+  VRE120_base         3  4985   424.6025     0.0000
+  VRE120_base         5  5729   399.7710     0.0000
+  VRE120_bal15        5  5057   361.0342     0.0000
+  VRE120_base         1  5008   271.5500     0.0000
+  VRE120_base         5  5005   195.3483     0.0000
+  VRE120_wind_hvy     5  5057   157.8014     0.0000
+  VRE120_base         3  5058   138.5451     0.0000
+  VRE120_bal15        2  4985    47.3525     0.0000
+  VRE120_base         3  5082    20.2878     0.0000
+  VRE120_base         3  5078    11.9819     0.0000
+
+  Total M2-only events: 17  |  Max M2 shed: 900.9398 MW  |  Mean M2 shed: 410.3700 MW
+
+Total runtime: 154.7 s
+==============================================================================
+Files: shortage_pattern_comparison.csv  |  shortage_hour_detail.csv
