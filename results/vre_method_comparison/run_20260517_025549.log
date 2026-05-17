@@ -1,0 +1,84 @@
+┌ Info: VRE method comparison | n_scenarios=3 | seed=42 | skip_m3=true
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:121
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_bal20, VRE120_bal30, VRE120_solar_hvy, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:122
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:157
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:216
+┌ Info:   M1:  LOLH=107.0 h  EUE=35119.1 MWh  (0.7s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:223
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:235
+┌ Info:   M1b: LOLH=94.67 h  EUE=32369.3 MWh  (0.3s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:242
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:270
+┌ Info: ── Case: VRE120_bal15 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:157
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:216
+┌ Info:   M1:  LOLH=57.67 h  EUE=17821.0 MWh  (0.2s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:223
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:235
+┌ Info:   M1b: LOLH=42.0 h  EUE=14090.8 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:242
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:270
+┌ Info: ── Case: VRE120_bal20 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:157
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:216
+┌ Info:   M1:  LOLH=40.67 h  EUE=12736.9 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:223
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:235
+┌ Info:   M1b: LOLH=22.33 h  EUE=8371.5 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:242
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:270
+┌ Info: ── Case: VRE120_bal30 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:157
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:216
+┌ Info:   M1:  LOLH=28.33 h  EUE=8889.3 MWh  (0.4s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:223
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:235
+┌ Info:   M1b: LOLH=10.33 h  EUE=4106.9 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:242
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:270
+┌ Info: ── Case: VRE120_solar_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:157
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:216
+┌ Info:   M1:  LOLH=49.67 h  EUE=16640.7 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:223
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:235
+┌ Info:   M1b: LOLH=23.33 h  EUE=9952.6 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:242
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:270
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:157
+┌ Info:   running M1 (RA-1a)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:216
+┌ Info:   M1:  LOLH=61.0 h  EUE=17905.1 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:223
+┌ Info:   running M1b (RA-1b, reserve_fraction=0.50)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:235
+┌ Info:   M1b: LOLH=32.33 h  EUE=11356.5 MWh  (0.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:242
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:270
+┌ Info: Total runtime: 8.7 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:274
+┌ Info: Results → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:338
+┌ Info: Errors  → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\vre_method_comparison_errors.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:339
+┌ Info: Summary → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\vre_method_comparison\summary.txt
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\16_run_vre_method_comparison.jl:477
