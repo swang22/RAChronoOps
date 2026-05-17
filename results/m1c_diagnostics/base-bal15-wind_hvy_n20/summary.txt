@@ -1,0 +1,103 @@
+================================================================================
+M1c vs M3 SOC and Charging Diagnostic Summary
+Generated: 2026-05-17 19:28:47
+n_scenarios: 20  |  seed: 42
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+================================================================================
+
+SOC trajectory comparison (M1c vs M3)
+--------------------------------------------------------------------------------
+  Case                   mean_soc_diff max_soc_diff pct_m1c_full  pct_m3_full
+  --------------------------------------------------------------------------
+  VRE120_base                2112.975     3932.000        98.4%        14.5%
+  VRE120_bal15               2195.909     3932.000        99.1%        14.6%
+  VRE120_wind_hvy            2274.801     3932.000        99.1%        17.6%
+
+SOC at first shortage event (M1c vs M3)
+--------------------------------------------------------------------------------
+  Case                   m1c_soc_first_h m3_soc_first_h   total_energy
+  --------------------------------------------------------------------
+  VRE120_base                     908.9          908.9         3932.0
+  VRE120_bal15                   1899.2         1649.7         3932.0
+  VRE120_wind_hvy                1017.0          959.1         3932.0
+
+Charging source proxy (M1c)
+--------------------------------------------------------------------------------
+  Case                    total_chg_MWh  vre_surplus_% therm_hdroom_%        other_%
+  --------------------------------------------------------------------------
+  VRE120_base                   33781.2            0.0          100.0            0.0
+  VRE120_bal15                  18254.1            0.0          100.0            0.0
+  VRE120_wind_hvy               18908.9           11.0           89.0            0.0
+
+Charging source proxy (M3)
+--------------------------------------------------------------------------------
+  Case                    total_chg_MWh  vre_surplus_%   no_surplus_%
+  ----------------------------------------------------------------
+  VRE120_base                  832005.0            2.1           97.9
+  VRE120_bal15                1143198.0           30.0           70.0
+  VRE120_wind_hvy             1026759.6           49.8           50.2
+
+Shortage event SOC at event start (M3-detected events)
+--------------------------------------------------------------------------------
+  Case                     n_events  m1c_soc_start   m3_soc_start   m1c_soc%    m3_soc%
+  --------------------------------------------------------------------------
+  VRE120_base                    40         1364.4         1364.4      34.7%      34.7%
+  VRE120_bal15                   12         2415.7         2270.1      61.4%      57.7%
+  VRE120_wind_hvy                17         2132.9         2060.4      54.2%      52.4%
+
+================================================================================
+Research questions
+================================================================================
+
+Q1. Is M1c storage full (or near-full) before shortage events?
+
+  VRE120_base: mean M1c SOC at event start = 1364.4 MWh / 3932.0 MWh (34.7%)
+    → Storage is NOT full (<75%) before events. Hypothesis A NOT supported.
+  VRE120_bal15: mean M1c SOC at event start = 2415.7 MWh / 3932.0 MWh (61.4%)
+    → Storage is NOT full (<75%) before events. Hypothesis A NOT supported.
+  VRE120_wind_hvy: mean M1c SOC at event start = 2132.9 MWh / 3932.0 MWh (54.2%)
+    → Storage is NOT full (<75%) before events. Hypothesis A NOT supported.
+
+Q2. Does M1c rely materially on thermal-headroom charging?
+
+  VRE120_base: thermal-headroom charging share = 100.0%
+    → Thermal headroom is a material charging source (≥20%). Hypothesis B SUPPORTED.
+  VRE120_bal15: thermal-headroom charging share = 100.0%
+    → Thermal headroom is a material charging source (≥20%). Hypothesis B SUPPORTED.
+  VRE120_wind_hvy: thermal-headroom charging share = 87.3%
+    → Thermal headroom is a material charging source (≥20%). Hypothesis B SUPPORTED.
+
+Q3. Are M1c and M3 SOC trajectories similar, or only shortage outcomes similar?
+
+  VRE120_base: mean |soc_m1c - soc_m3| = 2112.97 MWh  max = 3932.00 MWh  (total_energy=3932.0 MWh)
+    → Large trajectory difference (>10%) — outcomes match despite divergent paths. Hypothesis C NOT supported.
+  VRE120_bal15: mean |soc_m1c - soc_m3| = 2195.91 MWh  max = 3932.00 MWh  (total_energy=3932.0 MWh)
+    → Large trajectory difference (>10%) — outcomes match despite divergent paths. Hypothesis C NOT supported.
+  VRE120_wind_hvy: mean |soc_m1c - soc_m3| = 2274.80 MWh  max = 3932.00 MWh  (total_energy=3932.0 MWh)
+    → Large trajectory difference (>10%) — outcomes match despite divergent paths. Hypothesis C NOT supported.
+
+Q4. Does M3 also charge in hours without VRE surplus?
+
+  VRE120_base: M3 charges 814831.5 MWh without VRE surplus (97.9% of total M3 charging)
+    → M3 materially charges from non-VRE surplus hours (≥10%). M3 uses thermal headroom too.
+  VRE120_bal15: M3 charges 800527.3 MWh without VRE surplus (70.0% of total M3 charging)
+    → M3 materially charges from non-VRE surplus hours (≥10%). M3 uses thermal headroom too.
+  VRE120_wind_hvy: M3 charges 515050.0 MWh without VRE surplus (50.2% of total M3 charging)
+    → M3 materially charges from non-VRE surplus hours (≥10%). M3 uses thermal headroom too.
+
+Q5. Is the exact M1c = M3 LOLH match likely structural or case-specific?
+
+  Evidence summary:
+    A. Storage full before events:  NO/PARTIAL (mean SOC frac = 50.1%)
+    B. Thermal headroom critical:   YES (mean share = 95.8%)
+    C. SOC trajectories similar:    NO (mean diff = 2194.56 MWh)
+
+  → The exact match at N=20 appears coincidental (storage not reliably full
+    before events). With more scenarios or different VRE profiles the match
+    would likely not hold.
+
+Total runtime: 617.1 s
+================================================================================
+Files: m1c_m3_soc_comparison.csv
+       m1c_charging_source_proxy.csv
+       shortage_event_soc_detail.csv
