@@ -1,0 +1,62 @@
+┌ Info: RA-2 priority validation | n=5 | seed=42 | skip_m3=false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:108
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:109
+┌ Info: Output: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_priority_validation\base-bal15-wind_hvy_n5
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:110
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:148
+┌ Info:   running M1b (RA-1b)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:201
+┌ Info:   M1b: LOLH=103.8 h  EUE=39203.6 MWh  (0.8s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:207
+┌ Info:   running M2 (RA-2 event-window LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:216
+┌ Info:   M2:  LOLH=9.6 h  EUE=4707.4 MWh  (3.2s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:222
+┌ Info:   M2 windows: mean=6.0/scen  coverage=19.4%  LP_fails=0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:229
+┌ Info:   running M3 (RA-3, full-year ED LP) — may be slow...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:254
+┌ Info:   M3:  LOLH=11.2 h  EUE=4707.4 MWh  (48.9s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:260
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_priority_validation\base-bal15-wind_hvy_n5\ra2_validation_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:270
+┌ Info: ── Case: VRE120_bal15 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:148
+┌ Info:   running M1b (RA-1b)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:201
+┌ Info:   M1b: LOLH=48.6 h  EUE=17635.2 MWh  (1.2s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:207
+┌ Info:   running M2 (RA-2 event-window LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:216
+┌ Info:   M2:  LOLH=3.0 h  EUE=698.6 MWh  (0.9s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:222
+┌ Info:   M2 windows: mean=6.0/scen  coverage=18.3%  LP_fails=0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:229
+┌ Info:   running M3 (RA-3, full-year ED LP) — may be slow...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:254
+┌ Info:   M3:  LOLH=3.6 h  EUE=698.6 MWh  (48.1s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:260
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_priority_validation\base-bal15-wind_hvy_n5\ra2_validation_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:270
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:148
+┌ Info:   running M1b (RA-1b)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:201
+┌ Info:   M1b: LOLH=36.4 h  EUE=13798.6 MWh  (0.2s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:207
+┌ Info:   running M2 (RA-2 event-window LP)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:216
+┌ Info:   M2:  LOLH=3.4 h  EUE=1113.2 MWh  (1.3s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:222
+┌ Info:   M2 windows: mean=6.8/scen  coverage=17.3%  LP_fails=0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:229
+┌ Info:   running M3 (RA-3, full-year ED LP) — may be slow...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:254
+┌ Info:   M3:  LOLH=4.4 h  EUE=1113.2 MWh  (46.7s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:260
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\ra2_priority_validation\base-bal15-wind_hvy_n5\ra2_validation_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:270
+┌ Info: Total runtime: 156.1 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\17_run_ra2_priority_validation.jl:274
