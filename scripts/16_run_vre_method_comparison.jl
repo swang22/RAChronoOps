@@ -24,9 +24,13 @@
 #   julia --project=. scripts/16_run_vre_method_comparison.jl [options]
 #
 # Options:
-#   --n-scenarios N   Number of MC scenarios (default: 5)
-#   --seed S          RNG seed                (default: 42)
-#   --skip-m3         Omit RA-3 (fast mode; useful for quick sanity check)
+#   --n-scenarios N        Number of MC scenarios (default: 5)
+#   --seed S               RNG seed                (default: 42)
+#   --skip-m3              Omit RA-3 (fast mode; useful for quick sanity check)
+#   --cases C1,C2,...      Comma-separated subset of VRE120 cases to run
+#                          (default: all six VRE120 cases)
+#   --out-subdir DIR       Subdirectory name under results/vre_method_comparison/
+#                          (auto-derived from --cases if omitted)
 
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
@@ -64,6 +68,16 @@ function parse_cli(args::Vector{String})
         end
     end
     return kw
+end
+
+# ── derive a short output subdirectory name from the case list ────────────────
+function auto_subdir(cases::Vector{String}, n_scenarios::Int)
+    if cases == VRE120_CASES
+        return "all_n$(n_scenarios)"
+    end
+    # build abbreviation: strip "VRE120_" prefix and join with "-"
+    abbr = join([replace(c, "VRE120_" => "") for c in cases], "-")
+    return "$(abbr)_n$(n_scenarios)"
 end
 
 # ── Priority-1 emergency discharge counter ────────────────────────────────────
@@ -109,9 +123,24 @@ let
     seed        = parse(Int, get(kw, "seed",         "42"))
     skip_m3     = get(kw, "skip-m3", "false") == "true"
 
-    project_root = joinpath(@__DIR__, "..")
-    cases_root   = joinpath(project_root, "data_processed", "cases")
-    out_dir      = joinpath(project_root, "results", "vre_method_comparison")
+    # ── resolve case list ─────────────────────────────────────────────────────
+    cases_to_run = if haskey(kw, "cases")
+        requested = split(kw["cases"], ",")
+        for c in requested
+            c in VRE120_CASES || error("Unknown case: $c (valid: $(join(VRE120_CASES, ", ")))")
+        end
+        String.(requested)
+    else
+        VRE120_CASES
+    end
+
+    project_root  = joinpath(@__DIR__, "..")
+    cases_root    = joinpath(project_root, "data_processed", "cases")
+    base_out_dir  = joinpath(project_root, "results", "vre_method_comparison")
+
+    # ── resolve output subdirectory ───────────────────────────────────────────
+    subdir  = get(kw, "out-subdir", auto_subdir(cases_to_run, n_scenarios))
+    out_dir = joinpath(base_out_dir, subdir)
     mkpath(out_dir)
 
     log_path = joinpath(out_dir, "run_$(Dates.format(now(), "yyyymmdd_HHMMSS")).log")
@@ -119,10 +148,12 @@ let
     global_logger(logger)
 
     @info "VRE method comparison | n_scenarios=$n_scenarios | seed=$seed | skip_m3=$skip_m3"
-    @info "Cases: $(join(VRE120_CASES, ", "))"
+    @info "Cases: $(join(cases_to_run, ", "))"
+    @info "Output: $out_dir"
 
     # ── load VRE case summary for penetration metadata ────────────────────────
-    summary_csv = joinpath(out_dir, "vre_case_summary.csv")
+    # Always read from the base output dir where script 15 writes it
+    summary_csv = joinpath(base_out_dir, "vre_case_summary.csv")
     isfile(summary_csv) ||
         error("VRE case summary not found: $summary_csv\n" *
               "Run scripts/15_summarize_vre_cases.jl first.")
@@ -140,7 +171,7 @@ let
 
     total_t0 = time()
 
-    for cname in VRE120_CASES
+    for cname in cases_to_run
         cdir = joinpath(cases_root, cname)
         if !isdir(cdir)
             @warn "Case directory not found — skipping: $cdir"
@@ -279,7 +310,7 @@ let
 
     error_comparison_rows = NamedTuple[]
     if !skip_m3
-        for cname in VRE120_CASES
+        for cname in cases_to_run
             m3_row = filter(r -> r.case_name == cname && r.model == "M3" && r.status == "ok", ok_df)
             isempty(m3_row) && continue
             m3_lolh = m3_row[1, :lolh_hours]
@@ -345,6 +376,8 @@ let
         @printf(io, "Generated: %s\n", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"))
         @printf(io, "n_scenarios: %d  |  seed: %d  |  skip_m3: %s\n",
                 n_scenarios, seed, skip_m3)
+        @printf(io, "Cases: %s\n", join(cases_to_run, ", "))
+        @printf(io, "Output subdir: %s\n", subdir)
         println(io, "=" ^ 80)
         println(io)
 
@@ -370,7 +403,7 @@ let
 
             # ── Q1: does M1b improve over M1? ─────────────────────────────────
             println(io, "Q1. Does RA-1b improve over RA-1a across VRE cases?")
-            for cname in VRE120_CASES
+            for cname in cases_to_run
                 m1r  = filter(r -> r.case_name == cname && r.model == "M1",  ok_df)
                 m1br = filter(r -> r.case_name == cname && r.model == "M1b", ok_df)
                 (isempty(m1r) || isempty(m1br)) && continue
@@ -421,7 +454,8 @@ let
 
             # ── Q4: solar-heavy vs wind-heavy ─────────────────────────────────
             println(io, "Q4. Are solar-heavy and wind-heavy cases different?")
-            for cname in ("VRE120_solar_hvy", "VRE120_wind_hvy")
+            for cname in filter(c -> c in cases_to_run,
+                                ["VRE120_solar_hvy", "VRE120_wind_hvy"])
                 for mlabel in model_labels
                     mrow = filter(r -> r.case_name == cname && r.model == mlabel, ok_df)
                     isempty(mrow) && continue
@@ -479,7 +513,9 @@ let
     # ── console output ─────────────────────────────────────────────────────────
     println()
     println("=" ^ 90)
-    @printf("VRE Method Comparison  |  n_scenarios=%d  |  seed=%d\n", n_scenarios, seed)
+    @printf("VRE Method Comparison  |  n_scenarios=%d  |  seed=%d  |  subdir=%s\n",
+            n_scenarios, seed, subdir)
+    @printf("Cases: %s\n", join(cases_to_run, ", "))
     println("=" ^ 90)
 
     if !isempty(results_rows)
