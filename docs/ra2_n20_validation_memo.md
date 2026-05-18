@@ -184,6 +184,8 @@ merge_gap_hours       = 24     (fixed)
 |-------|--------|:-------------------:|:------------------:|:-------------:|
 | M1 (RA-1a) | Naive peak-shaving heuristic | +700%–+1300% | ~+700% | ~200× faster |
 | M1b (RA-1b) | Reserve-aware heuristic | +1000%–+2600% | ~+700% | ~200× faster |
+| M1c (RA-1c) | Emergency-only, system-surplus charging | 0.0 h at N=20 (case-specific) | 0 MWh at N=20 | ~130× faster |
+| M1c_VREOnly *(appendix)* | Emergency-only, VRE-surplus-only charging | +756%–+2526% | ~+1100% | ~130× faster |
 | **M2 (RA-2)** | **Event-window LP hybrid** | **−3% to −13%** | **< 10⁻⁹ MWh** | **20–37× faster** |
 | M3 (RA-3) | Full-year ED LP benchmark | 0% (reference) | 0% (reference) | 1× |
 
@@ -197,23 +199,56 @@ LOLH by 1000%–2600% at N=20, far larger than any remaining M2 error.  The rese
 prevents storage depletion before shortage events but cannot replicate the intertemporal
 energy-shifting logic of an LP.
 
+**M1c (N=20 exact match) is case-specific:** M1c matches M3 LOLH to 0.00 h at N=20 for
+all three priority cases.  This is not structural equivalence — SOC trajectories differ by
+54–58% of battery capacity.  The match holds because both models fill storage predominantly
+from thermal headroom hours (not VRE surplus) at current VRE120 penetration levels.
+M1c_VREOnly (appendix sensitivity) destroys the match entirely (+17–77 h error) because
+p_vre < load at 87–100% of hours, leaving the battery uncharged.
+
 ---
 
 ## 6. Next steps
 
-### 6a. Add M1c as additional simple baseline (immediate)
+### 6a. Emergency-only storage and charging-source sensitivity (COMPLETE)
 
-Implement **M1c** — an emergency-only heuristic that suppresses all proactive discharging.
-M1c does not perform priority-2 peak-shaving discharge.  It still allows charging from
-surplus energy (priority-3) and discharges only to cover observed pre-storage shortfalls
-(priority-1 only).
+**Scripts:** `scripts/21_run_m1c_comparison.jl`, `scripts/22_diagnose_m1c_m3_soc_and_charging.jl`, `scripts/23_compare_m1c_charging_assumptions.jl`
+**Commits:** `22dd7ff`, `091f0ab`, `142c7f6`
+**Memo:** `docs/m1c_charging_assumption_memo.md`
 
-M1c is not intended to be more accurate than M2.  It is a simple practice-oriented
-benchmark to test whether emergency-only storage dispatch can outperform reserve-aware
-peak-shaving heuristics (M1b) within the same N=20 scenario set.
+Two M1c variants were implemented and compared against M3 at N=20, seed=42:
 
-Then run a compact comparison of **M1 → M1b → M1c → M2 (rm=1000/buf=48) → M3** on the
-three priority cases at N=20.
+| Model | Discharge rule | Charging rule |
+|---|---|---|
+| **M1c_current** | P1 only: cover pre-storage shortfall | Any system surplus: `net_supply > load` (thermal headroom included) |
+| **M1c_VREOnly** | P1 only: cover pre-storage shortfall | VRE surplus only: `p_vre[h] > load[h]` |
+
+**M1c_current** is consistent with M3 economic dispatch: both models fill storage whenever
+the system has spare capacity regardless of its source (thermal or VRE).
+
+**M1c_VREOnly** enforces a "renewable firming" interpretation.  It performs poorly in VRE120
+cases because VRE output alone rarely exceeds system load (p_vre < load at 87–100% of hours):
+the battery rarely charges and the model reduces to a no-storage baseline.
+
+#### Charging-assumption comparison (N=20, seed=42)
+
+| Case | M3 LOLH (h) | M1c_current LOLH (h) | M1c_VREOnly LOLH (h) | M1c_VREOnly error (h) |
+|------|:-----------:|:--------------------:|:--------------------:|:---------------------:|
+| VRE120_base | 5.95 | **5.95** | 82.80 | +76.85 |
+| VRE120_bal15 | 1.35 | **1.35** | 35.45 | +34.10 |
+| VRE120_wind_hvy | 2.25 | **2.25** | 19.25 | +17.00 |
+
+M1c_current matches M3 exactly (0.00 h error) at 90–130× speedup.
+M1c_VREOnly has mean absolute LOLH error of 42.7 h (755%–2526% relative).
+
+**Caveat on the exact M1c_current = M3 match:** The match should not be interpreted as a
+structural equivalence.  The SOC diagnostic (script 22) shows that M1c and M3 SOC
+trajectories differ substantially (mean |SOC_diff| = 2,113–2,275 MWh, 54–58% of battery
+capacity).  The match is case/sample-specific and depends on charging-access assumptions.
+
+**Paper recommendation:** Include M1c_current in the main comparison table
+(M1 → M1b → M1c → M2 → M3).  Present M1c_VREOnly as an appendix sensitivity to explain
+why the charging-source assumption is not arbitrary.
 
 ### 6b. N=50 on VRE120_base (confidence interval tightening)
 

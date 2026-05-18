@@ -70,6 +70,15 @@ computed inside each scenario.
 | Role in paper | Practical improved heuristic. Tests whether a simple SOC guard is sufficient to recover most RA-3 accuracy. |
 | Implementation status | **Implemented and validated** (Phase B complete). `src/models/M1bReserveAwareStorage.jl`, `configs/m1b.yaml`. Validation: `scripts/14_run_ra1b_validation.jl`; results in `results/ra1b_validation/`. Key finding: P1 fires in 10/10 scenarios; LOLH storage-sensitive; still 3–11× above M3 at reference cases — motivates RA-2. |
 
+### RA-1c / M1c — Emergency-only chronological heuristic
+
+| Attribute | Detail |
+|-----------|--------|
+| Mathematical idea | Priority-1 emergency discharge only: discharge only to cover observed pre-storage shortfall. Charges from any system surplus (thermal headroom included). No priority-2 proactive peak-shaving. Tests whether eliminating proactive discharge removes the M1b SOC-depletion bias. |
+| Expected runtime | ~1–2 s/case at N=20 (no LP); ~130× faster than M3. |
+| Role in paper | Practice-oriented simple baseline in the M1 → M1b → M1c → M2 → M3 ladder. M1c_VREOnly (appendix): same discharge rule but charges only from VRE surplus — quantifies the charging-source assumption. |
+| Implementation status | **Implemented and validated at N=20** (`src/models/M1cEmergencyOnlyStorage.jl`, `src/models/M1cVREOnlyCharge.jl`). M1c matches M3 LOLH exactly at N=20 (case-specific; see caveat in Section 10c of `docs/vre_method_comparison_memo.md`). M1c_VREOnly has +17–77 h LOLH error because p_vre < load at almost all hours in VRE120 cases. See `docs/m1c_charging_assumption_memo.md`. |
+
 ### RA-2 — Event-window LP dispatch
 
 | Attribute | Detail |
@@ -186,8 +195,10 @@ These statistics are computed at case-build time and stored in
 | Method | Included in main experiment |
 |--------|-----------------------------|
 | RA-1a / M1 | Yes — cautionary heuristic baseline |
-| RA-1b | Yes — reserve-aware heuristic |
-| RA-2 | Yes — event-window LP |
+| RA-1b / M1b | Yes — reserve-aware heuristic |
+| RA-1c / M1c | Yes — emergency-only, system-surplus charging |
+| RA-1c_VREOnly / M1c_VREOnly | Appendix sensitivity — VRE-surplus-only charging |
+| RA-2 / M2 | Yes — event-window LP |
 | RA-3 / M3 | Yes — full-year ED benchmark |
 | RA-0 | Optional — static capacity-balance classical baseline |
 | RA-4 / M4 | Optional — HOPE UC/PCM stress-week validation on selected cases |
@@ -450,25 +461,41 @@ See `docs/ra2_n20_validation_memo.md` for full analysis and decision record.
 
 ---
 
-### Task 5 — Add M1c baseline and run compact 5-method comparison
+### Task 5 — Add M1c baseline and charging-assumption sensitivity ✓ COMPLETE
 
-**Status:** Next immediate task.
+**Status:** Complete (commits `22dd7ff`, `091f0ab`, `142c7f6`).
 
-**Motivation:** M1b overestimates LOLH by 1000%–2600% despite the SOC reserve floor.
-Adding M1c (emergency-only: no proactive dispatch, only priority-1 emergency discharge)
-isolates whether the M1b bias originates from proactive discharging depleting storage
-before shortage events.
+**M1c (RA-1c):** Implemented in `src/models/M1cEmergencyOnlyStorage.jl`.  Emergency-only
+storage: priority-1 discharge to cover shortfalls; charging from any system surplus (thermal
+headroom included); no priority-2 proactive discharge.
 
-**New model:** `src/models/M1cEmergencyOnlyStorage.jl`
-- Priority 1 (emergency discharge) only: discharge to cover shortfall.
-- No priority-2 proactive discharge; priority-3 charging from surplus still allowed.
-- Simplest possible storage model; expected to over-deplete but with cleaner failure mode.
+**N=20 compact comparison** (`scripts/21_run_m1c_comparison.jl`, M1 → M1b → M1c → M2 → M3):
+M1c matches M3 LOLH exactly (0.00 h error) across all three priority cases at 90–130× speedup.
 
-**Script:** `scripts/21_run_m1c_comparison.jl` — compare M1, M1b, M1c, M2 (rm=1000/buf=48), M3
-on VRE120_base, VRE120_bal15, VRE120_wind_hvy at N=20, seed=42.
+**SOC and charging diagnostic** (`scripts/22_diagnose_m1c_m3_soc_and_charging.jl`):
+M1c charges 87–100% from thermal headroom (not VRE surplus). SOC trajectories differ from
+M3 by 54–58% of battery capacity. The M1c = M3 LOLH match is case/sample-specific.
 
-**Purpose:** Fully characterise the M1 family before the VRE sweep; provides a cleaner
-baseline ladder (M1 → M1b → M1c → M2 → M3) for Figure 2.
+**Charging-assumption sensitivity** (`scripts/23_compare_m1c_charging_assumptions.jl`):
+M1c_VREOnly (`src/models/M1cVREOnlyCharge.jl`) charges only when `p_vre[h] > load[h]`.
+In VRE120 cases, p_vre < load at 87–100% of hours, so M1c_VREOnly rarely charges and
+reduces to an effective no-storage baseline.  LOLH errors: +17–77 h (755%–2526%).
+
+#### Emergency-only storage and charging-source sensitivity (N=20, seed=42)
+
+| Case | M3 LOLH (h) | M1c_current LOLH (h) | M1c_VREOnly LOLH (h) | M1c_VREOnly error (h) |
+|------|:-----------:|:--------------------:|:--------------------:|:---------------------:|
+| VRE120_base | 5.95 | **5.95** | 82.80 | +76.85 |
+| VRE120_bal15 | 1.35 | **1.35** | 35.45 | +34.10 |
+| VRE120_wind_hvy | 2.25 | **2.25** | 19.25 | +17.00 |
+
+**Caveat:** The exact M1c_current = M3 match should not be interpreted as a structural
+equivalence.  The SOC diagnostic shows trajectories differ substantially (mean |SOC_diff|
+= 54–58% of battery capacity); the match is case/sample-specific and depends on
+charging-access assumptions.
+
+**Model hierarchy confirmed:** M1 → M1b → M1c → M2 → M3, with M1c_VREOnly as appendix.
+See `docs/m1c_charging_assumption_memo.md` for full analysis.
 
 ---
 
@@ -525,7 +552,7 @@ confirmed.
 
 ---
 
-*Document version: Phase C complete — RA-2 N=20 validation done (2026-05-17).*
+*Document version: Phase D complete — M1c + charging-assumption sensitivity done (2026-05-17).*
 *Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
 *Link to RA-1b validation memo: [docs/ra1b_validation_memo.md](ra1b_validation_memo.md)*
 *Link to VRE method comparison memo: [docs/vre_method_comparison_memo.md](vre_method_comparison_memo.md)*

@@ -546,9 +546,74 @@ The M3 LOLH CI95 relative half-width is still 55–87% at N=20. The apparent RA-
 
 ---
 
+---
+
+---
+
+## 10. Emergency-only storage and charging-source sensitivity
+
+**Scripts:** `scripts/21_run_m1c_comparison.jl`, `scripts/22_diagnose_m1c_m3_soc_and_charging.jl`, `scripts/23_compare_m1c_charging_assumptions.jl`
+**Results:** `results/m1c_comparison/`, `results/m1c_diagnostics/`, `results/m1c_charging_assumptions/`
+**Commits:** `22dd7ff`, `091f0ab`, `142c7f6`
+
+Two M1c (RA-1c) variants were implemented and compared at N=20, seed=42 on the three priority cases:
+
+| Model | Discharge rule | Charging rule |
+|---|---|---|
+| **M1c_current** | P1 only: cover pre-storage shortfall | Any system surplus: `net_supply > load` (thermal headroom included) |
+| **M1c_VREOnly** *(appendix)* | P1 only: cover pre-storage shortfall | VRE surplus only: `p_vre[h] > load[h]` |
+
+**M1c_current** is consistent with M3 economic dispatch because both models fill storage
+whenever the system has spare capacity, regardless of its source.  In the VRE120 cases at
+current load scale, 87–100% of storage charging comes from thermal headroom hours
+(not VRE curtailment), so M1c and M3 arrive at similar SOC levels at shortage events.
+
+**M1c_VREOnly** enforces a stricter "renewable firming" interpretation.  In VRE120 cases,
+VRE output alone rarely exceeds system load (p_vre < load at 87–100% of hours), so the
+battery rarely charges and the model reduces to an effective no-storage baseline.
+
+### 10a. Charging-assumption comparison (N=20, seed=42)
+
+| Case | M3 LOLH (h) | M1c_current LOLH (h) | M1c_VREOnly LOLH (h) | M1c_VREOnly error (h) |
+|------|:-----------:|:--------------------:|:--------------------:|:---------------------:|
+| VRE120_base | 5.95 | **5.95** | 82.80 | +76.85 |
+| VRE120_bal15 | 1.35 | **1.35** | 35.45 | +34.10 |
+| VRE120_wind_hvy | 2.25 | **2.25** | 19.25 | +17.00 |
+
+M1c_current matches M3 exactly (0.00 h error) across all three cases at 90–130× speedup.
+M1c_VREOnly has mean absolute LOLH error of **42.7 h** (755%–2526% relative error).
+
+### 10b. Updated model hierarchy
+
+| Model | Method | LOLH accuracy vs M3 | EUE accuracy vs M3 | Runtime vs M3 |
+|-------|--------|:-------------------:|:------------------:|:-------------:|
+| M1 (RA-1a) | Naive peak-shaving heuristic | +700%–+1300% | ~+700% | ~200× faster |
+| M1b (RA-1b) | Reserve-aware heuristic | +1000%–+2600% | ~+700% | ~200× faster |
+| M1c (RA-1c) | Emergency-only, system-surplus charging | 0.0 h at N=20 (case-specific) | 0 MWh at N=20 | ~130× faster |
+| M1c_VREOnly *(appendix)* | Emergency-only, VRE-surplus-only charging | +756%–+2526% | ~+1100% | ~130× faster |
+| **M2 (RA-2)** | **Event-window LP hybrid** | **−3% to −13%** | **< 10⁻⁹ MWh** | **20–37× faster** |
+| M3 (RA-3) | Full-year ED LP benchmark | 0% (reference) | 0% (reference) | 1× |
+
+### 10c. Caveats and paper recommendation
+
+**The exact M1c_current = M3 LOLH match is not a structural equivalence.**  The SOC
+diagnostic (script 22) shows that M1c and M3 SOC trajectories differ substantially —
+mean |SOC_diff| = 2,113–2,275 MWh (54–58% of battery capacity).  The match is
+case/sample-specific and depends on charging-access assumptions.  Both models happen to
+fill storage from the same dominant source (thermal headroom) at current VRE120 penetration,
+but the dispatch strategies are fundamentally different.
+
+**Paper recommendation:** Include M1c_current in the main comparison table
+(M1 → M1b → M1c → M2 → M3).  Present M1c_VREOnly as an appendix sensitivity to explain
+why the charging-source assumption is not arbitrary and to show that a "renewable firming"
+heuristic is inappropriate for systems where VRE rarely curtails at current load scale.
+
+---
+
 *Generated from `results/vre_method_comparison/summary.txt`,
 `vre_method_comparison_results.csv`, `vre_method_comparison_errors.csv`,
 `results/ra2_priority_validation/base-bal15-wind_hvy_n5/summary.txt`,
-`results/ra2_parameter_sensitivity/risk_buffer_n5/summary.txt`, and
-`results/ra2_n20_selected_params/base-bal15-wind_hvy_n20/summary.txt`.*
+`results/ra2_parameter_sensitivity/risk_buffer_n5/summary.txt`,
+`results/ra2_n20_selected_params/base-bal15-wind_hvy_n20/summary.txt`, and
+`results/m1c_charging_assumptions/base-bal15-wind_hvy_n20/summary.txt`.*
 *All runs use common random numbers (shared `ScenarioSet`, seed=42).*
