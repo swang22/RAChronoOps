@@ -132,6 +132,9 @@ let
         vals
     end
 
+    # Optional output filename override (default keeps backward-compat name)
+    metrics_name = get(kw, "metrics-name", "hope_smoke_metrics.csv")
+
     mkpath(out_dir)
 
     println("="^72)
@@ -181,7 +184,7 @@ let
 
     # Write metrics CSV
     metrics_df  = DataFrame(metrics_rows)
-    metrics_path = joinpath(out_dir, "hope_smoke_metrics.csv")
+    metrics_path = joinpath(out_dir, metrics_name)
     CSV.write(metrics_path, metrics_df)
     println("\nWritten: $metrics_path")
 

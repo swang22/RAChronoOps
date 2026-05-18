@@ -1,0 +1,6 @@
+case_name,scenario_id,mode,case_folder,start_time,end_time,runtime_s,status,error_message,output_dir
+VRE120_base,1,UC,RAChronoOps_VRE120_base_s001_UC,2026-05-18 15:49:56,2026-05-18 16:00:19,623.2070000171661,OK,,D:/MIT Dropbox/Shen Wang/MIT/RA/RA_assessment/RAChronoOps/exports/hope_model_cases/RAChronoOps_VRE120_base_s001_UC/output
+VRE120_base,2,UC,RAChronoOps_VRE120_base_s002_UC,2026-05-18 16:00:21,2026-05-18 16:09:33,552.5260000228882,OK,,D:/MIT Dropbox/Shen Wang/MIT/RA/RA_assessment/RAChronoOps/exports/hope_model_cases/RAChronoOps_VRE120_base_s002_UC/output
+VRE120_base,3,UC,RAChronoOps_VRE120_base_s003_UC,2026-05-18 16:09:34,2026-05-18 16:18:39,545.4839999675751,OK,,D:/MIT Dropbox/Shen Wang/MIT/RA/RA_assessment/RAChronoOps/exports/hope_model_cases/RAChronoOps_VRE120_base_s003_UC/output
+VRE120_base,4,UC,RAChronoOps_VRE120_base_s004_UC,2026-05-18 16:18:39,2026-05-18 16:27:44,545.3599998950958,OK,,D:/MIT Dropbox/Shen Wang/MIT/RA/RA_assessment/RAChronoOps/exports/hope_model_cases/RAChronoOps_VRE120_base_s004_UC/output
+VRE120_base,5,UC,RAChronoOps_VRE120_base_s005_UC,2026-05-18 16:27:44,2026-05-18 16:38:01,616.2590000629425,OK,,D:/MIT Dropbox/Shen Wang/MIT/RA/RA_assessment/RAChronoOps/exports/hope_model_cases/RAChronoOps_VRE120_base_s005_UC/output

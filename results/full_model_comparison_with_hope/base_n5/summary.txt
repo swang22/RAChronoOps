@@ -1,0 +1,40 @@
+Full N=5 Model Comparison — VRE120_base
+Generated: 2026-05-18 19:13:55
+Scenarios: 1, 2, 3, 4, 5 from n_scenarios=20, seed=42
+M2 config: risk_margin=1000 MW, window_buffer=48 h
+
+──────────────────────────────────────────────────────────────────────
+Q1. Does HOPE-ED match M3 across all five scenarios?
+
+  NO — notable difference. M3 LOLH=11.2h EUE=4707.45MWh; HOPE-ED LOLH=12.2h EUE=4814.73MWh. Δ(ED−M3): LOLH=1.0h EUE=107.28MWh.
+
+──────────────────────────────────────────────────────────────────────
+Q2. Does HOPE-UC-lite increase LOLH relative to HOPE-ED?
+
+  YES — HOPE-UC mean LOLH=15.2h vs HOPE-ED=12.2h (Δ=+3.0h). UC constraints spread outages over more hours.
+
+──────────────────────────────────────────────────────────────────────
+Q3. Does HOPE-UC-lite change EUE or mainly event structure?
+
+  EUE also changes — UC=4707.45MWh vs ED=4814.73MWh (Δ=-107.28MWh).
+
+──────────────────────────────────────────────────────────────────────
+Q4. How close are M1c and M2 to HOPE-UC-lite, not just M3?
+
+  M1c LOLH=11.2h EUE=4707.45MWh vs HOPE-UC=15.2h/4707.45MWh (ΔLOLH=-4.0h ΔEUE=0.0MWh). M2 LOLH=11.2h EUE=4707.45MWh vs HOPE-UC (ΔLOLH=-4.0h ΔEUE=0.0MWh).
+
+──────────────────────────────────────────────────────────────────────
+Q5. How much slower is HOPE-UC-lite than M3, M2, and M1c?
+
+  HOPE-UC total 2882.8s — vs M3: 61.0×, vs M2: 1123.9×, vs M1c: 5439.3×.
+
+──────────────────────────────────────────────────────────────────────
+Q6. Should we scale to N=20 for VRE120_base?
+
+  Projected: HOPE-UC N=20 ≈ 3.2 h | M3 N=20 ≈ 3.1 min. Investigate HOPE-ED vs M3 discrepancy before scaling.
+
+──────────────────────────────────────────────────────────────────────
+Q7. Should we run HOPE-UC-lite for other priority cases yet?
+
+  HOPE-UC runtime is 577.0s/scenario. Run VRE120_base N=20 first to validate LOLH increase. Extend to VRE120_bal15 and VRE120_wind_hvy only after confirming consistent UC vs ED LOLH pattern and agreeing on UC model as the standard.
+
