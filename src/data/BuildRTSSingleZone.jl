@@ -6,7 +6,9 @@
 #
 # generators.csv   : gen_id, gen_type, fuel, pmax_mw, pmin_mw,
 #                    variable_cost_per_mwh, forced_outage_rate,
-#                    mean_repair_time_hours, is_thermal, is_vre, vre_type
+#                    mean_repair_time_hours, is_thermal, is_vre, vre_type,
+#                    min_up_time_hr, min_down_time_hr, ramp_mw_per_min,
+#                    startup_cost_dollars
 # storage.csv      : storage_id, power_mw, energy_mwh, charge_efficiency,
 #                    discharge_efficiency, variable_cost_per_mwh,
 #                    initial_soc_mwh
@@ -112,9 +114,14 @@ function _build_from_rts(rts_dir::String, out_dir::String)
     c_pmin = _col(gen_raw, ["PMin MW",   "Pmin MW",  "pmin_mw"])
     c_for  = _col(gen_raw, ["FOR",       "for_rate", "Forced Outage Rate"])
     c_mttr = _col(gen_raw, ["MTTR Hr",   "mttr_hr",  "MTTR"])
-    c_vom  = _col(gen_raw, ["VOM",       "VOM Cost \$/MWh", "Var OM Cost \$/MWh", "vom_cost"])
-    c_hr   = _col(gen_raw, ["HR_avg_0",  "heat_rate_mbtu_mwh", "Heat Rate MBTU/MMBTU"])
-    c_fp   = _col(gen_raw, ["Fuel Price \$/MMBTU", "fuel_price"])
+    c_vom      = _col(gen_raw, ["VOM",       "VOM Cost \$/MWh", "Var OM Cost \$/MWh", "vom_cost"])
+    c_hr       = _col(gen_raw, ["HR_avg_0",  "heat_rate_mbtu_mwh", "Heat Rate MBTU/MMBTU"])
+    c_fp       = _col(gen_raw, ["Fuel Price \$/MMBTU", "fuel_price"])
+    c_min_up   = _col(gen_raw, ["Min Up Time Hr",   "min_up_time_hr",   "MinUpTime"])
+    c_min_dn   = _col(gen_raw, ["Min Down Time Hr", "min_down_time_hr", "MinDownTime"])
+    c_ramp     = _col(gen_raw, ["Ramp Rate MW/Min", "ramp_rate_mw_per_min", "Ramp Rate"])
+    c_nf_start = _col(gen_raw, ["Non Fuel Start Cost \$", "non_fuel_start_cost"])
+    c_sh_hot   = _col(gen_raw, ["Start Heat Hot MBTU",   "start_heat_hot_mbtu"])
 
     for (label, col) in [("GEN UID", c_uid), ("Unit Type", c_type), ("PMax MW", c_pmax)]
         isnothing(col) && error("Cannot find required column '$label' in gen.csv")
@@ -161,6 +168,17 @@ function _build_from_rts(rts_dir::String, out_dir::String)
         for_out  = is_vre ? 0.0 : for_
         mttr_out = is_vre ? 0.0 : mttr
 
+        # UC parameters — zero for VRE (Flag_UC=0 in HOPE)
+        min_up = is_vre ? 0.0 : (isnothing(c_min_up) ? 1.0 :
+                     Float64(r[c_min_up]))
+        min_dn = is_vre ? 0.0 : (isnothing(c_min_dn) ? 1.0 :
+                     Float64(r[c_min_dn]))
+        ramp   = is_vre ? 0.0 : (isnothing(c_ramp) ? 999.0 :
+                     Float64(r[c_ramp]))
+        nf_sc  = isnothing(c_nf_start) ? 0.0 : Float64(r[c_nf_start])
+        sh_hot = isnothing(c_sh_hot)   ? 0.0 : Float64(r[c_sh_hot])
+        suc    = is_vre ? 0.0 : nf_sc + fp * sh_hot   # total hot-start cost ($)
+
         push!(rows, (
             gen_id                  = uid,
             gen_type                = utype,
@@ -173,6 +191,10 @@ function _build_from_rts(rts_dir::String, out_dir::String)
             is_thermal              = is_therm ? 1 : 0,
             is_vre                  = is_vre   ? 1 : 0,
             vre_type                = vre_type,
+            min_up_time_hr          = min_up,
+            min_down_time_hr        = min_dn,
+            ramp_mw_per_min         = ramp,
+            startup_cost_dollars    = suc,
         ))
     end
 
@@ -333,6 +355,10 @@ function _build_synthetic(out_dir::String)
         is_thermal              = [1, 1, 1, 0, 0],
         is_vre                  = [0, 0, 0, 1, 1],
         vre_type                = ["", "", "", "wind", "solar"],
+        min_up_time_hr          = [1.0, 2.0, 4.0, 0.0, 0.0],
+        min_down_time_hr        = [1.0, 2.0, 4.0, 0.0, 0.0],
+        ramp_mw_per_min         = [3.0, 4.0, 2.0, 0.0, 0.0],
+        startup_cost_dollars    = [50.0, 5000.0, 3000.0, 0.0, 0.0],
     )
     CSV.write(joinpath(out_dir, "generators.csv"), gen_df)
 

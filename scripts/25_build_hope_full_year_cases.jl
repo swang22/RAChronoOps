@@ -51,20 +51,6 @@ const VALID_MODES     = ["ED", "UC"]
 const DATA_CASE_NAME  = "Data_RAChronoOps_PCM"
 const HOPE_VOLL       = 10_000.0          # $/MWh — matches SimConfig default
 
-# UC startup parameters by RAChronoOps gen_type:
-#   (min_up_hours, min_down_hours, start_up_cost_per_mw)
-# Simplified conservative values for UC-lite smoke test.
-# Nuclear is set as must-run; start-up costs are 0 throughout.
-const UC_PARAMS = Dict{String, Tuple{Int,Int,Float64}}(
-    "CT"      => (1,  1,  0.0),
-    "CC"      => (2,  2,  0.0),
-    "STEAM"   => (4,  4,  0.0),
-    "NUCLEAR" => (24, 24, 0.0),
-    "PV"      => (1,  1,  0.0),
-    "RTPV"    => (1,  1,  0.0),
-    "WIND"    => (1,  1,  0.0),
-)
-
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 function parse_cli(args::Vector{String})
@@ -196,6 +182,13 @@ function write_gendata(data_dir::String, sys::SystemData, mode::String)::Int
     n_total   = n_therm + 2
     is_ed     = (mode == "ED")
 
+    # Check whether the generators DataFrame has UC columns (added in
+    # BuildRTSSingleZone v2).  Fall back to safe defaults if absent so the
+    # exporter still works with older processed-data snapshots.
+    has_uc_cols = all(c -> c in names(therm),
+                      ["min_up_time_hr", "min_down_time_hr",
+                       "ramp_mw_per_min", "startup_cost_dollars"])
+
     pmax    = Vector{Float64}(undef, n_total)
     pmin    = Vector{Float64}(undef, n_total)
     zones   = fill("Z1", n_total)
@@ -211,39 +204,57 @@ function write_gendata(data_dir::String, sys::SystemData, mode::String)::Int
     af      = ones(Float64, n_total)
     for_r   = zeros(Float64, n_total)    # 0: outages imposed via gen_availability
     rm_spin = zeros(Float64, n_total)
-    ru      = ones(Float64, n_total)
-    rd      = ones(Float64, n_total)
+    ru      = Vector{Float64}(undef, n_total)
+    rd      = Vector{Float64}(undef, n_total)
     f_uc    = zeros(Int, n_total)
-    min_dn  = ones(Int, n_total)
-    min_up  = ones(Int, n_total)
-    suc     = zeros(Float64, n_total)
+    min_dn  = Vector{Int}(undef, n_total)
+    min_up  = Vector{Int}(undef, n_total)
+    suc     = Vector{Float64}(undef, n_total)
 
     for (g, row) in enumerate(eachrow(therm))
-        gt        = row.gen_type
-        up, dn, s = get(UC_PARAMS, gt, (1, 1, 0.0))
-        pmax[g]  = row.pmax_mw
-        pmin[g]  = 0.0   # Must be 0 for all generators: HOPE's CLeL_con has no o[g,h] factor
-        types[g] = hope_type_str(gt, row.fuel)
-        f_thm[g] = 1
-        f_vre[g] = 0
-        f_mr[g]  = 0     # Flag_mustrun=1 conflicts with forced-outage hours (AF=0, p forced to 0)
-        cost[g]  = row.variable_cost_per_mwh
-        cc[g]    = 1.0
-        f_uc[g]  = is_ed ? 0 : 1
-        min_up[g] = is_ed ? 1 : up
-        min_dn[g] = is_ed ? 1 : dn
-        suc[g]    = is_ed ? 0.0 : s
+        gt = row.gen_type
+
+        # UC parameters: use real data when available, safe defaults otherwise
+        up_hr  = has_uc_cols ? Float64(row.min_up_time_hr)   : 1.0
+        dn_hr  = has_uc_cols ? Float64(row.min_down_time_hr) : 1.0
+        ramp   = has_uc_cols ? Float64(row.ramp_mw_per_min)  : 999.0
+        sc_tot = has_uc_cols ? Float64(row.startup_cost_dollars) : 0.0
+
+        # Ramp as fraction of Pmax per hour; cap at 1.0 (unconstrained)
+        ru_frac = row.pmax_mw > 0 ? min(1.0, ramp * 60.0 / row.pmax_mw) : 1.0
+        # Startup cost in $/MW (HOPE convention)
+        sc_mw   = row.pmax_mw > 0 ? sc_tot / row.pmax_mw : 0.0
+
+        pmax[g]   = row.pmax_mw
+        # ED: Pmin=0 (matches M3 LP relaxation).
+        # UC: use real Pmin — HOPE PCM.jl fix (CLeL_con uses pmin variable,
+        #     not P_min parameter) makes this safe with operation_reserve_mode=0.
+        pmin[g]   = is_ed ? 0.0 : Float64(row.pmin_mw)
+        types[g]  = hope_type_str(gt, row.fuel)
+        f_thm[g]  = 1
+        f_vre[g]  = 0
+        f_mr[g]   = 0    # Flag_mustrun conflicts with forced-outage hours
+        cost[g]   = row.variable_cost_per_mwh
+        cc[g]     = 1.0
+        f_uc[g]   = is_ed ? 0 : 1
+        min_up[g] = is_ed ? 1 : max(1, round(Int, up_hr))
+        min_dn[g] = is_ed ? 1 : max(1, round(Int, dn_hr))
+        suc[g]    = is_ed ? 0.0 : sc_mw
+        ru[g]     = ru_frac
+        rd[g]     = ru_frac   # use same value for ramp-down
     end
 
     # Aggregated wind (row n_therm+1)
-    gw         = n_therm + 1
-    pmax[gw]   = wind_cap; pmin[gw] = 0.0
-    types[gw]  = "WindOn";  f_thm[gw] = 0; f_vre[gw] = 1; cc[gw] = 0.0; cost[gw] = 0.0
+    gw = n_therm + 1
+    pmax[gw] = wind_cap; pmin[gw] = 0.0
+    types[gw] = "WindOn"; f_thm[gw] = 0; f_vre[gw] = 1; cc[gw] = 0.0; cost[gw] = 0.0
+    min_up[gw] = 1; min_dn[gw] = 1; suc[gw] = 0.0; ru[gw] = 1.0; rd[gw] = 1.0
 
     # Aggregated solar (row n_therm+2)
-    gs         = n_therm + 2
-    pmax[gs]   = solar_cap; pmin[gs] = 0.0
-    types[gs]  = "SolarPV"; f_thm[gs] = 0; f_vre[gs] = 1; cc[gs] = 0.0; cost[gs] = 0.0
+    gs = n_therm + 2
+    pmax[gs] = solar_cap; pmin[gs] = 0.0
+    types[gs] = "SolarPV"; f_thm[gs] = 0; f_vre[gs] = 1; cc[gs] = 0.0; cost[gs] = 0.0
+    min_up[gs] = 1; min_dn[gs] = 1; suc[gs] = 0.0; ru[gs] = 1.0; rd[gs] = 1.0
 
     df = DataFrame(
         "Pmax (MW)"              => pmax,
