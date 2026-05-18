@@ -129,6 +129,25 @@ end
 case_folder_name(case_name, scenario_id, mode) =
     @sprintf("RAChronoOps_%s_s%03d_%s", case_name, scenario_id, mode)
 
+# ── Writer: Settings/gurobi_settings.yml ─────────────────────────────────────
+
+function write_gurobi_settings(settings_dir::String)
+    content = """# Gurobi Solver Parameters
+Feasib_Tol: 1.0e-06
+Optimal_Tol: 1.0e-04
+TimeLimit: 7200
+Pre_Solve: -1
+Method: 2
+MIPGap: 1.0e-03
+BarConvTol: 1.0e-08
+NumericFocus: 0
+Crossover: -1
+AggFill: 10
+PreDual: -1
+"""
+    write(joinpath(settings_dir, "gurobi_settings.yml"), content)
+end
+
 # ── Writer: Settings/HOPE_model_settings.yml ──────────────────────────────────
 
 function write_settings(settings_dir::String, data_case::String, mode::String)
@@ -200,15 +219,14 @@ function write_gendata(data_dir::String, sys::SystemData, mode::String)::Int
     suc     = zeros(Float64, n_total)
 
     for (g, row) in enumerate(eachrow(therm))
-        gt     = row.gen_type
-        is_nuc = (gt == "NUCLEAR")
+        gt        = row.gen_type
         up, dn, s = get(UC_PARAMS, gt, (1, 1, 0.0))
         pmax[g]  = row.pmax_mw
-        pmin[g]  = is_ed ? 0.0 : Float64(row.pmin_mw)
+        pmin[g]  = 0.0   # Must be 0 for all generators: HOPE's CLeL_con has no o[g,h] factor
         types[g] = hope_type_str(gt, row.fuel)
         f_thm[g] = 1
         f_vre[g] = 0
-        f_mr[g]  = (is_nuc && !is_ed) ? 1 : 0
+        f_mr[g]  = 0     # Flag_mustrun=1 conflicts with forced-outage hours (AF=0, p forced to 0)
         cost[g]  = row.variable_cost_per_mwh
         cc[g]    = 1.0
         f_uc[g]  = is_ed ? 0 : 1
@@ -368,6 +386,25 @@ function write_single_parameter(data_dir::String, voll::Float64)
     CSV.write(joinpath(data_dir, "single_parameter.csv"), df)
 end
 
+# ── Writer: carbonpolicies.csv / rpspolicies.csv (unused stubs) ──────────────
+# carbon_policy=0 and clean_energy_policy=0 — HOPE reads these files regardless.
+
+function write_policy_stubs(data_dir::String)
+    cbp = DataFrame(
+        "State"             => ["Z1"],
+        "Time Period"       => [1],
+        "Allowance (tons)"  => [1.0e18],
+    )
+    CSV.write(joinpath(data_dir, "carbonpolicies.csv"), cbp)
+
+    rps = DataFrame(
+        "From_state" => ["Z1"],
+        "To_state"   => ["Z1"],
+        "RPS"        => [0.0],
+    )
+    CSV.write(joinpath(data_dir, "rpspolicies.csv"), rps)
+end
+
 # ── Writer: linedata.csv (dummy for network_model=0) ─────────────────────────
 
 function write_linedata(data_dir::String)
@@ -452,6 +489,7 @@ function export_hope_case(sys::SystemData, scenarios::ScenarioSet,
     annual_load_gwh = sum(sys.load_mw) / 1000.0
 
     write_settings(settings_dir, DATA_CASE_NAME, mode)
+    write_gurobi_settings(settings_dir)
     write_zonedata(data_dir, peak_load_mw)
     n_therm      = write_gendata(data_dir, sys, mode)
     max_pu       = write_load_timeseries(data_dir, sys.load_mw, peak_load_mw)
@@ -459,6 +497,7 @@ function export_hope_case(sys::SystemData, scenarios::ScenarioSet,
     n_avail_cols = write_gen_availability(data_dir, sys, scenarios, scenario_id, n_therm)
     write_storagedata(data_dir, sys)
     write_single_parameter(data_dir, HOPE_VOLL)
+    write_policy_stubs(data_dir)
     write_linedata(data_dir)
     write_readme(case_dir, case_name, scenario_id, seed, mode, sys,
                  peak_load_mw, annual_load_gwh, n_therm)

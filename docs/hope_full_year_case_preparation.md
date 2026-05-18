@@ -44,8 +44,11 @@ same installed capacities.
 | `solar_timeseries_regional.csv` | `sys.solar_cf` | Per-unit zonal solar CF (fallback) |
 | `storagedata.csv` | `sys.storage[1, :]` | Single aggregated battery (BES) |
 | `single_parameter.csv` | `SimConfig.voll`; all reserves = 0 | Consistent with M3 |
+| `carbonpolicies.csv` | Stub (1 row, large allowance) | Required by HOPE even when `carbon_policy: 0` |
+| `rpspolicies.csv` | Stub (1 row, RPS = 0) | Required by HOPE even when `clean_energy_policy: 0` |
 | `linedata.csv` | Dummy self-loop | network_model = 0 (copperplate) |
 | `Settings/HOPE_model_settings.yml` | Mode-specific | unit_commitment = 0 (ED) or 1 (UC) |
+| `Settings/gurobi_settings.yml` | Standard Gurobi tolerances | Required; read by HOPE before checking solver name |
 
 ### Generator ordering in gendata.csv
 
@@ -95,32 +98,48 @@ This is the primary comparison mode for validating HOPE against M3.
 | Parameter | Value |
 |---|---|
 | unit_commitment | 0 |
-| Pmin (thermal) | 0 MW |
+| Pmin (MW) in gendata | 0 (all generators) |
 | Flag_UC | 0 |
 | Start_up_cost | 0 $/MW |
 
 ### UC-lite (unit_commitment = 1)
 
 Adds integer unit-commitment constraints using Gurobi's MILP solver.  Thermal
-generators receive their actual Pmin values from RAChronoOps data (e.g., CT=8
-MW, Coal STEAM=30 MW, CC=170 MW, Nuclear=396 MW).
+generators have `Flag_UC=1` and minimum up/down times.  Start-up costs are 0
+$/MW so the model isolates the effect of commitment scheduling from economic
+cycling penalties.
 
-The nuclear unit is set as `Flag_mustrun=1` (always online) and has 24-hour
-minimum up/down times, reflecting its near-must-run operational status.
+**Important: `Pmin (MW)` must be 0 for all generators in this configuration.**
+HOPE's `CLeL_con` lower-bound constraint (`P_min ≤ p[g,h]`) does not include
+the commitment variable `o[g,h]`.  With `operation_reserve_mode: 0`, this
+makes the model infeasible whenever a generator is off (upper bound
+`p ≤ AF×Pmax×o = 0` conflicts with `p ≥ Pmin > 0`).  Setting `Pmin=0` in
+gendata is the required workaround; minimum stable generation is then absent
+from this UC-lite formulation.
 
-This is the benchmark for M4: testing whether commitment constraints change
-reliability estimates relative to the M3/M4-ED baseline.
+**`Flag_mustrun` must be 0 for all generators.**  When `Flag_mustrun=1`, HOPE
+enforces `p[g,h] = AF×Pmax×o[g,h]` (output equals maximum available capacity);
+combined with forced-outage hours where `AF=0`, this creates infeasibility
+because the commitment variable `o` can still be 1 under UC scheduling
+constraints.
 
-| Generator type | Pmin | Min_up_time | Min_down_time | Note |
-|---|---|---|---|---|
-| CT | data value | 1 h | 1 h | Fast-start peaker |
-| CC | data value | 2 h | 2 h | Combined cycle |
-| STEAM | data value | 4 h | 4 h | Slow thermal |
-| NUCLEAR | data value | 24 h | 24 h | Flag_mustrun=1 |
-| Wind / Solar | 0 | 1 h | 1 h | Flag_UC=0 |
+As a result, this initial UC-lite run does not strictly enforce Pmin and has
+no must-run units.  The UC structure (min up/down times, integer commitment
+variables) still differentiates the problem from ED, but with zero start-up
+costs and zero Pmin, the MILP relaxes to the same LP solution as M4-ED.
 
-Start-up costs are set to 0 $/MW in this initial UC-lite run to isolate the
-effect of Pmin constraints from start-up cost economics.
+**For a production UC run that enforces Pmin**, use `operation_reserve_mode: 1`
+or `2` (which adds reserve variables to the CLeL_con right-hand side, providing
+enough headroom for the lower bound when the unit is committed), or contribute
+the `o[g,h]` factor fix upstream to HOPE.
+
+| Generator type | Pmin (gendata) | Flag_UC | Min_up_time | Min_down_time | Flag_mustrun |
+|---|---|---|---|---|---|
+| CT | 0 | 1 | 1 h | 1 h | 0 |
+| CC | 0 | 1 | 2 h | 2 h | 0 |
+| STEAM | 0 | 1 | 4 h | 4 h | 0 |
+| NUCLEAR | 0 | 1 | 24 h | 24 h | 0 |
+| Wind / Solar | 0 | 0 | 1 h | 1 h | 0 |
 
 ---
 
@@ -144,11 +163,24 @@ All four checks passed in the smoke export (2026-05-18).
 | RAChronoOps_VRE120_base_s001_ED | ED | 75 | 73 | 2507.9 | 2715.9 | 9830.2 | 1.000 | 9.1e-13 | 8760×75 | OK |
 | RAChronoOps_VRE120_base_s001_UC | UC | 75 | 73 | 2507.9 | 2715.9 | 9830.2 | 1.000 | 9.1e-13 | 8760×75 | OK |
 
+### HOPE run results (VRE120_base, scenario 1, seed 42)
+
+Both cases ran to optimality using Gurobi 13.0.0 on 2026-05-18.
+
+| Mode | Obj ($M) | Op cost ($M) | LoL ($M) | EUE (MWh) | LOLH | Solve time (s) |
+|---|---|---|---|---|---|---|
+| ED (LP) | 813.5 | 795.7 | 17.8 | 1779.5 | 6 | 12 |
+| UC-lite (MILP, Pmin=0) | 813.5 | 795.7 | 17.8 | 1779.5 | 6 | 188 |
+
+ED and UC-lite produce identical results because Pmin=0 and startup costs=0
+cause the MILP to relax to the same LP solution.  See Section 3 for the HOPE
+formulation constraint that requires Pmin=0 in this configuration.
+
 ---
 
 ## 5. Remaining steps to run HOPE
 
-### Step 1 — Install HOPE
+### Step 1 — Install HOPE ✓ (done)
 
 ```bash
 git clone https://github.com/HOPE-Model-Project/HOPE
@@ -156,22 +188,32 @@ cd HOPE
 julia --project=. -e "using Pkg; Pkg.instantiate()"
 ```
 
-### Step 2 — Run an exported case
+Local HOPE project at `D:\MIT Dropbox\Shen Wang\MIT\RA\HOPE_project`.
+`Pkg.instantiate()` was run on 2026-05-18 to resolve Julia 1.12.6 compatibility.
 
-```bash
-cd exports/hope_model_cases/RAChronoOps_VRE120_base_s001_ED
-julia --project=<HOPE_dir> <HOPE_dir>/run_hope.jl \
-    --settings Settings/HOPE_model_settings.yml
+### Step 2 — Run an exported case ✓ (done, 2026-05-18)
+
+```julia
+using HOPE
+HOPE.run_hope(raw"<absolute_path>/RAChronoOps_VRE120_base_s001_ED")
 ```
 
-### Step 3 — Collect reliability metrics
+Both ED and UC-lite smoke cases ran successfully.  Output written to
+`<case_folder>/output/`.
 
-HOPE produces dispatch results in its output directory.  Post-process with
-`RAChronoOps.compute_metrics` on the extracted `load_shed` vectors to compute
-LOLH/EUE/CVaR-EUE in the same format as M1–M3 results.
+### Step 3 — Collect reliability metrics (not yet implemented)
 
-This post-processing step is not yet implemented (see Task 8 in
-`docs/redesigned_experiment_plan.md`).
+HOPE writes hourly load-shedding results to `output/power_loadshedding.csv`
+(wide format: 1 row per zone, columns `AnnTol`, `h1`…`h8760`).  The
+`AnnTol` column is the annual EUE; LOLH is the count of hours with non-zero
+values in `h1`…`h8760`.
+
+Post-processing script `scripts/27_collect_hope_results.jl` (not yet written)
+should extract `load_shed_mw[1:8760]` from `power_loadshedding.csv` for zone Z1
+and call `RAChronoOps.compute_metrics` to produce LOLH/EUE/CVaR-EUE in the
+same format as M1–M3 results.
+
+See Task 8 in `docs/redesigned_experiment_plan.md`.
 
 ### Step 4 — Compare M3-ED vs M4-ED vs M4-UC
 
@@ -214,4 +256,4 @@ the penalty of ignoring commitment feasibility.
 
 ---
 
-*Generated: 2026-05-18 | Script: `scripts/25_build_hope_full_year_cases.jl`*
+*Generated: 2026-05-18 | Script: `scripts/25_build_hope_full_year_cases.jl` | HOPE smoke runs: 2026-05-18*
