@@ -1,0 +1,46 @@
+┌ Info: M1c vs M3 SOC and charging diagnostics
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:109
+┌ Info: n=20 | seed=42
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:110
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:111
+┌ Info: Output: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_diagnostics\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:112
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:129
+┌ Info:   running M1c...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:150
+┌ Info:   M1c done in 1.3 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:155
+┌ Info:   running M3...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:158
+┌ Info:   M3 done in 183.0 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:163
+┌ Info:   Case VRE120_base complete.
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:332
+┌ Info: ── Case: VRE120_bal15 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:129
+┌ Info:   running M1c...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:150
+┌ Info:   M1c done in 1.3 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:155
+┌ Info:   running M3...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:158
+┌ Info:   M3 done in 183.4 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:163
+┌ Info:   Case VRE120_bal15 complete.
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:332
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:129
+┌ Info:   running M1c...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:150
+┌ Info:   M1c done in 2.2 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:155
+┌ Info:   running M3...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:158
+┌ Info:   M3 done in 179.2 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:163
+┌ Info:   Case VRE120_wind_hvy complete.
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:332
+┌ Info: Total runtime: 617.1 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\22_diagnose_m1c_m3_soc_and_charging.jl:336
