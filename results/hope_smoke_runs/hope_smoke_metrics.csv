@@ -1,0 +1,3 @@
+case_folder,mode,lolh,lolp_percent,lole_days,eue_mwh,ann_tol_mwh,eue_ann_tol_error_pct,cvar_eue_mwh,max_shortfall_mw,n_shortage_events,mean_shortage_duration_h,p95_shortage_duration_h,runtime_s
+RAChronoOps_VRE120_base_s001_ED,ED,6.0,0.0684931506849315,3.0,1779.477813396131,1779.477813396131,0.0,1779.477813396131,540.6860412653765,6,1.0,1.0,12.0
+RAChronoOps_VRE120_base_s001_UC,UC,9.0,0.10273972602739725,3.0,1779.4778133961322,1779.4778133961322,0.0,1779.4778133961322,668.2972087999997,7,1.2857142857142858,2.0,472.2

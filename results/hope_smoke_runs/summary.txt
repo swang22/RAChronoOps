@@ -1,0 +1,49 @@
+HOPE Smoke Run vs M3 — Summary
+Generated: 2026-05-18 13:35:40
+Case: VRE120_base  |  Scenario: 1  |  Seed: 42
+
+──────────────────────────────────────────────────────────────────────
+Q1. Does HOPE-ED reproduce M3 for scenario 1?
+
+  YES — HOPE-ED and M3 agree within tolerance.
+    M3       : LOLH=   6 h  EUE=  1779.48 MWh  max_sf= 636.8 MW
+    HOPE-ED  : LOLH=   6 h  EUE=  1779.48 MWh  max_sf= 540.7 MW
+    Δ (ED−M3): LOLH=+0 h  EUE=-0.00 MWh
+
+──────────────────────────────────────────────────────────────────────
+Q2. Does HOPE-UC-lite differ from HOPE-ED?
+
+  YES — HOPE-UC-lite differs from HOPE-ED:
+    HOPE-ED  : LOLH=   6 h  EUE=  1779.48 MWh  events=6
+    HOPE-UC  : LOLH=   9 h  EUE=  1779.48 MWh  events=7
+    Δ (UC−ED): LOLH=+3 h  EUE=+0.00 MWh
+
+  Interpretation: with UC constraints and real Pmin, the same
+  total unserved energy is spread over more shortage hours because
+  min-up/down times prevent immediate re-commitment after an outage.
+
+──────────────────────────────────────────────────────────────────────
+Q3. If HOPE-ED differs from M3, which hours drive the difference?
+
+  Not applicable — HOPE-ED and M3 agree.
+
+──────────────────────────────────────────────────────────────────────
+Q4. Runtime ratio HOPE-UC-lite / HOPE-ED?
+
+  HOPE-ED runtime :   12.0 s
+  HOPE-UC runtime :  472.2 s
+  M3 runtime      :   11.6 s
+  Ratio UC/ED     : 39.4×
+  Ratio UC/M3     : 40.7×
+
+──────────────────────────────────────────────────────────────────────
+Q5. What should be fixed before scaling to N=5 or N=20?
+
+  • HOPE-ED matches M3: no correctness issue. Safe to scale.
+  • HOPE-UC runtime (~472 s/scenario) makes N=20
+    feasible (~2.6 h wall time) but should be run on a compute node.
+  • HOPE-ED (~12 s/scenario) is fast enough for N=20 runs interactively.
+  • M3 (12 s/scenario) is the fastest benchmark.
+  • Confirm HOPE exporter correctly propagates all 20 scenario
+    availability matrices before a full N=20 run.
+
