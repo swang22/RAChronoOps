@@ -385,6 +385,234 @@ end
     @test all(r.storage_discharge .< 1e-9)
 end
 
+@testset "Storage dynamics — M1c_VREOnlyCharge" begin
+    sys    = make_test_system(168)
+    config = SimConfig(n_scenarios=50, seed=17)
+    avail  = generate_scenarios(sys, config)
+    results = run_m1c_vre_only_charge(sys, avail, config)
+
+    stor         = sys.storage
+    total_energy = sum(stor.energy_mwh)
+    eta_ch       = mean(stor.charge_efficiency)
+    eta_dis      = mean(stor.discharge_efficiency)
+    init_soc     = sum(stor.initial_soc_mwh)
+
+    for r in results
+        n = length(r.load_shed)
+
+        @test all(r.soc .>= -1e-9)
+        @test all(r.soc .<= total_energy + 1e-9)
+        @test all(r.load_shed         .>= -1e-9)
+        @test all(r.storage_discharge .>= -1e-9)
+        @test all(r.storage_charge    .>= -1e-9)
+        @test all(r.curtailment       .>= -1e-9)
+
+        @test r.soc[1] ≈ clamp(
+            init_soc + r.storage_charge[1] * eta_ch
+                     - r.storage_discharge[1] / eta_dis,
+            0.0, total_energy) atol=1e-6
+
+        for h in 2:n
+            expected = clamp(
+                r.soc[h-1] + r.storage_charge[h] * eta_ch
+                           - r.storage_discharge[h] / eta_dis,
+                0.0, total_energy)
+            @test r.soc[h] ≈ expected atol=1e-6
+        end
+
+        for h in 1:n
+            @test !(r.storage_charge[h] > 1e-9 && r.storage_discharge[h] > 1e-9)
+        end
+    end
+end
+
+@testset "M1c_VREOnlyCharge never discharges without shortfall" begin
+    # Abundant thermal, no outages → shortfall_pre = 0 always → no discharge.
+    gen_df = DataFrame(
+        gen_id                 = ["TH1"],
+        gen_type               = ["CT"],
+        fuel                   = ["Gas"],
+        pmax_mw                = [200.0],
+        pmin_mw                = [0.0],
+        variable_cost_per_mwh  = [50.0],
+        forced_outage_rate     = [0.0],
+        mean_repair_time_hours = [0.0],
+        is_thermal             = [1],
+        is_vre                 = [0],
+        vre_type               = [""],
+    )
+    stor_df = DataFrame(
+        storage_id            = ["BAT1"],
+        power_mw              = [25.0],
+        energy_mwh            = [100.0],
+        charge_efficiency     = [1.0],
+        discharge_efficiency  = [1.0],
+        variable_cost_per_mwh = [0.0],
+        initial_soc_mwh       = [50.0],
+    )
+    sys_nf = SystemData(gen_df, stor_df,
+                        fill(55.0, 48), fill(0.0, 48), fill(0.0, 48), 48)
+
+    cfg    = SimConfig(n_scenarios=5, seed=42)
+    avail  = generate_scenarios(sys_nf, cfg)
+    results = run_m1c_vre_only_charge(sys_nf, avail, cfg)
+
+    for r in results
+        @test all(r.storage_discharge .< 1e-9)
+        @test all(r.load_shed         .< 1e-9)
+    end
+end
+
+@testset "M1c_VREOnlyCharge discharges when shortfall exists" begin
+    # Zero thermal, no VRE → shortfall = load every hour → discharge.
+    gen_df = DataFrame(
+        gen_id                 = ["TH1"],
+        gen_type               = ["CT"],
+        fuel                   = ["Gas"],
+        pmax_mw                = [0.0],
+        pmin_mw                = [0.0],
+        variable_cost_per_mwh  = [50.0],
+        forced_outage_rate     = [0.0],
+        mean_repair_time_hours = [0.0],
+        is_thermal             = [1],
+        is_vre                 = [0],
+        vre_type               = [""],
+    )
+    stor_df = DataFrame(
+        storage_id            = ["BAT1"],
+        power_mw              = [25.0],
+        energy_mwh            = [100.0],
+        charge_efficiency     = [1.0],
+        discharge_efficiency  = [1.0],
+        variable_cost_per_mwh = [0.0],
+        initial_soc_mwh       = [50.0],
+    )
+    sys_zero = SystemData(gen_df, stor_df,
+                          fill(55.0, 48), fill(0.0, 48), fill(0.0, 48), 48)
+
+    cfg = SimConfig(n_scenarios=1, seed=42)
+    r   = run_m1c_vre_only_charge(sys_zero, generate_scenarios(sys_zero, cfg), cfg)[1]
+
+    @test r.storage_discharge[1] ≈ 25.0 atol=1e-6
+    @test r.storage_discharge[2] ≈ 25.0 atol=1e-6
+    @test r.load_shed[3]         ≈ 55.0 atol=1e-6
+    @test all(r.storage_charge   .< 1e-9)
+end
+
+@testset "M1c_VREOnlyCharge never charges when p_vre <= load" begin
+    # Thermal always covers load exactly; VRE capacity = 0 → p_vre = 0 always.
+    # No VRE surplus → no charging allowed.
+    gen_df = DataFrame(
+        gen_id                 = ["TH1"],
+        gen_type               = ["CT"],
+        fuel                   = ["Gas"],
+        pmax_mw                = [55.0],
+        pmin_mw                = [0.0],
+        variable_cost_per_mwh  = [50.0],
+        forced_outage_rate     = [0.0],
+        mean_repair_time_hours = [0.0],
+        is_thermal             = [1],
+        is_vre                 = [0],
+        vre_type               = [""],
+    )
+    stor_df = DataFrame(
+        storage_id            = ["BAT1"],
+        power_mw              = [25.0],
+        energy_mwh            = [100.0],
+        charge_efficiency     = [1.0],
+        discharge_efficiency  = [1.0],
+        variable_cost_per_mwh = [0.0],
+        initial_soc_mwh       = [0.0],
+    )
+    # load = 55, thermal_pmax = 55, no VRE → vre_surplus = 0 every hour
+    sys_novresur = SystemData(gen_df, stor_df,
+                              fill(55.0, 48), fill(0.0, 48), fill(0.0, 48), 48)
+
+    cfg = SimConfig(n_scenarios=3, seed=42)
+    for r in run_m1c_vre_only_charge(sys_novresur, generate_scenarios(sys_novresur, cfg), cfg)
+        @test all(r.storage_charge .< 1e-9)
+    end
+end
+
+@testset "M1c_VREOnlyCharge charges when p_vre > load" begin
+    # No thermal, VRE 100 MW, load 55 MW → vre_surplus = 45 MW every hour.
+    # Battery 25 MW / 100 MWh, init SOC = 0.
+    # Expected: charges at 25 MW/h until full (4 hours).
+    gen_df = DataFrame(
+        gen_id                 = ["W1"],
+        gen_type               = ["Wind"],
+        fuel                   = ["Wind"],
+        pmax_mw                = [100.0],
+        pmin_mw                = [0.0],
+        variable_cost_per_mwh  = [0.0],
+        forced_outage_rate     = [0.0],
+        mean_repair_time_hours = [0.0],
+        is_thermal             = [0],
+        is_vre                 = [1],
+        vre_type               = ["wind"],
+    )
+    stor_df = DataFrame(
+        storage_id            = ["BAT1"],
+        power_mw              = [25.0],
+        energy_mwh            = [100.0],
+        charge_efficiency     = [1.0],
+        discharge_efficiency  = [1.0],
+        variable_cost_per_mwh = [0.0],
+        initial_soc_mwh       = [0.0],
+    )
+    # wind_cf = 1.0 everywhere → p_vre = 100 MW > load = 55 MW → surplus = 45 MW
+    sys_vre = SystemData(gen_df, stor_df,
+                         fill(55.0, 48), fill(1.0, 48), fill(0.0, 48), 48)
+
+    cfg = SimConfig(n_scenarios=1, seed=42)
+    r   = run_m1c_vre_only_charge(sys_vre, generate_scenarios(sys_vre, cfg), cfg)[1]
+
+    @test r.storage_charge[1] ≈ 25.0 atol=1e-6
+    @test r.storage_charge[2] ≈ 25.0 atol=1e-6
+    @test r.storage_charge[3] ≈ 25.0 atol=1e-6
+    @test r.storage_charge[4] ≈ 25.0 atol=1e-6
+    @test r.storage_charge[5] < 1e-9   # full
+    @test all(r.storage_discharge .< 1e-9)
+    @test all(r.load_shed         .< 1e-9)
+end
+
+@testset "M1c_VREOnlyCharge no-storage reduces to thermal+VRE adequacy" begin
+    sys_no_stor = SystemData(
+        DataFrame(
+            gen_id                 = ["TH1"],
+            gen_type               = ["CT"],
+            fuel                   = ["Gas"],
+            pmax_mw                = [50.0],
+            pmin_mw                = [0.0],
+            variable_cost_per_mwh  = [50.0],
+            forced_outage_rate     = [0.10],
+            mean_repair_time_hours = [10.0],
+            is_thermal             = [1],
+            is_vre                 = [0],
+            vre_type               = [""],
+        ),
+        DataFrame(
+            storage_id            = String[],
+            power_mw              = Float64[],
+            energy_mwh            = Float64[],
+            charge_efficiency     = Float64[],
+            discharge_efficiency  = Float64[],
+            variable_cost_per_mwh = Float64[],
+            initial_soc_mwh       = Float64[],
+        ),
+        fill(55.0, 168), fill(0.3, 168), fill(0.0, 168), 168,
+    )
+    cfg     = SimConfig(n_scenarios=10, seed=42)
+    avail   = generate_scenarios(sys_no_stor, cfg)
+    results = run_m1c_vre_only_charge(sys_no_stor, avail, cfg)
+
+    for r in results
+        @test all(r.storage_discharge .< 1e-9)
+        @test all(r.storage_charge    .< 1e-9)
+        @test all(r.load_shed         .>= -1e-9)
+    end
+end
+
 @testset "Storage dynamics — M2" begin
     sys    = make_test_system(168)
     config = SimConfig(n_scenarios=5, seed=22, lookahead_hours=12)

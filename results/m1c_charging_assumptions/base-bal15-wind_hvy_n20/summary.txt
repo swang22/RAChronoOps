@@ -1,0 +1,110 @@
+================================================================================
+M1c Charging-Assumption Comparison Summary
+Generated: 2026-05-17 22:10:01
+n_scenarios: 20  |  seed: 42
+Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+================================================================================
+
+Aggregate reliability metrics
+----------------------------------------------------------------------------------------------------
+  Case                   Model                   LOLH(h)   LOLP%  LOLE_d   EUE(MWh)   CVaR-EUE  MaxSF(MW)    rt(s)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1c_current                5.95   0.068    1.75     2479.2     9782.9      461.1      1.5
+  VRE120_bal15           M1c_current                1.35   0.015    0.50      360.1     2722.0      148.0      2.2
+  VRE120_wind_hvy        M1c_current                2.25   0.026    0.75      648.2     3528.4      225.5      1.5
+  VRE120_base            M1c_VREOnly               82.80   0.945   21.20    28179.7    49099.8     1000.4      1.5
+  VRE120_bal15           M1c_VREOnly               35.45   0.405   12.30    11185.6    22184.0      800.6      1.4
+  VRE120_wind_hvy        M1c_VREOnly               19.25   0.220    5.40     7392.3    19194.8      734.6      1.2
+  VRE120_base            M3                         5.95   0.068    1.75     2479.2     9782.9      461.1    193.8
+  VRE120_bal15           M3                         1.35   0.015    0.50      360.1     2722.0      148.0    194.3
+  VRE120_wind_hvy        M3                         2.25   0.026    0.75      648.2     3528.4      225.5    188.1
+
+Event-structure and severity metrics
+----------------------------------------------------------------------------------------------------
+  Case                   Model                    n_evts mean_dur  p95_dur  MaxSF(MW) MeanSF(MW)
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1c_current                 2.0     2.98     6.05      461.1      416.7
+  VRE120_bal15           M1c_current                 0.6     2.25     4.90      148.0      266.7
+  VRE120_wind_hvy        M1c_current                 0.8     2.65     6.00      225.5      288.1
+  VRE120_base            M1c_VREOnly                22.6     3.67     8.00     1000.4      340.3
+  VRE120_bal15           M1c_VREOnly                12.7     2.79     5.00      800.6      315.5
+  VRE120_wind_hvy        M1c_VREOnly                 6.0     3.21     6.00      734.6      384.0
+  VRE120_base            M3                          2.0     2.98     6.05      461.1      416.7
+  VRE120_bal15           M3                          0.6     2.25     4.90      148.0      266.7
+  VRE120_wind_hvy        M3                          0.8     2.65     6.00      225.5      288.1
+
+Monte Carlo uncertainty (M3 benchmark)
+--------------------------------------------------------------------------------
+  Case                      LOLH_CI95   LOLH_CI95%     EUE_CI95    EUE_CI95%
+  --------------------------------------------------------------------------
+  VRE120_base                   3.253        54.7%       1500.0        60.5%
+  VRE120_bal15                  1.175        87.0%        383.5       106.5%
+  VRE120_wind_hvy               1.557        69.2%        499.7        77.1%
+
+Method error vs M3 benchmark
+----------------------------------------------------------------------------------------------------
+  Case                   Method                   M3_LOLH Meth_LOLH     err_h   rel_err%     M3_EUE    EUE_err
+  ----------------------------------------------------------------------------------------------
+  VRE120_base            M1c_current                 5.95      5.95     +0.00      +0.0%     2479.2    -0.0000
+  VRE120_base            M1c_VREOnly                 5.95     82.80    +76.85   +1291.6%     2479.2 +25700.4944
+  VRE120_bal15           M1c_current                 1.35      1.35     +0.00      +0.0%      360.1    +0.0000
+  VRE120_bal15           M1c_VREOnly                 1.35     35.45    +34.10   +2525.9%      360.1 +10825.5116
+  VRE120_wind_hvy        M1c_current                 2.25      2.25     +0.00      +0.0%      648.2    +0.0000
+  VRE120_wind_hvy        M1c_VREOnly                 2.25     19.25    +17.00    +755.6%      648.2 +6744.0649
+
+Runtime and speedup vs M3
+--------------------------------------------------------------------------------
+  Case                   Method                      rt(s)   M3_rt(s)      speedup
+  --------------------------------------------------------------------------
+  VRE120_base            M1c_current                   1.5      193.8       129.2x
+  VRE120_base            M1c_VREOnly                   1.5      193.8       129.2x
+  VRE120_bal15           M1c_current                   2.2      194.3        88.3x
+  VRE120_bal15           M1c_VREOnly                   1.4      194.3       138.8x
+  VRE120_wind_hvy        M1c_current                   1.5      188.1       125.4x
+  VRE120_wind_hvy        M1c_VREOnly                   1.2      188.1       156.8x
+
+================================================================================
+Research questions
+================================================================================
+
+Q1. Does VRE-only charging break the exact M1c = M3 LOLH match?
+
+  VRE120_base:  M1c_current err=+0.00 h  M1c_VREOnly err=+76.85 h  → MATCH BROKEN
+  VRE120_bal15:  M1c_current err=+0.00 h  M1c_VREOnly err=+34.10 h  → MATCH BROKEN
+  VRE120_wind_hvy:  M1c_current err=+0.00 h  M1c_VREOnly err=+17.00 h  → MATCH BROKEN
+
+Q2. How much worse is VRE-only charging than current M1c?
+
+  VRE120_base:  ΔLOLH_abs = +76.85 h  ΔEUE = +25700.5 MWh
+  VRE120_bal15:  ΔLOLH_abs = +34.10 h  ΔEUE = +10825.5 MWh
+  VRE120_wind_hvy:  ΔLOLH_abs = +17.00 h  ΔEUE = +6744.1 MWh
+
+  Mean abs LOLH error:  M1c_current=0.000 h  M1c_VREOnly=42.650 h  Δ=+42.650 h
+
+Q3. Which cases are most sensitive to the charging-source assumption?
+
+  VRE120_base:  ΔLOLH_abs = 76.85 h
+  VRE120_bal15:  ΔLOLH_abs = 34.10 h
+  VRE120_wind_hvy:  ΔLOLH_abs = 17.00 h
+
+Q4. Does VRE-only M1c still outperform M1b (from script 21)?
+
+  (M1b N=20 reference from script 21:)
+    VRE120_base:     M1b LOLH = 83.55 h  (err = +77.60 h vs M3)
+    VRE120_bal15:    M1b LOLH = 36.75 h  (err = +35.40 h vs M3)
+    VRE120_wind_hvy: M1b LOLH = 25.00 h  (err = +22.75 h vs M3)
+  VRE120_base: M1c_VREOnly LOLH=82.80 h  err=+76.85 h vs M3
+  VRE120_bal15: M1c_VREOnly LOLH=35.45 h  err=+34.10 h vs M3
+  VRE120_wind_hvy: M1c_VREOnly LOLH=19.25 h  err=+17.00 h vs M3
+
+Q5. Which M1c formulation should the paper present?
+
+  → Large difference (>2 h mean LOLH error gap).
+    M1c_VREOnly is significantly worse. Recommend presenting M1c_current
+    as the main result and M1c_VREOnly as an appendix sensitivity.
+  Mean abs LOLH error:  M1c_current=0.000 h  M1c_VREOnly=42.650 h  gap=42.650 h
+
+Total runtime: 592.8 s
+================================================================================
+Files: m1c_charging_assumption_results.csv
+       m1c_charging_assumption_errors.csv

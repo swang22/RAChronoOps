@@ -1,0 +1,58 @@
+┌ Info: M1c charging-assumption comparison
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:96
+┌ Info: n=20 | seed=42 | skip_m3=false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:97
+┌ Info: Cases: VRE120_base, VRE120_bal15, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:98
+┌ Info: Output: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_charging_assumptions\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:99
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:181
+┌ Info:   running M1c_current...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:189
+┌ Info:   M1c_current: LOLH=5.95 h  EUE=2479.2 MWh  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:195
+┌ Info:   running M1c_VREOnly...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:204
+┌ Info:   M1c_VREOnly: LOLH=82.8 h  EUE=28179.7 MWh  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:210
+┌ Info:   running M3...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:220
+┌ Info:   M3: LOLH=5.95 h  EUE=2479.2 MWh  (193.8 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:228
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_charging_assumptions\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:236
+┌ Info: ── Case: VRE120_bal15 ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:181
+┌ Info:   running M1c_current...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:189
+┌ Info:   M1c_current: LOLH=1.35 h  EUE=360.1 MWh  (2.2 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:195
+┌ Info:   running M1c_VREOnly...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:204
+┌ Info:   M1c_VREOnly: LOLH=35.45 h  EUE=11185.6 MWh  (1.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:210
+┌ Info:   running M3...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:220
+┌ Info:   M3: LOLH=1.35 h  EUE=360.1 MWh  (194.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:228
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_charging_assumptions\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:236
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:181
+┌ Info:   running M1c_current...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:189
+┌ Info:   M1c_current: LOLH=2.25 h  EUE=648.2 MWh  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:195
+┌ Info:   running M1c_VREOnly...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:204
+┌ Info:   M1c_VREOnly: LOLH=19.25 h  EUE=7392.3 MWh  (1.2 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:210
+┌ Info:   running M3...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:220
+┌ Info:   M3: LOLH=2.25 h  EUE=648.2 MWh  (188.1 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:228
+┌ Info:   Intermediate outputs saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_charging_assumptions\base-bal15-wind_hvy_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:236
+┌ Info: Total runtime: 592.8 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\23_compare_m1c_charging_assumptions.jl:240

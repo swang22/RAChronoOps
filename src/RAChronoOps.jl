@@ -32,6 +32,7 @@ include("scenarios/SequentialOutages.jl")
 include("models/M1RuleBasedStorage.jl")
 include("models/M1bReserveAwareStorage.jl")
 include("models/M1cEmergencyOnlyStorage.jl")
+include("models/M1cVREOnlyCharge.jl")
 include("models/M2RollingWindow.jl")
 include("models/M2EventWindowLP.jl")
 include("models/M3EDDispatch.jl")
@@ -62,6 +63,7 @@ export DispatchResult
 export run_m1_rule_based
 export run_m1b_reserve_aware
 export run_m1c_emergency_only
+export run_m1c_vre_only_charge
 export run_m2_rolling_window
 export run_m2_event_window_lp, run_m2_with_diagnostics, Ra2ScenarioDiag
 export build_risk_windows
