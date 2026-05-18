@@ -497,63 +497,81 @@ charging-access assumptions.
 **Model hierarchy confirmed:** M1 → M1b → M1c → M2 → M3, with M1c_VREOnly as appendix.
 See `docs/m1c_charging_assumption_memo.md` for full analysis.
 
+**M1c recharge-stress robustness** (`scripts/24_stress_test_m1c_recharge_limits.jl`, commit `2286c2e`):
+Six in-memory VRE120_base variants (higher load, smaller/larger storage, higher M3 cycling cost) tested at N=20.
+M1c_current matched M3 exactly (0.00 h LOLH error) across all six stress cases, including M3 LOLH up to 27.4 h.
+M2 within −0.65 h throughout.  M1c_VREOnly errors: +59.9 to +153.6 h.
+
+| Stress case | M3 LOLH (h) | M1c_current error (h) | M2 error (h) |
+|-------------|:-----------:|:---------------------:|:------------:|
+| base_reference | 5.95 | **+0.00** | −0.20 |
+| load_scale_1225 | 13.25 | **+0.00** | −0.20 |
+| load_scale_125 | 24.75 | **+0.00** | −0.65 |
+| storage_p05_d4 | 27.40 | **+0.00** | −0.50 |
+| storage_p10_d8 | 2.45 | **+0.00** | +0.00 |
+| cycling_cost_high | 5.95 | **+0.00** | −0.20 |
+
+**Interpretation:** M1c is a strong fast benchmark under single-zone ED assumptions, conditional on thermal headroom being available for recharging.  Robustness is not structural — it holds in the VRE120_base parameter range where shortage events are thermally driven and charging headroom is ample.  See `docs/vre_method_comparison_memo.md` Section 11 for full analysis.
+
+No further heuristic variants are planned.
+
 ---
 
-### Task 6 — N=50 on VRE120_base (CI tightening)
+### Task 6 — Paper/writeup tables and figures (near-term)
 
-**Status:** Pending; run after Task 5.
+**Status:** Active — this is the main near-term priority.
 
-**Purpose:** M3 LOLH CI95 relative half-width at N=20 is 54.7% for VRE120_base.
-N=50 reduces this to approximately 35%, enabling a definitive quantification of
-any residual RA-2 LOLH bias.  Recommended before reporting final paper results.
+**Purpose:** Produce the tables and figures needed for the paper.  All key
+computational experiments are complete (Tasks 1–5 including stress test).
+
+**Target outputs:**
+- Table 1: model hierarchy (M1 → M1b → M1c → M2 → M3), runtime, LOLH error
+- Table 2: N=20 main results (three priority VRE cases, all models)
+- Table 3: M1c stress robustness (six stress cases)
+- Figure 1: accuracy-runtime frontier scatter (all methods × three VRE cases)
+- Figure 2: reliability metrics vs method (VRE120_base, bar or panel chart)
+- Figure 3: example stress-week SOC and dispatch (M1c vs M2 vs M3)
+- Appendix table: M1c_VREOnly charging-source sensitivity
+
+---
+
+### Task 7 — N=50 VRE120_base (optional CI tightening)
+
+**Status:** Optional; lower priority than Task 6.
+
+**Purpose:** M3 LOLH CI95 relative half-width is 54.7% at N=20 for VRE120_base.
+N=50 reduces this to approximately 35% and would allow a definitive quantification
+of any residual RA-2 LOLH bias.  Run only if tighter confidence intervals are
+needed to support the paper's claims about M2 accuracy.
 
 **Script:** `scripts/20_run_ra2_n20_selected_params.jl --n-scenarios 50 --seed 42 --cases VRE120_base`
 
 ---
 
-### Task 7 — VRE sweep with RA-2 (longer term)
+### Task 8 — HOPE UC/PCM or constrained-charging tests (longer-term)
 
-**Status:** Future; after Tasks 5–6 are complete.
+**Purpose:** Evaluate where M1c fails and where M2 or a full PCM adds value.
+Two directions:
 
-**Script:** extend `scripts/16_run_vre_method_comparison.jl` to include RA-2, or
-create `scripts/22_run_vre_all_methods.jl`.
+**8a. Constrained-charging / transmission tests** — Introduce binding
+constraints that reduce thermal headroom (e.g., very high VRE penetration,
+multi-zone transmission limits, must-run constraints).  Identify the parameter
+region where M1c diverges from M3 and M2's LP structure recovers accuracy.
+Script: extend `scripts/24_stress_test_m1c_recharge_limits.jl` with VRE
+scaling variants or import multi-zone topology from RTS-GMLC.
 
-**Purpose:** extends RQ3 and RQ4 across all six VRE cases; completes data for
-Figures 2–4.
+**8b. HOPE UC/PCM stress-week validation** — Extract stress weeks from RA-3
+dispatch on the highest-stress VRE case.  Export via `ExportHOPECase.jl`.
+Run HOPE with `unit_commitment = 1`.  Compare ED (RA-3) vs UC (RA-4) reliability.
+Script: `scripts/25_run_hope_stress_weeks.jl`.
 
----
-
-### Task 8 — HOPE UC/PCM stress-week validation (future)
-
-**When:** after VRE sweep results are available and the paper framing is confirmed.
-
-**Approach:**
-1. Extract stress weeks from RA-3 dispatch on the highest-stress VRE case.
-2. Export as HOPE input via `ExportHOPECase.jl`.
-3. Run HOPE with `unit_commitment = 1`.
-4. Compare ED (RA-3) vs UC (RA-4) reliability.
+**When:** after Task 6 (paper/writeup) is complete and the framing is confirmed.
 
 ---
 
-### Task 6 — HOPE UC/PCM stress-week validation (future)
-
-**When:** after RA-2 results are available and the paper framing is
-confirmed.
-
-**Approach:**
-1. For the highest-stress VRE case, extract stress weeks from RA-3
-   dispatch (weeks containing the most scenario-hours of load shedding).
-2. Export those weeks as HOPE input cases via `ExportHOPECase.jl`.
-3. Run HOPE with `unit_commitment = 1`.
-4. Compare ED (RA-3) vs UC (RA-4) reliability and dispatch for the
-   selected weeks.
-
-**Script:** `scripts/18_run_hope_stress_weeks.jl`.
-
----
-
-*Document version: Phase D complete — M1c + charging-assumption sensitivity done (2026-05-17).*
+*Document version: Phase E complete — M1c recharge-stress test done (2026-05-18).*
 *Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
 *Link to RA-1b validation memo: [docs/ra1b_validation_memo.md](ra1b_validation_memo.md)*
 *Link to VRE method comparison memo: [docs/vre_method_comparison_memo.md](vre_method_comparison_memo.md)*
 *Link to RA-2 N=20 validation memo: [docs/ra2_n20_validation_memo.md](ra2_n20_validation_memo.md)*
+*Link to M1c charging-assumption memo: [docs/m1c_charging_assumption_memo.md](m1c_charging_assumption_memo.md)*

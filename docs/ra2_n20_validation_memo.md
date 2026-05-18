@@ -184,7 +184,7 @@ merge_gap_hours       = 24     (fixed)
 |-------|--------|:-------------------:|:------------------:|:-------------:|
 | M1 (RA-1a) | Naive peak-shaving heuristic | +700%–+1300% | ~+700% | ~200× faster |
 | M1b (RA-1b) | Reserve-aware heuristic | +1000%–+2600% | ~+700% | ~200× faster |
-| M1c (RA-1c) | Emergency-only, system-surplus charging | 0.0 h at N=20 (case-specific) | 0 MWh at N=20 | ~130× faster |
+| M1c (RA-1c) | Emergency-only, system-surplus charging | 0.0 h across VRE120_base stress range (not structural) | 0 MWh | ~130× faster |
 | M1c_VREOnly *(appendix)* | Emergency-only, VRE-surplus-only charging | +756%–+2526% | ~+1100% | ~130× faster |
 | **M2 (RA-2)** | **Event-window LP hybrid** | **−3% to −13%** | **< 10⁻⁹ MWh** | **20–37× faster** |
 | M3 (RA-3) | Full-year ED LP benchmark | 0% (reference) | 0% (reference) | 1× |
@@ -199,12 +199,16 @@ LOLH by 1000%–2600% at N=20, far larger than any remaining M2 error.  The rese
 prevents storage depletion before shortage events but cannot replicate the intertemporal
 energy-shifting logic of an LP.
 
-**M1c (N=20 exact match) is case-specific:** M1c matches M3 LOLH to 0.00 h at N=20 for
-all three priority cases.  This is not structural equivalence — SOC trajectories differ by
-54–58% of battery capacity.  The match holds because both models fill storage predominantly
-from thermal headroom hours (not VRE surplus) at current VRE120 penetration levels.
-M1c_VREOnly (appendix sensitivity) destroys the match entirely (+17–77 h error) because
-p_vre < load at 87–100% of hours, leaving the battery uncharged.
+**M1c matches M3 robustly within the VRE120_base stress range:** M1c matches M3 LOLH to
+0.00 h not only across the three priority VRE cases (script 21) but also across all six
+VRE120_base stress variants in script 24 (load scaled to 1.25, halved storage power, doubled
+duration, high M3 cycling cost).  EUE matches to machine precision and event count/duration
+are identical in all cases.  This robustness is not structural — SOC trajectories still
+differ by 54–58% of battery capacity — but reflects that VRE120 shortage events are
+thermally driven and thermal headroom enables recharging between events.  M1c is therefore
+a strong fast benchmark under the current single-zone ED assumptions, conditional on
+thermal headroom being available for recharging.  M1c_VREOnly (appendix sensitivity)
+destroys the match entirely (+17–154 h error) by blocking access to thermal headroom.
 
 ---
 
@@ -250,18 +254,55 @@ capacity).  The match is case/sample-specific and depends on charging-access ass
 (M1 → M1b → M1c → M2 → M3).  Present M1c_VREOnly as an appendix sensitivity to explain
 why the charging-source assumption is not arbitrary.
 
-### 6b. N=50 on VRE120_base (confidence interval tightening)
+### 6b. M1c recharge-stress robustness (COMPLETE)
+
+**Script:** `scripts/24_stress_test_m1c_recharge_limits.jl`
+**Commit:** `2286c2e`
+
+Six VRE120_base stress variants were tested to identify when M1c stops matching M3.
+All variants share the same ScenarioSet (CRN); modifications are built in-memory.
+
+| Stress case | M3 LOLH (h) | M1c error (h) | M2 error (h) | M1c_VREOnly error (h) |
+|---|---:|---:|---:|---:|
+| base_reference | 5.95 | **0.00** | −0.20 | +76.85 |
+| load_scale_1225 | 13.25 | **0.00** | −0.20 | +115.90 |
+| load_scale_125 | 24.75 | **0.00** | −0.65 | +153.60 |
+| storage_p05_d4 | 27.40 | **0.00** | −0.50 | +59.90 |
+| storage_p10_d8 | 2.45 | **0.00** | 0.00 | +73.25 |
+| cycling_cost_high | 5.95 | **0.00** | −0.20 | +76.85 |
+
+M1c_current matched M3 exactly (LOLH and EUE) across the full stress range — including
+4× base scarcity (storage_p05_d4, M3 LOLH 27.4 h) and load scaled to 1.25 (24.75 h).
+M2 remained within −0.65 h throughout.  M1c_VREOnly errors grew with load stress to
++153.6 h at load_scale_125.
+
+**Interpretation:** M1c is a strong fast benchmark under single-zone ED assumptions, as
+long as thermal headroom is available for storage recharging.  Breaking the match requires
+conditions that block thermal headroom: multi-zone transmission congestion, unit commitment
+constraints, reserves, or forced-charging restrictions.  M2 remains important as the
+extensible optimization-based method for these future test conditions.
+
+**No further heuristic variants are planned.**  The model hierarchy is final:
+M1 → M1b → M1c → M2 → M3 (M1c_VREOnly as appendix sensitivity).
+
+### 6c. N=50 on VRE120_base (confidence interval tightening — optional)
 
 The M3 LOLH CI95 relative half-width is 54.7% for `VRE120_base` at N=20.  The RA-2
 LOLH errors (−0.05 to −0.30 h) are within this noise floor.  A run at N=50 on
 `VRE120_base` would reduce the M3 CI to approximately 35%, allowing a more precise
-quantification of any residual RA-2 bias.
+quantification of any residual RA-2 bias.  This is optional pending the paper timeline.
 
-### 6c. VRE sweep with RA-2 (longer term)
+### 6d. Near-term and longer-term next steps
 
-Once the M1c comparison is complete and N=50 confirms the N=20 findings, extend the
-RA-2 validation to all six VRE cases to address RQ1 and RQ4 (how the RA-2 advantage
-varies with VRE profile and penetration level).
+**Near-term (paper/writeup focus):**
+- Finalize method comparison tables for M1 → M1b → M1c → M2 → M3 across all three priority cases.
+- Produce Figures 2–4 (reliability vs VRE, error by method, accuracy-runtime frontier).
+- N=50 on VRE120_base if tighter M3 CI is needed before submission.
+
+**Longer-term (extensibility tests, if time permits):**
+- VRE sweep with RA-2 across all six VRE cases to address RQ1 and RQ4.
+- HOPE UC/PCM stress-week validation for one high-stress case (RA-4).
+- Constrained-charging or multi-zone variants to find conditions where M1c fails and M2/PCM adds value.
 
 ---
 

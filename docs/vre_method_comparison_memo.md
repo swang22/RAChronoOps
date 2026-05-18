@@ -589,7 +589,7 @@ M1c_VREOnly has mean absolute LOLH error of **42.7 h** (755%–2526% relative er
 |-------|--------|:-------------------:|:------------------:|:-------------:|
 | M1 (RA-1a) | Naive peak-shaving heuristic | +700%–+1300% | ~+700% | ~200× faster |
 | M1b (RA-1b) | Reserve-aware heuristic | +1000%–+2600% | ~+700% | ~200× faster |
-| M1c (RA-1c) | Emergency-only, system-surplus charging | 0.0 h at N=20 (case-specific) | 0 MWh at N=20 | ~130× faster |
+| M1c (RA-1c) | Emergency-only, system-surplus charging | 0.0 h across VRE120_base stress range (not structural) | 0 MWh at N=20 | ~130× faster |
 | M1c_VREOnly *(appendix)* | Emergency-only, VRE-surplus-only charging | +756%–+2526% | ~+1100% | ~130× faster |
 | **M2 (RA-2)** | **Event-window LP hybrid** | **−3% to −13%** | **< 10⁻⁹ MWh** | **20–37× faster** |
 | M3 (RA-3) | Full-year ED LP benchmark | 0% (reference) | 0% (reference) | 1× |
@@ -610,10 +610,54 @@ heuristic is inappropriate for systems where VRE rarely curtails at current load
 
 ---
 
+## 11. M1c recharge-stress robustness
+
+**Script:** `scripts/24_stress_test_m1c_recharge_limits.jl`
+**Results:** `results/m1c_recharge_stress/base_n20/`
+**Run:** N=20, seed=42, VRE120_base in-memory variants
+**Commit:** `2286c2e`
+
+Six in-memory variants of VRE120_base were constructed to test whether M1c_current matches M3 under conditions that might exhaust thermal headroom or alter storage recharge dynamics:
+
+| Stress case | Modification |
+|---|---|
+| base_reference | VRE120_base as-is (load_scale=1.20) |
+| load_scale_1225 | load scale 1.20→1.225 (+2.1% load) |
+| load_scale_125 | load scale 1.20→1.25 (+4.2% load) |
+| storage_p05_d4 | storage 491.5 MW / 1,966 MWh (5%/4h) |
+| storage_p10_d8 | storage 983.0 MW / 7,864 MWh (10%/8h) |
+| cycling_cost_high | base_reference; M3 storage_cycling_cost=5 $/MWh |
+
+### 11a. Stress test results (N=20, seed=42)
+
+| Stress case | M3 LOLH (h) | M1c_current error (h) | M2 error (h) | M1c_VREOnly error (h) |
+|-------------|:-----------:|:---------------------:|:------------:|:---------------------:|
+| base_reference | 5.95 | **+0.00** | −0.20 | +76.85 |
+| load_scale_1225 | 13.25 | **+0.00** | −0.20 | +115.90 |
+| load_scale_125 | 24.75 | **+0.00** | −0.65 | +153.60 |
+| storage_p05_d4 | 27.40 | **+0.00** | −0.50 | +59.90 |
+| storage_p10_d8 | 2.45 | **+0.00** | +0.00 | +73.25 |
+| cycling_cost_high | 5.95 | **+0.00** | −0.20 | +76.85 |
+
+M1c_current matches M3 exactly (0.00 h LOLH error, 0 MWh EUE error) across all six stress cases, including conditions where M3 LOLH reaches 27.4 h.  M2 remains within −0.65 h throughout (within M3 sampling noise at N=20).
+
+### 11b. Interpretation
+
+**M1c is a strong fast benchmark under single-zone ED assumptions,** as long as thermal headroom is available for recharging.  In the VRE120_base stress range, shortage events are driven by thermal forced outages, and the generators remaining on-line provide enough surplus capacity to recharge the battery between events — making M1c's eager-charging rule coincide with M3's economically optimal dispatch.
+
+**This robustness is not structural.**  If thermal headroom were insufficient (e.g., very high VRE penetration forcing gas units offline, binding transmission constraints, or UC start-up costs), M1c's charging rule would diverge from M3 and errors would grow.  The stress test validates M1c as a reliable fast proxy within the tested parameter range but does not generalise beyond it.
+
+**M2 remains important as the extensible optimization-based method.**  Its small residual LOLH underestimation (≤ 0.65 h) is within M3 sampling noise at N=20, and its LP structure naturally accommodates constrained charging, transmission limits, or multi-zone topologies that M1c cannot handle.
+
+**No further heuristic variants are planned.**  The M1 → M1b → M1c hierarchy is complete.  The near-term priority is paper/writeup tables and figures.
+
+---
+
 *Generated from `results/vre_method_comparison/summary.txt`,
 `vre_method_comparison_results.csv`, `vre_method_comparison_errors.csv`,
 `results/ra2_priority_validation/base-bal15-wind_hvy_n5/summary.txt`,
 `results/ra2_parameter_sensitivity/risk_buffer_n5/summary.txt`,
-`results/ra2_n20_selected_params/base-bal15-wind_hvy_n20/summary.txt`, and
-`results/m1c_charging_assumptions/base-bal15-wind_hvy_n20/summary.txt`.*
+`results/ra2_n20_selected_params/base-bal15-wind_hvy_n20/summary.txt`,
+`results/m1c_charging_assumptions/base-bal15-wind_hvy_n20/summary.txt`, and
+`results/m1c_recharge_stress/base_n20/summary.txt`.*
 *All runs use common random numbers (shared `ScenarioSet`, seed=42).*
