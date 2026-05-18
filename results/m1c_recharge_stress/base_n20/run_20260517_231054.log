@@ -1,0 +1,84 @@
+┌ Info: M1c recharge-limits stress test
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:96
+┌ Info: n=20 | seed=42 | skip_m3=false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:97
+┌ Info: Output: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_recharge_stress\base_n20
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:98
+┌ Info: Base system loaded. Peak load = 9830.2 MW
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:109
+┌ Info: Generated 20 scenarios (seed=42, CRN shared across all stress cases)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:114
+┌ Info: ── Stress case: base_reference (VRE120_base as-is (load_scale=1.20)) ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:205
+┌ Info:   M1c_current: LOLH=5.95 h  EUE=2479.0 MWh  (1.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:223
+┌ Info:   M1c_VREOnly: LOLH=82.8 h  EUE=28180.0 MWh  (1.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:236
+┌ Info:   M2:          LOLH=5.75 h  EUE=2479.0 MWh  (9.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:249
+┌ Info:   M3:          LOLH=5.95 h  EUE=2479.0 MWh  (183.1 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:265
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_recharge_stress\base_n20\m1c_recharge_stress_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:273
+┌ Info: ── Stress case: load_scale_1225 (load scale 1.20→1.225  (+2.1% load)) ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:205
+┌ Info:   M1c_current: LOLH=13.25 h  EUE=6185.0 MWh  (2.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:223
+┌ Info:   M1c_VREOnly: LOLH=129.15 h  EUE=49077.0 MWh  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:236
+┌ Info:   M2:          LOLH=13.05 h  EUE=6185.0 MWh  (7.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:249
+┌ Info:   M3:          LOLH=13.25 h  EUE=6185.0 MWh  (190.2 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:265
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_recharge_stress\base_n20\m1c_recharge_stress_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:273
+┌ Info: ── Stress case: load_scale_125 (load scale 1.20→1.25  (+4.2% load)) ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:205
+┌ Info:   M1c_current: LOLH=24.75 h  EUE=12780.0 MWh  (1.7 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:223
+┌ Info:   M1c_VREOnly: LOLH=178.35 h  EUE=77881.0 MWh  (1.1 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:236
+┌ Info:   M2:          LOLH=24.1 h  EUE=12780.0 MWh  (10.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:249
+┌ Info:   M3:          LOLH=24.75 h  EUE=12780.0 MWh  (192.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:265
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_recharge_stress\base_n20\m1c_recharge_stress_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:273
+┌ Info: ── Stress case: storage_p05_d4 (storage 491.5 MW / 1966.0 MWh (5%/4h)) ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:205
+┌ Info:   M1c_current: LOLH=27.4 h  EUE=8770.0 MWh  (1.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:223
+┌ Info:   M1c_VREOnly: LOLH=87.3 h  EUE=29152.0 MWh  (2.3 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:236
+┌ Info:   M2:          LOLH=26.9 h  EUE=8770.0 MWh  (11.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:249
+┌ Info:   M3:          LOLH=27.4 h  EUE=8770.0 MWh  (188.7 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:265
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_recharge_stress\base_n20\m1c_recharge_stress_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:273
+┌ Info: ── Stress case: storage_p10_d8 (storage 983.0 MW / 7864.0 MWh (10%/8h)) ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:205
+┌ Info:   M1c_current: LOLH=2.45 h  EUE=359.0 MWh  (2.2 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:223
+┌ Info:   M1c_VREOnly: LOLH=75.7 h  EUE=26315.0 MWh  (1.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:236
+┌ Info:   M2:          LOLH=2.45 h  EUE=359.0 MWh  (7.9 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:249
+┌ Info:   M3:          LOLH=2.45 h  EUE=359.0 MWh  (186.0 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:265
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_recharge_stress\base_n20\m1c_recharge_stress_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:273
+┌ Info: ── Stress case: cycling_cost_high (base_reference; M3 storage_cycling_cost=5 $/MWh) ──
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:205
+┌ Info:   M1c_current: LOLH=5.95 h  EUE=2479.0 MWh  (1.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:223
+┌ Info:   M1c_VREOnly: LOLH=82.8 h  EUE=28180.0 MWh  (2.5 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:236
+┌ Info:   M2:          LOLH=5.75 h  EUE=2479.0 MWh  (7.6 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:249
+┌ Info:   M3:          LOLH=5.95 h  EUE=2479.0 MWh  (183.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:265
+┌ Info:   Intermediate results saved → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\m1c_recharge_stress\base_n20\m1c_recharge_stress_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:273
+┌ Info: Total runtime: 1202.1 s
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\24_stress_test_m1c_recharge_limits.jl:277
