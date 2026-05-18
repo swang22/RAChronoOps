@@ -28,6 +28,10 @@ highs_*.log
 *.lp
 *.mps
 
+# ── HOPE exports — large case folders are not version-controlled ──────────
+# Only export_summary.csv (small) is committed; case folders are local only.
+exports/hope_model_cases/RAChronoOps_*/
+
 # ── Editor / OS ───────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
