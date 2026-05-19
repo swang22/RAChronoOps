@@ -123,13 +123,15 @@ function hope_aggregate_row(model::String,
     n_hours     = length(load_mw)
     annual_load = sum(load_mw)
 
-    scen_lolh = [Float64(r.lolh) for r in scen_rows]
-    scen_eue  = [Float64(r.eue_mwh) for r in scen_rows]
+    scen_lolh      = [Float64(r.lolh)      for r in scen_rows]
+    scen_eue       = [Float64(r.eue_mwh)   for r in scen_rows]
+    scen_lole_days = [Float64(r.lole_days) for r in scen_rows]
 
-    lolh = mean(scen_lolh)
-    lolp = n_hours > 0 ? lolh / n_hours : 0.0
-    eue  = mean(scen_eue)
-    neue = annual_load > 0.0 ? eue / annual_load : 0.0
+    lolh      = mean(scen_lolh)
+    lolp      = n_hours > 0 ? lolh / n_hours : 0.0
+    eue       = mean(scen_eue)
+    neue      = annual_load > 0.0 ? eue / annual_load : 0.0
+    lole_days = mean(scen_lole_days)
 
     # Shortage durations from hourly data
     all_durations = Int[]
@@ -187,7 +189,7 @@ function hope_aggregate_row(model::String,
         model                        = model,
         lolh                         = lolh,
         lolp_percent                 = lolp * 100.0,
-        lole_days                    = 0.0,   # not available from HOPE CSV
+        lole_days                    = lole_days,
         eue_mwh                      = eue,
         neue_ppm                     = neue * 1e6,
         cvar_eue_mwh                 = cvar_val,
@@ -359,6 +361,7 @@ let
                 push!(rows_m, (
                     scenario_id          = s_id,
                     lolh                 = Float64(r.lolh),
+                    lole_days            = Float64(r.lole_days),
                     eue_mwh              = Float64(r.eue_mwh),
                     max_shortfall_mw     = Float64(r.max_shortfall_mw),
                     n_shortage_events    = Float64(r.n_shortage_events),
