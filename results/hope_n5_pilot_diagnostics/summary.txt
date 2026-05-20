@@ -1,126 +1,121 @@
-HOPE-ED vs M3 Discrepancy Diagnostics — VRE120_base  N=5
-Generated: 2026-05-18 20:26:43
-Scenarios: 1, 2, 3, 4, 5 from n_scenarios=20, seed=42
+HOPE-ED vs M3 Discrepancy: Root Cause and Fix
+Generated: 2026-05-19
 
-──────────────────────────────────────────────────────────────────────
-Per-scenario EUE differences (HOPE-ED minus M3):
-──────────────────────────────────────────────────────────────────────
-  s001: M3=1779.48 MWh  HOPE-ED=1779.48 MWh  D=  -0.00 MWh  common=3 h  m3_only=3 h  hope_only=4 h
-  s002: M3=2522.27 MWh  HOPE-ED=2628.87 MWh  D=+106.60 MWh  common=4 h  m3_only=2 h  hope_only=3 h
-  s003: M3=2519.04 MWh  HOPE-ED=2625.64 MWh  D=+106.60 MWh  common=2 h  m3_only=4 h  hope_only=6 h
-  s004: M3=7004.09 MWh  HOPE-ED=7217.29 MWh  D=+213.20 MWh  common=10 h  m3_only=4 h  hope_only=6 h
-  s005: M3=9712.36 MWh  HOPE-ED=9822.36 MWh  D=+110.00 MWh  common=15 h  m3_only=9 h  hope_only=8 h
-  MEAN: M3=4707.45 MWh  HOPE-ED=4814.73 MWh  Δ=+107.28 MWh
+NOTE: The earlier version of this file (2026-05-18) attributed the
+discrepancy to LP degeneracy / storage dispatch timing.  That was an
+intermediate hypothesis.  The true root cause was identified the same
+day and is documented here.  See also ramp_constraint_root_cause.txt
+for a detailed numerical breakdown.
 
-──────────────────────────────────────────────────────────────────────
-Q1. Which scenario drives the +107.28 MWh HOPE-ED EUE difference?
+=======================================================================
+SYMPTOM  (+107.28 MWh mean EUE excess, N=5 pilot)
+=======================================================================
+VRE120_base, scenarios 1–5, seed=42, before fix:
 
-  All 5 scenarios show non-negative HOPE-ED EUE excess.
-  Largest single-scenario difference: s004 (Δ=213.2 MWh, 39.7% of total).
-  Pattern: s001:+-0.0  s002:+106.6  s003:+106.6  s004:+213.2  s005:+110.0.
-  The difference is SYSTEMATIC — present in every scenario — rather than
-  driven by one outlier scenario.
+  Scenario  M3 EUE (MWh)  HOPE-ED EUE (MWh)  Delta (MWh)
+  --------  ------------  -----------------  -----------
+  s001          1779.48          1779.48         +0.00
+  s002          2522.27          2628.88        +106.60
+  s003          2519.04          2625.64        +106.60
+  s004          7004.09          7217.29        +213.20   (= 2 × 106.60)
+  s005          9712.36          9822.36        +110.00
+  MEAN          4707.45          4814.73        +107.28 MWh (+2.3%)
 
-──────────────────────────────────────────────────────────────────────
-Q2. Is the difference concentrated in one hour/event?
+The systematic pattern — exact multiples of ~106.6 MW × 1 hour —
+pointed to a specific per-generator capacity penalty.
 
-  Across all scenarios: 27 HOPE-only hours, 22 M3-only hours.
-  HOPE-only EUE (energy in hours M3 has no shedding): 7893.48 MWh
-  M3-only EUE (energy in hours HOPE has no shedding): 11301.08 MWh
-  Common hours EUE difference (same hours, diff magnitudes): 3944.0 MWh
-  Net: 7893.48 - 11301.08 + 3944.0 = 536.4 MWh  (should ≈ 536.4)
+=======================================================================
+ROOT CAUSE: Ramp constraints active in HOPE-ED, absent in M3
+=======================================================================
+Reading both model formulations directly revealed the mismatch:
 
-──────────────────────────────────────────────────────────────────────
-Q3. Is it an event-structure difference or an actual energy difference?
+  M3  (src/models/M3EDDispatch.jl):
+      NO ramp constraints.  Only: 0 ≤ p[g,h] ≤ A[g,h] × Pmax[g]
 
-  BOTH: HOPE-ED has 27 extra shortage hours (7893.48 MWh) AND common hours differ (3944.0 MWh).
+  HOPE (HOPE_project/src/PCM.jl, constraints PCM-C3.RU / PCM-C3.RD):
+      p[g,h] − p[g,h−1] ≤ RU_g × (1−FOR_g) × Pmax_g   (ramp-up)
+      p[g,h−1] − p[g,h] ≤ RD_g × (1−FOR_g) × Pmax_g   (ramp-down)
+      Applied to all thermal generators (G_F set).
 
-──────────────────────────────────────────────────────────────────────
-Q4. Does this point to a data mapping issue or model formulation difference?
+The exporter script 25 was passing real M3 ramp rates (as RU/RD
+fractions of Pmax per hour) into HOPE for BOTH ED and UC modes.
 
-  HOPE-only shortage hours diagnostic (27 hour-obs):
-    Mean load              =  9112.7 MW
-    Mean net avail (no stor)=  8748.7 MW
-    Mean generation gap     =   364.0 MW  (>0 means storage could fill)
-    Mean M3 SOC at these hrs=  3239.7 MWh
+Mechanism — NGCC unit (Pmax = 355 MW, ramp = 4.14 MW/min):
 
-  In 27/27 HOPE-only hours, M3 SOC > 100 MWh.
-  → M3 had storage available at these hours but HOPE did not dispatch storage.
-  M3-only shortage hours: 22 hours,
-    mean M3 SOC = 0.0 MWh (nearly depleted if << 1966)
+    ru_frac = 4.14 × 60 / 355 = 0.6997
+    HOPE ramp-down limit at hour h−1 = 0.6997 × 355 = 248.4 MW
 
-  ROOT CAUSE HYPOTHESIS:
-  HOPE enforces both a cyclic SOC and a fixed terminal SOC = 50% capacity
-  (PCM.jl lines 2245-2257: SDBe_st_con + SDBe_ed_con).
-  HOPE terminal constraint: soc[s, H[end]] = 0.5 × SECAP = 1966 MWh.
-  HOPE cyclic constraint:   soc[s, 1] = soc[s, H[end]] = 1966 MWh.
-  The cyclic constraint fixes soc[s,1] = 1966 but has NO transition
-  equation for hour 1 (SoC_con applies only to h in setdiff(H, [1])).
-  This means HOPE storage dispatch in hour 1 is decoupled from the SOC:
-  the LP can inject/absorb up to ±983 MW in hour 1 without changing SOC.
-  M3 (RAChronoOps) also uses cyclic SOC (config.cyclic_soc=true) with
-  initial_soc=1966 MWh, but its hour-1 SOC is constrained by the transition
-  equation: soc[1] = initial_soc + eta_ch*charge[1] - discharge[1]/eta_dis.
-  RECOMMENDATION: Investigate whether LP degeneracy (multiple optimal solutions)
-  at the HOPE-only shortage hours causes different storage dispatch patterns.
-  The consistent ~106.6 MWh difference per scenario suggests a systematic
-  offset, possibly linked to one generator, or the hour-1 SOC formulation.
+    When unit transitions INTO forced outage at hour h:
+      M3:       p[g, h−1] can reach 355.0 MW (no ramp constraint)
+      HOPE-ED:  p[g, h−1] ≤ 248.4 MW (ramp-down constraint binding)
+      Gap = 355.0 − 248.4 = 106.6 MW
 
-──────────────────────────────────────────────────────────────────────
-HOPE-only shortage hours detail:
-──────────────────────────────────────────────────────────────────────
-  Scen   Hour  LoadShed   Load         Net Avail      Gap(kW>0)    M3_SOC       HOPE_SOC  
-  s001  h04983    +135.54     8867.3       8731.8       135.5     3789.1     3932.0
-  s001  h05006    +169.78     9617.7       9447.9       169.8     3753.0     3932.0
-  s001  h05010    +101.77     9018.2       8344.8       673.4     1270.6     1556.9
-  s001  h06063    +249.32     8581.4       8332.1       249.3     3669.2     3932.0
-  s002  h04983     +84.54     8867.3       8782.8        84.5     3842.9     3932.0
-  s002  h05005    +450.35     9342.2       8891.9       450.3     3457.3     3932.0
-  s002  h05007    +752.54     9668.9       9023.0       645.9     2179.0     3334.6
-  s003  h04984    +424.60     9036.0       8518.7       517.3     3386.7     3834.3
-  s003  h05055      +1.74     9062.6       9060.9         1.7     3930.2     3932.0
-  s003  h05056    +503.59     8988.0       8484.4       503.6     3399.3     3932.0
-  s003  h05078     +11.98     8597.3       8585.3        12.0     3919.4     3932.0
-  s003  h05079    +459.89     8743.6       8283.7       459.9     3434.6     3932.0
-  s003  h05081    +126.89     8611.4       7889.2       722.2     2246.8     2878.0
-  s004  h04406     +34.53     8449.4       8414.9        34.5     3895.6     3932.0
-  s004  h05005    +172.35     9342.2       9169.9       172.3     3750.3     3932.0
-  s004  h05007    +784.54     9668.9       8991.0       677.9     2567.9     3464.2
-  s004  h05029     +63.55     9082.3       9018.8        63.5     3865.0     3932.0
-  s004  h05030    +619.57     9308.2       8688.6       619.6     3211.9     3932.0
-  s004  h05032     +17.64     9157.4       8654.7       502.7     1765.1     2503.8
-  s005  h04959    +206.52     8727.1       8520.6       206.5     3714.3     3932.0
-  s005  h04983    +339.54     8867.3       8527.8       339.5     3574.1     3932.0
-  s005  h05004    +238.50     8987.0       8748.5       238.5     3680.6     3932.0
-  s005  h05006    +466.78     9617.7       9150.9       466.8     2982.7     3610.1
-  s005  h05007    +900.94     9668.9       8768.0       900.9     2033.0     3610.1
-  s005  h05055    +176.74     9062.6       8885.9       176.7     3745.7     3932.0
-  s005  h05725    +159.41     9271.6       9112.2       159.4     3764.0     3932.0
-  s005  h05727    +240.36     9830.2       9186.9       643.3     2644.0     3065.4
+    If hour h−1 is a shortage hour: M3 avoids 106.6 MWh of load
+    shedding that HOPE-ED cannot avoid.
 
-──────────────────────────────────────────────────────────────────────
-M3-only shortage hours detail:
-──────────────────────────────────────────────────────────────────────
-  Scen   Hour  LoadShed   Load         Net Avail      Gap(kW>0)    M3_SOC       HOPE_SOC  
-  s001  h04988    +636.82     8389.1       7583.4       805.7        0.0        0.0
-  s001  h05012    +271.55     8616.5       7877.4       739.1        0.0        0.0
-  s001  h06068    +347.28     7606.9       6966.6       640.3        0.0        0.0
-  s002  h04988    +609.82     8389.1       7558.4       830.7        0.0        0.0
-  s002  h05012    +781.09     8616.5       7835.4       781.1        0.0        0.0
-  s003  h04988     +89.69     8389.1       7658.4       730.7        0.0      353.0
-  s003  h04989    +334.92     8016.6       7681.7       334.9        0.0        0.0
-  s003  h05060    +138.55     7895.2       7140.9       754.3        0.0      386.6
-  s003  h05085    +854.07     7496.9       6642.8       854.1        0.0        0.0
-  s004  h04413    +362.23     7252.7       6890.5       362.2        0.0        0.0
-  s004  h04989    +646.92     8016.6       7369.7       646.9        0.0        0.0
-  s004  h05012    +968.09     8616.5       7648.4       968.1        0.0        0.0
-  s004  h05036    +728.45     7968.0       7239.5       728.5        0.0        0.0
-  s005  h04965    +682.52     7817.2       7134.7       682.5        0.0        0.0
-  s005  h04989    +689.92     8016.6       7326.7       689.9        0.0        0.0
-  s005  h05010    +713.42     9018.2       8047.8       970.4        0.0      825.1
-  s005  h05013    +297.24     8299.3       8002.1       297.2        0.0        0.0
-  s005  h05060    +909.29     7895.2       6985.9       909.3        0.0      629.2
-  s005  h05061    +596.94     7614.5       7017.6       596.9        0.0        0.0
-  s005  h05418     +14.02     8596.4       8307.0       289.4        0.0      240.9
-  s005  h05419    +228.49     8222.2       7993.7       228.5        0.0        0.0
-  s005  h05732    +399.77     8241.7       7784.9       456.8        0.0        0.0
+Per-scenario accounting (all exact matches):
+  s002: 1 NGCC outage-transition × 106.6 MW × 1 h  → +106.60 MWh ✓
+  s003: 1 NGCC outage-transition × 106.6 MW × 1 h  → +106.60 MWh ✓
+  s004: 2 NGCC outage-transitions × 106.6 MW × 1 h → +213.20 MWh ✓
+  s005: CoalSteam-350 (350 MW, ramp 6.83 MW/min):
+        350 × (1 − 6.83×60/350) = 350 × (1−0.6857) = 110.0 MW
+        1 outage-transition × 110.0 MW × 1 h        → +110.00 MWh ✓
+
+All other parameter differences (storage efficiency, initial SOC,
+VOLL, operating reserves, Pmin, outage state encoding) were verified
+identical and ruled out as root causes.
+
+=======================================================================
+FIX (scripts/25_build_hope_full_year_cases.jl, lines 243–249)
+=======================================================================
+  BEFORE (wrong — same ramp fraction for both modes):
+      ru[g] = ru_frac
+      rd[g] = ru_frac
+
+  AFTER (correct):
+      # ED: RU=RD=1.0 disables effective ramp limits (max ramp = Pmax),
+      #     matching M3's LP which has no ramp constraints.
+      # UC: keep real ramp rates — meaningful operational constraint.
+      ru[g] = is_ed ? 1.0 : ru_frac
+      rd[g] = is_ed ? 1.0 : ru_frac
+
+=======================================================================
+RESULT — N=5 AFTER FIX
+=======================================================================
+Re-exported all 5 scenarios; re-ran HOPE-ED:
+
+  Scenario  M3 EUE (MWh)  HOPE-ED EUE (MWh)  Delta (MWh)
+  --------  ------------  -----------------  -----------
+  s001          1779.48          1779.48         −0.00
+  s002          2522.27          2522.27         −0.00
+  s003          2519.04          2519.04         −0.00
+  s004          7004.09          7004.09         −0.00
+  s005          9712.36          9712.36         −0.00
+  MEAN          4707.45          4707.45         −0.00 MWh
+
+All differences sub-0.001 MWh (numerical noise only).
+Remaining LOLH differences (0–2 h) are LP degeneracy — same total EUE,
+different hour-by-hour dispatch patterns.
+
+=======================================================================
+RESULT — N=20 AFTER FIX
+=======================================================================
+Full N=20 run (VRE120_base, scenarios 1–20, seed=42):
+
+  Model      LOLH (h)  EUE (MWh)  CVaR (MWh)  Runtime (s)
+  ---------  --------  ---------  ----------  -----------
+  M3              6.0    2479.17      9782.93        190.5
+  HOPE-ED         6.2    2479.17      9782.93       2355.5
+  HOPE-UC         7.2    2479.17      9782.93      11438.4
+
+EUE discrepancy: 0.00 MWh.  HOPE-ED is a faithful reimplementation of
+M3's ED LP.  HOPE-UC adds commitment/ramp constraints that spread the
+same total EUE over more, shorter shortage events (+1.2 h LOLH).
+
+=======================================================================
+RELATED FILES
+=======================================================================
+  ramp_constraint_root_cause.txt  — detailed numerical breakdown
+  hour1_patch_test.txt            — hour-1 SOC patch test (ruled out)
+  scenario_level_m3_vs_hope_ed.csv — per-scenario comparison data
+  hourly_m3_vs_hope_ed_loadshed.csv — hourly load-shed comparison

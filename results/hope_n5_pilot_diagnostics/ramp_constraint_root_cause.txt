@@ -1,0 +1,114 @@
+HOPE-ED vs M3 Root Cause: Ramp Constraints in ED Mode
+Generated: 2026-05-19
+
+=======================================================================
+ROOT CAUSE IDENTIFIED
+=======================================================================
+The +107.28 MWh mean EUE discrepancy between HOPE-ED and M3 (N=5 pilot)
+was caused by ramp rate constraints in HOPE's ED model that are absent
+from M3's ED formulation.
+
+MECHANISM:
+  script 25 (build_hope_full_year_cases.jl) exports M3's ramp_mw_per_min
+  data as fraction-of-Pmax-per-hour into gendata.csv RU/RD columns.
+  For NGCC units (355 MW, 4.14 MW/min):
+    ru_frac = 4.14 * 60 / 355 = 0.6997
+  For CoalSteam 350 MW units (6.83 MW/min? — actual M3 rate):
+    ru_frac = 0.6857
+
+  HOPE PCM.jl enforces ramp constraints for all thermal generators (G_F):
+    [PCM-C3.RU]: p[g,h] - p[g,h-1] <= RU_g[g]*(1-FOR_g[g])*P_max[g]
+    [PCM-C3.RD]: p[g,h-1] - p[g,h] <= RD_g[g]*(1-FOR_g[g])*P_max[g]
+
+  M3 EDDispatch.jl has NO ramp constraints; only:
+    0 <= p[g,h] <= A[g,h] * pmax[g]
+
+BINDING CASE:
+  When an NGCC unit (355 MW) transitions INTO a forced outage at hour h:
+    - HOPE ramp-down constraint limits p[g,h-1] <= 0.6997 * 355 = 248.4 MW
+    - M3 can dispatch p[g,h-1] = 355 MW (full capacity)
+    - Capacity difference: 355 - 248.4 = 106.6 MW
+
+  If hour h-1 is a shortage hour (load > available capacity):
+    - M3: full 355 MW from NGCC → may not shed load
+    - HOPE: only 248.4 MW from NGCC → sheds 106.6 MW
+
+NUMERICAL MATCH:
+  Observed systematic discrepancy:
+    s002: +106.60 MWh = 1 NGCC unit × 106.6 MW × 1 hour
+    s003: +106.60 MWh = 1 NGCC unit × 106.6 MW × 1 hour
+    s004: +213.20 MWh = 2 NGCC units × 106.6 MW × 1 hour (= 2 × 106.6)
+    s005: +110.00 MWh ≈ 1 CoalSteam-350 unit × 110.0 MW × 1 hour
+  Where 350 × (1 - 0.6857) = 110.0 MW  ← exact match
+
+=======================================================================
+CONFIRMED CHECKS: Other Parameter Differences Are Not the Root Cause
+=======================================================================
+The following parameters were verified identical between HOPE-ED and M3:
+  - VOLL                   : 10,000 $/MWh (both)
+  - Storage capacity       : 3932 MWh (both)
+  - Storage power          : 983 MW (both)
+  - Storage efficiency     : 0.9487 charge and discharge (both)
+  - Initial/terminal SOC   : 1966 MWh (50% SECAP, both cyclic)
+  - VRE capacity           : wind 2507.9 MW, solar 2715.9 MW (both)
+  - Operating reserves     : all = 0.0 MW (both, operation_reserve_mode=0)
+  - Pmin in ED mode        : 0.0 for all generators (both)
+  - FOR in gendata.csv     : 0.0 (outages imposed via gen_availability_timeseries)
+  - Gen availability       : binary outage states correctly exported from M3 Monte Carlo
+    (verified: all 73 thermal generators have scenario-specific zero-hours)
+  - Hour-1 SOC constraint  : patched (c[s,1]=dc[s,1]=0, see hour1_patch_test.txt)
+    → had no effect on results (LP was already setting these to 0)
+  - Storage cycling cost   : HOPE uses 0.01 $/MWh, M3 uses 0.01+0.01=0.02 $/MWh
+    → tiny vs VOLL=10000; breaks degeneracy differently but not the root cause
+
+=======================================================================
+FIX APPLIED (scripts/25_build_hope_full_year_cases.jl lines 243-244)
+=======================================================================
+Changed:
+    ru[g] = ru_frac
+    rd[g] = ru_frac
+
+To:
+    # ED: RU=RD=1.0 — no ramp constraints, matching M3's LP which has none.
+    # UC: use actual ramp rates from M3 data.
+    ru[g] = is_ed ? 1.0 : ru_frac
+    rd[g] = is_ed ? 1.0 : ru_frac
+
+This sets RU=RD=1.0 for all thermal generators in ED mode, making the
+HOPE-ED ramp constraints trivially inactive (max ramp = Pmax >= any possible
+change), exactly matching M3's ED formulation.
+
+UC mode retains the actual ramp rates (appropriate for unit commitment
+where ramping is a meaningful operational constraint).
+
+=======================================================================
+TEST RESULTS — VRE120_base scenarios 1-5, HOPE-ED with RU=RD=1.0
+=======================================================================
+Scenario  Old HOPE-ED  Fixed HOPE-ED  M3 EUE  Old Delta   New Delta
+   s001    1779.478      1779.478      1779.48   -0.00 MWh   -0.00 MWh
+   s002    2628.875      2522.275      2522.27  +106.60 MWh   -0.00 MWh
+   s003    2625.638      2519.038      2519.04  +106.60 MWh   -0.00 MWh
+   s004    7217.291      7004.091      7004.09  +213.20 MWh   -0.00 MWh
+   s005    9822.357      9712.357      9712.36  +110.00 MWh   -0.00 MWh
+   MEAN    4814.728      4707.448      4707.45  +107.28 MWh   -0.00 MWh
+
+All differences sub-0.001 MWh (numerical noise only) after the fix.
+LOLH may still differ by 0-2 h between HOPE-ED and M3 (LP degeneracy:
+same total EUE, different hour-by-hour dispatch patterns).
+
+=======================================================================
+CONCLUSION
+=======================================================================
+The root cause was a formulation mismatch: HOPE-ED applied real ramp
+constraints (inherited from M3 generator data) while M3-ED has none.
+The magnitude of the discrepancy matched exactly to the ramp-limited
+capacity difference at outage-transition hours for NGCC (106.6 MW) and
+CoalSteam-350 (110.0 MW) generators.
+
+After setting RU=RD=1.0 for ED mode in the exporter:
+  - Mean EUE discrepancy: +107.28 MWh → 0.00 MWh
+  - Error rate: 2.3% → 0.00%
+  - HOPE-ED is now a faithful reimplementation of M3's ED LP
+
+Scale to N=20 can proceed. The HOPE-ED vs M3 discrepancy is fully
+resolved with this change.

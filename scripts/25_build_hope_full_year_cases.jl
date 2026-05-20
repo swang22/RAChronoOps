@@ -240,8 +240,14 @@ function write_gendata(data_dir::String, sys::SystemData, mode::String)::Int
         min_up[g] = is_ed ? 1 : max(1, round(Int, up_hr))
         min_dn[g] = is_ed ? 1 : max(1, round(Int, dn_hr))
         suc[g]    = is_ed ? 0.0 : sc_mw
-        ru[g]     = ru_frac
-        rd[g]     = ru_frac   # use same value for ramp-down
+        # ED: RU=RD=1.0 disables effective ramp limits (max ramp = Pmax ≥ any
+        # hour-to-hour change).  M3's ED LP (M3EDDispatch.jl) has no ramp
+        # constraints at all; passing ru_frac here caused HOPE to shed up to
+        # 106.6 MW extra per outage-transition hour (root cause of the +107 MWh
+        # N=5 EUE discrepancy; fixed 2026-05-19).  See ramp_constraint_root_cause.txt.
+        # UC: keep real ramp rates — ramping is a meaningful constraint in MILP.
+        ru[g]     = is_ed ? 1.0 : ru_frac
+        rd[g]     = is_ed ? 1.0 : ru_frac
     end
 
     # Aggregated wind (row n_therm+1)
@@ -473,8 +479,8 @@ stochastic sampling on top of the imposed scenario.
 
 ## Mode-Specific Notes
 $(mode == "ED" ?
-  "- ED mode: Pmin = 0 for all thermal generators (consistent with M3 LP relaxation)" :
-  "- UC mode: Pmin = RAChronoOps data values; nuclear unit is Flag_mustrun=1\n- Start-up costs = 0 \$/MW (UC-lite smoke test)\n- Ramp rates RU/RD = 1 MW/min (effectively unconstrained for smoke test)")
+  "- ED mode: Pmin = 0 for all thermal generators (consistent with M3 LP relaxation)\n- ED mode: RU = RD = 1.0 for all thermal generators (no ramp constraints; M3 LP has none)" :
+  "- UC mode: Pmin = RAChronoOps data values\n- UC mode: RU/RD = actual ramp rates from M3 data (fraction of Pmax per hour)\n- Start-up costs from RAChronoOps data")
 
 ## gendata.csv Generator Order
 - Rows 1–$(n_therm): thermal generators (same order as ScenarioSet thermal index)

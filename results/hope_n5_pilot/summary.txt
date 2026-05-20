@@ -1,5 +1,5 @@
 Full N=5 Model Comparison — VRE120_base
-Generated: 2026-05-20 00:32:02
+Generated: 2026-05-19 10:51:54
 Scenarios: 1, 2, 3, 4, 5 from n_scenarios=20, seed=42
 M2 config: risk_margin=1000 MW, window_buffer=48 h
 
@@ -26,12 +26,12 @@ Q4. How close are M1c and M2 to HOPE-UC-lite, not just M3?
 ──────────────────────────────────────────────────────────────────────
 Q5. How much slower is HOPE-UC-lite than M3, M2, and M1c?
 
-  HOPE-UC total 2882.9s — vs M3: 60.5×, vs M2: 1039.3×, vs M1c: 5619.7×.
+  HOPE-UC total 2882.9s — vs M3: 58.7×, vs M2: 1040.0×, vs M1c: 5944.1×.
 
 ──────────────────────────────────────────────────────────────────────
 Q6. Should we scale to N=20 for VRE120_base?
 
-  Projected: HOPE-ED N=20 ≈ 40.5 min | HOPE-UC N=20 ≈ 3.2 h | M3 N=20 ≈ 3.2 min. HOPE-ED validates M3; scaling to N=20 is appropriate. HOPE-UC needs a compute node for N=20.
+  Projected: HOPE-ED N=20 ≈ 40.5 min | HOPE-UC N=20 ≈ 3.2 h | M3 N=20 ≈ 3.3 min. HOPE-ED validates M3; scaling to N=20 is appropriate. HOPE-UC needs a compute node for N=20.
 
 ──────────────────────────────────────────────────────────────────────
 Q7. Should we run HOPE-UC-lite for other priority cases yet?

@@ -172,9 +172,12 @@ Both cases ran to optimality using Gurobi 13.0.0 on 2026-05-18.
 | ED (LP) | 813.5 | 795.7 | 17.8 | 1779.5 | 6 | 12 |
 | UC-lite (MILP, Pmin=0) | 813.5 | 795.7 | 17.8 | 1779.5 | 6 | 188 |
 
-ED and UC-lite produce identical results because Pmin=0 and startup costs=0
-cause the MILP to relax to the same LP solution.  See Section 3 for the HOPE
-formulation constraint that requires Pmin=0 in this configuration.
+ED and UC-lite produce identical EUE for scenario 1 (both 1779.5 MWh).
+This is expected at zero start-up cost with Pmin=0 — the MILP can commit
+every generator at every hour at no penalty, so commitment constraints are
+non-binding.  Note: UC-lite uses real ramp rates (RU~0.70 for NGCC); in
+scenarios with outage-transition hours, UC ramp constraints can spread the
+same total EUE over more shortage events relative to ED.  See Section 3.
 
 ---
 
@@ -201,32 +204,33 @@ HOPE.run_hope(raw"<absolute_path>/RAChronoOps_VRE120_base_s001_ED")
 Both ED and UC-lite smoke cases ran successfully.  Output written to
 `<case_folder>/output/`.
 
-### Step 3 — Collect reliability metrics (not yet implemented)
+### Step 3 — Collect reliability metrics ✓ (done, 2026-05-19)
 
-HOPE writes hourly load-shedding results to `output/power_loadshedding.csv`
-(wide format: 1 row per zone, columns `AnnTol`, `h1`…`h8760`).  The
-`AnnTol` column is the annual EUE; LOLH is the count of hours with non-zero
-values in `h1`…`h8760`.
+`scripts/27_collect_hope_results.jl` reads `output/power_loadshedding.csv`
+(wide format: 1 row per zone, columns `AnnTol`, `h1`…`h8760`) and computes
+LOLH, EUE, CVaR-EUE, and shortage-event statistics using
+`RAChronoOps.compute_metrics`, producing the same output format as M1–M3.
 
-Post-processing script `scripts/27_collect_hope_results.jl` (not yet written)
-should extract `load_shed_mw[1:8760]` from `power_loadshedding.csv` for zone Z1
-and call `RAChronoOps.compute_metrics` to produce LOLH/EUE/CVaR-EUE in the
-same format as M1–M3 results.
+N=5 pilot results written to `results/hope_n5_pilot/hope_metrics_by_scenario.csv`.
+N=20 results written to `results/hope_n20_pilot/hope_metrics_by_scenario.csv`.
 
-See Task 8 in `docs/redesigned_experiment_plan.md`.
+### Step 4 — Compare M3-ED vs M4-ED vs M4-UC ✓ (done, 2026-05-19)
 
-### Step 4 — Compare M3-ED vs M4-ED vs M4-UC
+`scripts/30_compare_all_models_hope_n5.jl` runs M1/M1b/M1c/M2/M3 inline and
+reads HOPE metrics from the CSV produced by Step 3.
 
-| Model | Description | Expected runtime |
-|---|---|---|
-| M3 (RA-3) | RAChronoOps full-year LP (Gurobi), no UC | ~190 s/scenario |
-| M4-ED | HOPE full-year LP (same problem structure), no UC | ~190 s/scenario |
-| M4-UC | HOPE full-year MILP (integer commitment) | Minutes to hours/scenario |
+**N=20 results (VRE120_base, scenarios 1–20, seed=42):**
 
-M3 and M4-ED should produce near-identical dispatch and reliability metrics if
-both are solving the same LP relaxation.  Any differences diagnose
-implementation gaps.  M4-UC adds UC constraints; divergence from M3 quantifies
-the penalty of ignoring commitment feasibility.
+| Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | Runtime (s) |
+|---|---|---|---|---|
+| M3 (RA-3) | 6.0 | **2479.17** | 9782.93 | 190.5 |
+| M4-ED (HOPE-ED) | 6.2 | **2479.17** | 9782.93 | 2355.5 |
+| M4-UC (HOPE-UC) | 7.2 | **2479.17** | 9782.93 | 11438.4 |
+
+HOPE-ED EUE matches M3 exactly (Δ = 0.00 MWh) after the ramp-rate fix.
+HOPE-UC adds commitment/ramp constraints that spread the same total EUE
+over more, shorter events (+1.2 h LOLH, unchanged EUE).
+Full comparison: `results/full_model_comparison_with_hope/base_n20/`.
 
 ---
 
@@ -240,10 +244,16 @@ the penalty of ignoring commitment feasibility.
 
 - **VOLL = 10,000 $/MWh**: Matches `SimConfig.voll` used by M3.
 
-- **Ramp rates**: RU = RD = 1 MW/min for all generators (effectively
-  unconstrained for most units; consistent with M3 which has no ramp
-  constraints). Should be updated with real RTS-GMLC ramp data for production
-  runs.
+- **Ramp rates (ED mode)**: RU = RD = 1.0 (fraction of Pmax per hour) for all
+  generators, making ramp constraints trivially inactive.  This is intentional:
+  M3's ED LP has no ramp constraints, so ED-match mode must also have none.
+  Passing real ramp rates in ED mode caused a +107 MWh EUE discrepancy at N=5
+  (root cause identified 2026-05-19; see
+  `results/hope_n5_pilot_diagnostics/ramp_constraint_root_cause.txt`).
+
+- **Ramp rates (UC mode)**: RU/RD set to actual ramp rates from M3 generator
+  data (ramp_mw_per_min, converted to fraction of Pmax per hour, capped at 1.0).
+  Example: NGCC 355 MW at 4.14 MW/min → RU = min(1.0, 4.14×60/355) = 0.6997.
 
 - **UC start-up costs**: 0 $/MW in this initial UC-lite run. Real RTS-GMLC
   values are O(100–600 $/MW per start) and would penalise frequent cycling.
@@ -257,3 +267,4 @@ the penalty of ignoring commitment feasibility.
 ---
 
 *Generated: 2026-05-18 | Script: `scripts/25_build_hope_full_year_cases.jl` | HOPE smoke runs: 2026-05-18*
+*Updated: 2026-05-19 — ramp-rate fix applied; N=5 and N=20 validation complete.*

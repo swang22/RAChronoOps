@@ -1,40 +1,40 @@
-Full N=5 Model Comparison — VRE120_base
-Generated: 2026-05-20 00:32:02
-Scenarios: 1, 2, 3, 4, 5 from n_scenarios=20, seed=42
+Full N=20 Model Comparison — VRE120_base
+Generated: 2026-05-19 22:53:07
+Scenarios: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 from n_scenarios=20, seed=42
 M2 config: risk_margin=1000 MW, window_buffer=48 h
 
 ──────────────────────────────────────────────────────────────────────
 Q1. Does HOPE-ED match M3 across all five scenarios?
 
-  NO — notable difference. M3 LOLH=11.2h EUE=4707.45MWh; HOPE-ED LOLH=11.8h EUE=4707.45MWh. Δ(ED−M3): LOLH=0.6h EUE=-0.0MWh.
+  YES — mean LOLH: M3=6.0h HOPE-ED=6.2h Δ=0.3h. Mean EUE: M3=2479.17MWh HOPE-ED=2479.17MWh Δ=-0.0MWh.
 
 ──────────────────────────────────────────────────────────────────────
 Q2. Does HOPE-UC-lite increase LOLH relative to HOPE-ED?
 
-  YES — HOPE-UC mean LOLH=15.2h vs HOPE-ED=11.8h (Δ=+3.4h). UC constraints spread outages over more hours.
+  YES — HOPE-UC mean LOLH=7.2h vs HOPE-ED=6.2h (Δ=+1.0h). UC constraints spread outages over more hours.
 
 ──────────────────────────────────────────────────────────────────────
 Q3. Does HOPE-UC-lite change EUE or mainly event structure?
 
-  Mainly event structure — EUE is unchanged (UC=4707.45MWh vs ED=4707.45MWh, Δ=0.0MWh). Same total energy unserved, redistributed.
+  Mainly event structure — EUE is unchanged (UC=2479.17MWh vs ED=2479.17MWh, Δ=0.0MWh). Same total energy unserved, redistributed.
 
 ──────────────────────────────────────────────────────────────────────
 Q4. How close are M1c and M2 to HOPE-UC-lite, not just M3?
 
-  M1c LOLH=11.2h EUE=4707.45MWh vs HOPE-UC=15.2h/4707.45MWh (ΔLOLH=-4.0h ΔEUE=0.0MWh). M2 LOLH=11.2h EUE=4707.45MWh vs HOPE-UC (ΔLOLH=-4.0h ΔEUE=0.0MWh).
+  M1c LOLH=6.0h EUE=2479.17MWh vs HOPE-UC=7.2h/2479.17MWh (ΔLOLH=-1.3h ΔEUE=0.0MWh). M2 LOLH=5.8h EUE=2479.17MWh vs HOPE-UC (ΔLOLH=-1.5h ΔEUE=0.0MWh).
 
 ──────────────────────────────────────────────────────────────────────
 Q5. How much slower is HOPE-UC-lite than M3, M2, and M1c?
 
-  HOPE-UC total 2882.9s — vs M3: 60.5×, vs M2: 1039.3×, vs M1c: 5619.7×.
+  HOPE-UC total 11438.4s — vs M3: 60.1×, vs M2: 1286.7×, vs M1c: 12446.6×.
 
 ──────────────────────────────────────────────────────────────────────
 Q6. Should we scale to N=20 for VRE120_base?
 
-  Projected: HOPE-ED N=20 ≈ 40.5 min | HOPE-UC N=20 ≈ 3.2 h | M3 N=20 ≈ 3.2 min. HOPE-ED validates M3; scaling to N=20 is appropriate. HOPE-UC needs a compute node for N=20.
+  Projected: HOPE-ED N=20 ≈ 39.3 min | HOPE-UC N=20 ≈ 3.2 h | M3 N=20 ≈ 3.2 min. HOPE-ED validates M3; scaling to N=20 is appropriate. HOPE-UC needs a compute node for N=20.
 
 ──────────────────────────────────────────────────────────────────────
 Q7. Should we run HOPE-UC-lite for other priority cases yet?
 
-  HOPE-UC runtime is 577.0s/scenario. Run VRE120_base N=20 first to validate LOLH increase. Extend to VRE120_bal15 and VRE120_wind_hvy only after confirming consistent UC vs ED LOLH pattern and agreeing on UC model as the standard.
+  HOPE-UC runtime is 572.0s/scenario. Run VRE120_base N=20 first to validate LOLH increase. Extend to VRE120_bal15 and VRE120_wind_hvy only after confirming consistent UC vs ED LOLH pattern and agreeing on UC model as the standard.
 

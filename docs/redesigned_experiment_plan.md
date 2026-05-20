@@ -548,28 +548,61 @@ needed to support the paper's claims about M2 accuracy.
 
 ---
 
-### Task 8 — HOPE UC/PCM or constrained-charging tests (longer-term)
+### Task 8 — HOPE UC/PCM full-year validation ✓ COMPLETE (N=5 + N=20)
 
-**Purpose:** Evaluate where M1c fails and where M2 or a full PCM adds value.
-Two directions:
+**Purpose:** Validate HOPE-ED against M3 (full-year LP benchmark) and
+quantify the LOLH/EUE impact of adding unit-commitment constraints (HOPE-UC).
+
+**Scripts:**
+- `scripts/25_build_hope_full_year_cases.jl` — export HOPE input cases
+- `scripts/29_run_hope_n5_pilot.jl` — run HOPE per scenario
+- `scripts/27_collect_hope_results.jl` — collect reliability metrics
+- `scripts/30_compare_all_models_hope_n5.jl` — 7-model comparison
+- `scripts/32_scale_n20.jl` — full N=20 pipeline (export → run → collect → compare)
+
+**Root-cause finding (2026-05-19):** The initial N=5 HOPE-ED run showed a
++107.28 MWh mean EUE excess over M3.  Investigation found the cause was a
+formulation mismatch in the exporter: `scripts/25_build_hope_full_year_cases.jl`
+was passing real M3 ramp rates into HOPE for both ED and UC modes.  M3's ED LP
+has no ramp constraints; HOPE enforces them.  For an NGCC unit (355 MW,
+4.14 MW/min): RU=0.6997, limiting output to 248.4 MW in the hour before a
+forced outage and creating a 106.6 MW gap that M3 does not see.
+
+**Fix:** Set `RU=RD=1.0` for ED mode only in the exporter (trivially
+inactive constraint = no ramp limit), preserving real ramp rates for UC.
+See `results/hope_n5_pilot_diagnostics/ramp_constraint_root_cause.txt`.
+
+**N=20 results (VRE120_base, scenarios 1–20, seed=42, post-fix):**
+
+| Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | Runtime (s) | vs M3 EUE |
+|---|---|---|---|---|---|
+| M3 | 6.0 | **2479.17** | 9782.93 | 190.5 | — |
+| HOPE-ED | 6.2 | **2479.17** | 9782.93 | 2355.5 | 0.00 MWh |
+| HOPE-UC | 7.2 | **2479.17** | 9782.93 | 11438.4 | 0.00 MWh |
+
+Key findings:
+- HOPE-ED reproduces M3 EUE exactly (Δ = 0.00 MWh) — validates the
+  exporter and the HOPE PCM.jl implementation as a faithful M3 reimplementation.
+- HOPE-UC adds commitment/ramp constraints that spread the same total EUE
+  over more, shorter events (+1.2 h LOLH); total energy unserved unchanged.
+- HOPE-UC is 60× slower than M3 (572 s/scenario vs 9.5 s/scenario).
+- LOLH differences between models (±0–2 h) are LP degeneracy, not EUE errors.
+
+**Remaining directions (lower-priority):**
 
 **8a. Constrained-charging / transmission tests** — Introduce binding
-constraints that reduce thermal headroom (e.g., very high VRE penetration,
-multi-zone transmission limits, must-run constraints).  Identify the parameter
-region where M1c diverges from M3 and M2's LP structure recovers accuracy.
-Script: extend `scripts/24_stress_test_m1c_recharge_limits.jl` with VRE
-scaling variants or import multi-zone topology from RTS-GMLC.
+constraints that reduce thermal headroom (very high VRE penetration,
+multi-zone transmission limits, must-run constraints).  Identify the
+parameter region where M1c diverges from M3 and M2's LP structure recovers
+accuracy.  Script: extend `scripts/24_stress_test_m1c_recharge_limits.jl`.
 
-**8b. HOPE UC/PCM stress-week validation** — Extract stress weeks from RA-3
-dispatch on the highest-stress VRE case.  Export via `ExportHOPECase.jl`.
-Run HOPE with `unit_commitment = 1`.  Compare ED (RA-3) vs UC (RA-4) reliability.
-Script: `scripts/25_run_hope_stress_weeks.jl`.
-
-**When:** after Task 6 (paper/writeup) is complete and the framing is confirmed.
+**8b. Production UC run** — Real Pmin and start-up costs.  Requires either
+`operation_reserve_mode: 1` or the upstream HOPE fix for the `CLeL_con`
+commitment-variable term.  When: after paper (Task 6) is complete.
 
 ---
 
-*Document version: Phase E complete — M1c recharge-stress test done (2026-05-18).*
+*Document version: Phase F complete — HOPE N=20 validation done, ramp-rate fix confirmed (2026-05-19).*
 *Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
 *Link to RA-1b validation memo: [docs/ra1b_validation_memo.md](ra1b_validation_memo.md)*
 *Link to VRE method comparison memo: [docs/vre_method_comparison_memo.md](vre_method_comparison_memo.md)*
