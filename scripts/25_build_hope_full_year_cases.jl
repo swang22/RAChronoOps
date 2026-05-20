@@ -367,20 +367,38 @@ end
 # ── Writer: storagedata.csv ───────────────────────────────────────────────────
 
 function write_storagedata(data_dir::String, sys::SystemData)
-    s = sys.storage[1, :]
-    df = DataFrame(
-        "Zone"                   => ["Z1"],
-        "Type"                   => ["BES"],
-        "Capacity (MWh)"         => [s.energy_mwh],
-        "Max Power (MW)"         => [s.power_mw],
-        "Charging efficiency"    => [s.charge_efficiency],
-        "Discharging efficiency" => [s.discharge_efficiency],
-        "Cost (\$/MWh)"          => [s.variable_cost_per_mwh],
-        "EF"                     => [0.0],
-        "CC"                     => [0.0],
-        "Charging Rate"          => [1.0],
-        "Discharging Rate"       => [1.0],
-    )
+    if size(sys.storage, 1) > 0
+        s = sys.storage[1, :]
+        df = DataFrame(
+            "Zone"                   => ["Z1"],
+            "Type"                   => ["BES"],
+            "Capacity (MWh)"         => [s.energy_mwh],
+            "Max Power (MW)"         => [s.power_mw],
+            "Charging efficiency"    => [s.charge_efficiency],
+            "Discharging efficiency" => [s.discharge_efficiency],
+            "Cost (\$/MWh)"          => [s.variable_cost_per_mwh],
+            "EF"                     => [0.0],
+            "CC"                     => [0.0],
+            "Charging Rate"          => [1.0],
+            "Discharging Rate"       => [1.0],
+        )
+    else
+        # No-storage case: write a disabled dummy BES row (Max Power=0, Capacity=0).
+        # HOPE requires at least one row; zero power/energy make the unit non-operational.
+        df = DataFrame(
+            "Zone"                   => ["Z1"],
+            "Type"                   => ["BES"],
+            "Capacity (MWh)"         => [0.0],
+            "Max Power (MW)"         => [0.0],
+            "Charging efficiency"    => [1.0],
+            "Discharging efficiency" => [1.0],
+            "Cost (\$/MWh)"          => [0.0],
+            "EF"                     => [0.0],
+            "CC"                     => [0.0],
+            "Charging Rate"          => [0.0],
+            "Discharging Rate"       => [0.0],
+        )
+    end
     CSV.write(joinpath(data_dir, "storagedata.csv"), df)
 end
 
@@ -442,7 +460,9 @@ function write_readme(case_dir::String, case_name::String, scenario_id::Int,
                        peak_load_mw::Float64, annual_load_gwh::Float64,
                        n_therm::Int)
     therm = thermal_generators(sys)
-    stor  = sys.storage[1, :]
+    n_stor_readme = size(sys.storage, 1)
+    stor_power_mw  = n_stor_readme > 0 ? Float64(sys.storage[1, :power_mw])   : 0.0
+    stor_energy_mwh = n_stor_readme > 0 ? Float64(sys.storage[1, :energy_mwh]) : 0.0
     uc    = (mode == "UC") ? 1 : 0
     content = """# RAChronoOps HOPE Export
 
@@ -459,8 +479,8 @@ function write_readme(case_dir::String, case_name::String, scenario_id::Int,
 - **Thermal capacity:** $(@sprintf("%.1f", sum(therm.pmax_mw))) MW ($(size(therm, 1)) units)
 - **Wind capacity:** $(@sprintf("%.1f", wind_capacity_mw(sys))) MW (aggregated into 1 generator)
 - **Solar capacity:** $(@sprintf("%.1f", solar_capacity_mw(sys))) MW (aggregated into 1 generator)
-- **Storage power:** $(@sprintf("%.1f", stor.power_mw)) MW
-- **Storage energy:** $(@sprintf("%.1f", stor.energy_mwh)) MWh
+- **Storage power:** $(@sprintf("%.1f", stor_power_mw)) MW$(n_stor_readme == 0 ? " (no storage — disabled dummy BES exported)" : "")
+- **Storage energy:** $(@sprintf("%.1f", stor_energy_mwh)) MWh
 
 ## Thermal Outage Representation
 Thermal generator availability is imposed through `Data_RAChronoOps_PCM/gen_availability_timeseries.csv`.
@@ -539,8 +559,9 @@ function export_hope_case(sys::SystemData, scenarios::ScenarioSet,
         thermal_capacity_mw             = sum(therm.pmax_mw),
         wind_capacity_mw_val            = wind_capacity_mw(sys),
         solar_capacity_mw_val           = solar_capacity_mw(sys),
-        storage_power_mw                = Float64(sys.storage[1, :power_mw]),
-        storage_energy_mwh              = Float64(sys.storage[1, :energy_mwh]),
+        storage_power_mw                = size(sys.storage, 1) > 0 ? Float64(sys.storage[1, :power_mw])   : 0.0,
+        storage_energy_mwh              = size(sys.storage, 1) > 0 ? Float64(sys.storage[1, :energy_mwh]) : 0.0,
+        nostorage_dummy                 = size(sys.storage, 1) == 0,
         max_load_profile_pu             = max_pu,
         reconstructed_load_error_max_mw = load_err_max,
         availability_rows               = sys.n_hours,
