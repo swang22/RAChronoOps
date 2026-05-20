@@ -102,20 +102,26 @@ This is the primary comparison mode for validating HOPE against M3.
 | Flag_UC | 0 |
 | Start_up_cost | 0 $/MW |
 
-### UC-lite (unit_commitment = 1)
+### UC (unit_commitment = 1)
 
 Adds integer unit-commitment constraints using Gurobi's MILP solver.  Thermal
-generators have `Flag_UC=1` and minimum up/down times.  Start-up costs are 0
-$/MW so the model isolates the effect of commitment scheduling from economic
-cycling penalties.
+generators have `Flag_UC=1`, real minimum up/down times, real ramp rates, and
+real start-up costs from the RTS-GMLC data.
 
-**Important: `Pmin (MW)` must be 0 for all generators in this configuration.**
-HOPE's `CLeL_con` lower-bound constraint (`P_min ≤ p[g,h]`) does not include
-the commitment variable `o[g,h]`.  With `operation_reserve_mode: 0`, this
-makes the model infeasible whenever a generator is off (upper bound
-`p ≤ AF×Pmax×o = 0` conflicts with `p ≥ Pmin > 0`).  Setting `Pmin=0` in
-gendata is the required workaround; minimum stable generation is then absent
-from this UC-lite formulation.
+**Pmin is enforced correctly.**  HOPE PCM.jl implements Pmin through a
+`pmin[g,h]` JuMP decision variable (not the `P_min` parameter directly):
+
+```
+MRL_con:   pmin[g,h]  ≤  (1−FOR_g) × P_min_unit[g] × o[g,h]
+           pmin[g,h]  ≥  0                                      (variable lb)
+CLeL_con:  pmin[g,h]  ≤  p[g,h] + ReserveUpG[g,h]
+```
+
+When a unit is off (`o[g,h]=0`), `MRL_con` forces `pmin[g,h]=0`, so `CLeL_con`
+becomes `0 ≤ p[g,h]` — trivially satisfied.  When the unit is on, `pmin` is
+bounded by the real `P_min_unit[g]`, enforcing minimum stable generation.
+This is safe with `operation_reserve_mode: 0` and no further workaround is
+needed.
 
 **`Flag_mustrun` must be 0 for all generators.**  When `Flag_mustrun=1`, HOPE
 enforces `p[g,h] = AF×Pmax×o[g,h]` (output equals maximum available capacity);
@@ -123,23 +129,18 @@ combined with forced-outage hours where `AF=0`, this creates infeasibility
 because the commitment variable `o` can still be 1 under UC scheduling
 constraints.
 
-As a result, this initial UC-lite run does not strictly enforce Pmin and has
-no must-run units.  The UC structure (min up/down times, integer commitment
-variables) still differentiates the problem from ED, but with zero start-up
-costs and zero Pmin, the MILP relaxes to the same LP solution as M4-ED.
-
-**For a production UC run that enforces Pmin**, use `operation_reserve_mode: 1`
-or `2` (which adds reserve variables to the CLeL_con right-hand side, providing
-enough headroom for the lower bound when the unit is committed), or contribute
-the `o[g,h]` factor fix upstream to HOPE.
-
 | Generator type | Pmin (gendata) | Flag_UC | Min_up_time | Min_down_time | Flag_mustrun |
 |---|---|---|---|---|---|
-| CT | 0 | 1 | 1 h | 1 h | 0 |
-| CC | 0 | 1 | 2 h | 2 h | 0 |
-| STEAM | 0 | 1 | 4 h | 4 h | 0 |
-| NUCLEAR | 0 | 1 | 24 h | 24 h | 0 |
+| CT | real (8 MW) | 1 | 1 h | 1 h | 0 |
+| CC | real (≥55 MW) | 1 | 2 h | 2 h | 0 |
+| STEAM | real (30 MW) | 1 | 4 h | 8 h | 0 |
+| NUCLEAR | real | 1 | 24 h | 24 h | 0 |
 | Wind / Solar | 0 | 0 | 1 h | 1 h | 0 |
+
+*Note: earlier documentation (before 2026-05-20) described this mode as
+"UC-lite" with `Pmin=0` as a required workaround.  That reflected an
+intermediate state before the `pmin` variable formulation was confirmed in
+PCM.jl.  The current export (script 25) and all N=20 results use real Pmin.*
 
 ---
 
