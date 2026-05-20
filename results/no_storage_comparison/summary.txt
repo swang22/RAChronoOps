@@ -1,0 +1,71 @@
+No-Storage Comparison: MC-NoStorage vs M3-NoStorage vs M3-WithStorage
+Generated: 2026-05-20T02:28:55.232
+Cases: VRE120_base, VRE120_wind_hvy
+N scenarios: 20  seed: 42
+
+──────────────────────────────────────────────────────────────────────
+Aggregate metrics
+──────────────────────────────────────────────────────────────────────
+Model                 Case                       LOLH (h)    EUE (MWh)   CVaR (MWh)    p95 (MWh)    RT (s)
+--------------------------------------------------------------------------------------------------
+MC-NoStorage          VRE120_base                    95.4     31017.14     51937.30     49735.98       1.2
+M3-NoStorage          VRE120_base                    95.4     31017.14     51937.30     49735.98     151.6
+M3-WithStorage        VRE120_base                     6.0      2479.17      9782.93      9719.41     180.4
+MC-NoStorage          VRE120_wind_hvy                52.4     15801.11     26871.07     25525.23       1.9
+M3-NoStorage          VRE120_wind_hvy                52.4     15801.11     26871.07     25525.23     146.3
+M3-WithStorage        VRE120_wind_hvy                 2.2       648.24      3528.39      2866.21     174.5
+
+──────────────────────────────────────────────────────────────────────
+EUE decomposition (MWh)
+──────────────────────────────────────────────────────────────────────
+Case                             MC-NS        M3-NS        M3-WS    MC-NS−M3-NS    M3-NS−M3-WS    MC-NS−M3-WS
+-------------------------------------------------------------------------------------------------------
+VRE120_base                   31017.14     31017.14      2479.17           0.00       28537.97       28537.97
+VRE120_wind_hvy               15801.11     15801.11       648.24           0.00       15152.87       15152.87
+Key:
+  MC-NS   = MC-NoStorage  (hourly capacity check, no LP, no storage)
+  M3-NS   = M3-NoStorage  (full-year ED LP, no storage)
+  M3-WS   = M3-WithStorage (full-year ED LP with storage, reference)
+  MC-NS − M3-NS  : LP foresight value (both no storage; LP pre-positions vs MC reacts)
+  M3-NS − M3-WS  : storage reliability value (same LP; with vs without storage)
+  MC-NS − M3-WS  : total gain from LP foresight + storage
+
+──────────────────────────────────────────────────────────────────────
+Per-scenario MC-NoStorage vs M3-NoStorage EUE discrepancy
+──────────────────────────────────────────────────────────────────────
+  VRE120_base:
+    mean Δ = 0.00 MWh   max Δ = 0.00 MWh   min Δ = -0.00 MWh
+    scenarios with |Δ| > 0.1 MWh: 0 / 20
+  VRE120_wind_hvy:
+    mean Δ = 0.00 MWh   max Δ = 0.00 MWh   min Δ = -0.00 MWh
+    scenarios with |Δ| > 0.1 MWh: 0 / 20
+
+──────────────────────────────────────────────────────────────────────
+Q&A
+──────────────────────────────────────────────────────────────────────
+
+--- VRE120_base ---
+Q1. Does MC-NoStorage match M3-NoStorage?
+  YES — EUE Δ=0.00 MWh, LOLH Δ=0.0 h (well within MC noise).
+  Classic hourly capacity adequacy matches ED LP when storage is absent.
+Q3. Storage reliability value (M3-NS − M3-WS): 28537.97 MWh (92.0% reduction in EUE).
+
+--- VRE120_wind_hvy ---
+Q1. Does MC-NoStorage match M3-NoStorage?
+  YES — EUE Δ=0.00 MWh, LOLH Δ=0.0 h (well within MC noise).
+  Classic hourly capacity adequacy matches ED LP when storage is absent.
+Q3. Storage reliability value (M3-NS − M3-WS): 15152.87 MWh (95.9% reduction in EUE).
+
+Q4. Storage value larger in: VRE120_base (Δ=28537.97 MWh) vs VRE120_wind_hvy (Δ=15152.87 MWh).
+
+Q5. More severe scarcity without storage: VRE120_base (MC-NS EUE=31017.14 MWh) vs VRE120_wind_hvy (15801.11 MWh).
+
+Q6. Paper story support:
+  YES — MC-NoStorage ≈ M3-NoStorage across all cases (EUE within 1 MWh).
+  Interpretation: classic hourly capacity adequacy is exact when no storage
+  is present (LP dispatch collapses to the same feasible set as MC).
+  Any discrepancy between M1/M3 and MC-NoStorage then traces entirely to
+  storage operation: LP foresight enables optimal pre-dispatch of storage
+  before shortage hours, while rule-based M1 cannot. This supports the
+  paper narrative that operation-aware modelling is needed only because
+  of storage (and VRE integration), not for thermal-only systems.
