@@ -588,6 +588,31 @@ Key findings:
 - HOPE-UC is 60× slower than M3 (572 s/scenario vs 9.5 s/scenario).
 - LOLH differences between models (±0–2 h) are LP degeneracy, not EUE errors.
 
+**No-storage HOPE-UC validation (Phase H — 2026-05-20):**
+
+Four-model N=5 comparison on `VRE120_base_nostorage` (scripts 25/29/27/36,
+commits `8b3108f`, `3bede10`):
+
+| Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | RT (s) |
+|---|---|---|---|---|
+| MC-NoStorage | 115.6 | 41846.40 | 54383.21 | 0.5 |
+| M3-NoStorage | 115.6 | 41846.40 | 54383.21 | 40.0 |
+| HOPE-ED-NoStorage | 115.6 | 41846.40 | 54383.21 | 614.3 |
+| HOPE-UC-NoStorage | 115.6 | 41846.40 | 54383.21 | 4331.1 |
+
+All four models produce identical reliability metrics (ΔEUE = 0.00 MWh,
+ΔLOLH = 0.0 h across all 5 scenarios).  Dispatch inspection confirms:
+thermal output by type is identical between ED and UC; only VRE curtailment
+differs (up to ~260 MW in surplus hours), which has no cost or reliability
+effect.  **Storage SOC, not UC commitment constraints, is the reason
+operation-aware modelling becomes important for RA.**  Without storage, LP
+and MILP collapse to the same feasible set because load shedding is
+determined solely by available thermal/VRE capacity — exogenous to dispatch.
+UC is 7× slower than ED per scenario with zero reliability gain; ED is
+sufficient for no-storage RA baselines.
+
+---
+
 **Remaining directions (lower-priority):**
 
 **8a. Constrained-charging / transmission tests** — Introduce binding
@@ -602,7 +627,7 @@ commitment-variable term.  When: after paper (Task 6) is complete.
 
 ---
 
-*Document version: Phase F complete — HOPE N=20 validation done, ramp-rate fix confirmed (2026-05-19).*
+*Document version: Phase H complete — no-storage HOPE-UC validation done (2026-05-20).*
 *Link to completed diagnostic results: [docs/experiment_archive.md](experiment_archive.md)*
 *Link to RA-1b validation memo: [docs/ra1b_validation_memo.md](ra1b_validation_memo.md)*
 *Link to VRE method comparison memo: [docs/vre_method_comparison_memo.md](vre_method_comparison_memo.md)*

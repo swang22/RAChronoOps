@@ -1,7 +1,7 @@
 # Next Experiment Design: No-Storage Baselines and Real UC Parameters
 
 **Date:** 2026-05-20
-**Status:** Implementation complete (scripts 33–34, McNoStorage model)
+**Status:** Phase H complete — no-storage HOPE-UC validation done (2026-05-20)
 
 ---
 
@@ -179,7 +179,70 @@ system with tighter margins may show a difference.
 
 ---
 
-## 7. Suggested Next Run Order
+## 7. No-Storage HOPE-UC Validation (Phase H — 2026-05-20)
+
+### Result
+
+N=5 pilot comparing MC-NoStorage, M3-NoStorage, HOPE-ED-NoStorage, and
+HOPE-UC-NoStorage on `VRE120_base_nostorage` (scenarios 1–5, seed=42).
+
+| Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | RT (s) |
+|---|---|---|---|---|
+| MC-NoStorage | 115.6 | 41846.40 | 54383.21 | 0.5 |
+| M3-NoStorage | 115.6 | 41846.40 | 54383.21 | 40.0 |
+| HOPE-ED-NoStorage | 115.6 | 41846.40 | 54383.21 | 614.3 |
+| HOPE-UC-NoStorage | 115.6 | 41846.40 | 54383.21 | 4331.1 |
+
+ΔEUE = 0.00 MWh and ΔLOLH = 0.0 h across all scenario/model pairs.
+
+### Interpretation
+
+**UC constraints add no reliability effect without storage.**  In the
+absence of storage there is no intertemporal state variable linking hours
+together.  Load shedding in any hour is determined entirely by available
+thermal and VRE capacity — an exogenous quantity fixed by the Monte Carlo
+outage draw before the dispatch problem is even formulated.  Whether the
+dispatch is solved as an LP (HOPE-ED) or a MILP with binary commitment
+variables (HOPE-UC), the total MW served per hour is identical, and
+therefore LOLH and EUE are identical.
+
+**Unit-level dispatch differs; system-level outcomes do not.**  An
+inspection of `power_hourly.csv` shows:
+- Total system generation per hour: identical (0 MW difference, all 8760 h).
+- Thermal output by technology type: identical.
+- Individual unit dispatch within a type: differs (LP bang-bang vs UC
+  min-up/down redistribution).
+- VRE curtailment: differs by up to ~260 MW in surplus hours, where UC
+  locks thermal units at Pmin and spills more wind/solar.  This affects
+  neither cost nor reliability since curtailment has zero marginal cost.
+
+**Implication for paper narrative.**  Storage SOC — not UC commitment
+constraints alone — is the reason operation-aware modelling becomes
+important for reliability assessment.  UC's binary commitment variables
+create binding inter-hour constraints only when generators must be kept
+on/off to protect an intertemporal energy resource (storage).  Without
+storage there is nothing to pre-position, so the LP and MILP collapse to
+the same feasible set.
+
+**Runtime note.**  HOPE-UC averages ~850 s/scenario vs ~120 s/scenario
+for HOPE-ED — a 7× MILP penalty with zero reliability benefit in the
+no-storage case.  UC is only warranted when storage is present.
+
+### Scripts and outputs
+
+| Item | Path |
+|---|---|
+| Case export (n_stor=0 fix) | `scripts/25_build_hope_full_year_cases.jl` |
+| HOPE runner | `scripts/29_run_hope_n5_pilot.jl` |
+| Metric collection | `scripts/27_collect_hope_results.jl` |
+| Four-model comparison | `scripts/36_compare_nostorage_hope_uc_n5.jl` |
+| Run status | `results/hope_nostorage_n5_pilot/hope_run_status.csv` |
+| Per-scenario metrics | `results/hope_nostorage_n5_pilot/hope_metrics_by_scenario.csv` |
+| Aggregate + summary | `results/nostorage_hope_uc_comparison/base_n5/` |
+
+---
+
+## 8. Suggested Next Run Order
 
 ```
 # 1. Build no-storage case directories (fast, pure file I/O)

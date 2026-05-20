@@ -37,7 +37,7 @@ Q2. Does HOPE-UC-NoStorage increase LOLH or EUE relative to HOPE-ED?
   HOPE-UC vs HOPE-ED:  ΔEUE = 0.00 MWh,  ΔLOLH = 0.0 h,  ΔCVaR = 0.00 MWh
   NO — HOPE-UC closely matches HOPE-ED (ΔEUE < 1 MWh, ΔLOLH < 0.5 h).
   With no storage, LP and MILP see the same feasible set (no intertemporal resource).
-  UC constraints may redistribute shortage hours but do not add net EUE.
+  UC and ED produce identical adequacy metrics in this no-storage case.
 
 Q3. Which metric differs most between HOPE-UC and HOPE-ED?
   EUE Δ=0.00 MWh | LOLH Δ=0.0 h | CVaR Δ=0.00 MWh | max-shortfall Δ=0.0 MW
