@@ -62,6 +62,7 @@ end
 @testset "RAChronoOps" begin
     include("test_outages.jl")
     include("test_storage.jl")
+    include("test_m1d.jl")
     include("test_power_balance.jl")
     include("test_common_scenarios.jl")
     include("test_metrics.jl")

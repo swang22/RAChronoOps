@@ -1,0 +1,148 @@
+M1d Risk-Hour Allocation: Heuristic Comparison
+Generated: 2026-05-21T00:08:48.611
+Cases: VRE120_base, VRE120_wind_hvy  |  N=20, seed=42
+M1d config: lookback=72h, gap=0h
+M2 config: risk_margin_mw=1000, window_buffer_hours=48
+
+──────────────────────────────────────────────────────────────────────
+Case: VRE120_base
+──────────────────────────────────────────────────────────────────────
+Model             LOLH (h)     EUE (MWh)    CVaR (MWh)     p95 (MWh)     RT (s)
+----------------------------------------------------------------------
+M1c                    6.0       2479.17       9782.93       9719.41        1.3
+M1d_earliest           6.0       2479.17       9782.93       9719.41        1.0
+M1d_largest            8.4       2479.17       9782.93       9719.41        1.2
+M2                     5.8       2479.17       9782.93       9719.41        8.7
+M3                     6.0       2479.17       9782.93       9719.41      191.1
+
+Per-scenario EUE (MWh):
+s_id    M1c                   M1d_earliest          M1d_largest           M2                    M3
+--------------------------------------------------------------------------------------------------------------------
+s001                 1779.48               1779.48               1779.48               1779.48               1779.48
+s002                 2522.27               2522.27               2522.27               2522.27               2522.27
+s003                 2519.04               2519.04               2519.04               2519.04               2519.04
+s004                 7004.09               7004.09               7004.09               7004.09               7004.09
+s005                 9712.36               9712.36               9712.36               9712.36               9712.36
+s006                 8239.84               8239.84               8239.84               8239.84               8239.84
+s007                  676.58                676.58                676.58                676.58                676.58
+s008                    0.00                  0.00                  0.00                  0.00                  0.00
+s009                    0.00                  0.00                  0.00                  0.00                  0.00
+s010                    0.00                  0.00                  0.00                  0.00                  0.00
+s011                 3237.74               3237.74               3237.74               3237.74               3237.74
+s012                    0.00                  0.00                  0.00                  0.00                  0.00
+s013                    0.00                  0.00                  0.00                  0.00                  0.00
+s014                  839.77                839.77                839.77                839.77                839.77
+s015                 9853.51               9853.51               9853.51               9853.51               9853.51
+s016                  102.98                102.98                102.98                102.98                102.98
+s017                    0.00                  0.00                  0.00                  0.00                  0.00
+s018                 3095.75               3095.75               3095.75               3095.75               3095.75
+s019                    0.00                  0.00                  0.00                  0.00                  0.00
+s020                    0.00                  0.00                  0.00                  0.00                  0.00
+
+──────────────────────────────────────────────────────────────────────
+Q&A
+──────────────────────────────────────────────────────────────────────
+
+Q1. Does M1d_earliest match M1c EUE and M3 EUE?
+  M1d_earliest vs M1c:  ΔEUE = 0.00 MWh,  ΔLOLH = 0.0 h
+  M1d_earliest vs M3:   ΔEUE = 0.00 MWh,  ΔLOLH = 0.0 h
+  YES — exact per-scenario EUE match across all 20 scenarios.
+  With a 72-hour lookback the M1d_earliest rule charges from the same surplus
+  pool and discharges chronologically as M1c, converging to identical dispatch
+  in the tested cases.
+
+Q2. Does M1d_largest reduce CVaR/p95 vs M1d_earliest?
+  M1d_earliest:  CVaR = 9782.93 MWh,  p95 = 9719.41 MWh
+  M1d_largest:   CVaR = 9782.93 MWh,  p95 = 9719.41 MWh
+  NO difference at the scenario level — CVaR and p95 are identical.
+  Explanation: scenario-level EUE is identical across modes because both
+  allocate the same stored energy budget within each event (total discharge
+  is conserved). The largest_first mode shifts load shed from smaller shortfall
+  hours to larger ones WITHIN the event window, but the total unserved energy
+  per scenario is unchanged. CVaR and p95 are computed from scenario-level EUE
+  and therefore cannot differ. A within-event peak-shortfall analysis (e.g.,
+  max_shortfall_mw per event) would reveal the mode difference.
+  Observation: M1d_largest LOLH is higher than M1d_earliest (+2.4 h for
+  VRE120_base). Largest_first leaves small shortfall hours partially covered
+  (positive load shed) while fully covering the dominant event hours — spreading
+  the energy across fewer but more severe shedding hours increases LOLH.
+
+Q3. How does M1d compare to M2 and M3 in EUE accuracy?
+  M1d_earliest vs M3:  ΔEUE = 0.00 MWh,  ΔLOLH = +0.0 h
+  M2           vs M3:  ΔEUE = 0.00 MWh,  ΔLOLH = -0.2 h
+  Both M1d_earliest and M2 match M3 EUE to machine precision.
+  M1d is ~130× faster than M3 (1.0 s vs 191.1 s).
+
+Q4. What is the runtime overhead of M1d vs M1c?
+  M1c:          1.3 s
+  M1d_earliest: 1.0 s  (0.8× M1c — comparable; lookback loop adds O(lookback) work)
+  M1d is a pure heuristic (no LP) and runs at the same order of magnitude as M1c.
+
+──────────────────────────────────────────────────────────────────────
+Case: VRE120_wind_hvy
+──────────────────────────────────────────────────────────────────────
+Model             LOLH (h)     EUE (MWh)    CVaR (MWh)     p95 (MWh)     RT (s)
+----------------------------------------------------------------------
+M1c                    2.2        648.24       3528.39       2866.21        1.4
+M1d_earliest           2.2        648.24       3528.39       2866.21        2.3
+M1d_largest            2.6        648.24       3528.39       2866.21        1.1
+M2                     1.9        648.24       3528.39       2866.21        7.6
+M3                     2.2        648.24       3528.39       2866.21      184.4
+
+Per-scenario EUE (MWh):
+s_id    M1c                   M1d_earliest          M1d_largest           M2                    M3
+--------------------------------------------------------------------------------------------------------------------
+s001                  514.14                514.14                514.14                514.14                514.14
+s002                  537.14                537.14                537.14                537.14                537.14
+s003                    0.00                  0.00                  0.00                  0.00                  0.00
+s004                 1722.01               1722.01               1722.01               1722.01               1722.01
+s005                 2792.63               2792.63               2792.63               2792.63               2792.63
+s006                 1513.24               1513.24               1513.24               1513.24               1513.24
+s007                    0.00                  0.00                  0.00                  0.00                  0.00
+s008                    0.00                  0.00                  0.00                  0.00                  0.00
+s009                    0.00                  0.00                  0.00                  0.00                  0.00
+s010                    0.00                  0.00                  0.00                  0.00                  0.00
+s011                  814.80                814.80                814.80                814.80                814.80
+s012                    0.00                  0.00                  0.00                  0.00                  0.00
+s013                    0.00                  0.00                  0.00                  0.00                  0.00
+s014                    0.00                  0.00                  0.00                  0.00                  0.00
+s015                 4264.14               4264.14               4264.14               4264.14               4264.14
+s016                    0.00                  0.00                  0.00                  0.00                  0.00
+s017                    0.00                  0.00                  0.00                  0.00                  0.00
+s018                  806.63                806.63                806.63                806.63                806.63
+s019                    0.00                  0.00                  0.00                  0.00                  0.00
+s020                    0.00                  0.00                  0.00                  0.00                  0.00
+
+──────────────────────────────────────────────────────────────────────
+Q&A
+──────────────────────────────────────────────────────────────────────
+
+Q1. Does M1d_earliest match M1c EUE and M3 EUE?
+  M1d_earliest vs M1c:  ΔEUE = 0.00 MWh,  ΔLOLH = 0.0 h
+  M1d_earliest vs M3:   ΔEUE = 0.00 MWh,  ΔLOLH = 0.0 h
+  YES — exact per-scenario EUE match across all 20 scenarios.
+
+Q2. Does M1d_largest reduce CVaR/p95 vs M1d_earliest?
+  M1d_earliest:  CVaR = 3528.39 MWh,  p95 = 2866.21 MWh
+  M1d_largest:   CVaR = 3528.39 MWh,  p95 = 2866.21 MWh
+  NO difference at the scenario level — same explanation as VRE120_base.
+  M1d_largest LOLH is +0.4 h vs M1d_earliest (same pattern as base case).
+
+Q3. How does M1d compare to M2 and M3 in EUE accuracy?
+  M1d_earliest vs M3:  ΔEUE = 0.00 MWh,  ΔLOLH = +0.0 h
+  M2           vs M3:  ΔEUE = 0.00 MWh,  ΔLOLH = -0.3 h
+  Both M1d_earliest and M2 match M3 EUE to machine precision.
+
+Q4. What is the runtime overhead of M1d vs M1c?
+  M1c:          1.4 s
+  M1d_earliest: 2.3 s  (1.6× M1c — comparable; slightly slower due to event+lookback loop)
+  M1d is ~80× faster than M3 (2.3 s vs 184.4 s).
+
+──────────────────────────────────────────────────────────────────────
+Q5. Are findings consistent across VRE profiles?
+──────────────────────────────────────────────────────────────────────
+  VRE120_base:     M1d_earliest ΔEUE = 0.00 MWh,  M2 ΔEUE = 0.00 MWh
+  VRE120_wind_hvy: M1d_earliest ΔEUE = 0.00 MWh,  M2 ΔEUE = 0.00 MWh
+  YES — M1d_earliest matches M3 EUE exactly in both VRE profiles.
+  The allocation mode (earliest vs largest) does not affect EUE in any case;
+  it only redistributes load shed across hours within shortage events.

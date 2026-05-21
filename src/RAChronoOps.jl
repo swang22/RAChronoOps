@@ -37,6 +37,7 @@ include("models/M2RollingWindow.jl")
 include("models/M2EventWindowLP.jl")
 include("models/M3EDDispatch.jl")
 include("models/McNoStorage.jl")
+include("models/M1dRiskHourAllocation.jl")
 
 # 6. metrics (defines MetricsResult + individual metric functions)
 include("metrics/ReliabilityMetrics.jl")
@@ -70,6 +71,7 @@ export run_m2_event_window_lp, run_m2_with_diagnostics, Ra2ScenarioDiag
 export build_risk_windows
 export run_m3_ed_dispatch
 export run_mc_no_storage
+export run_m1d_risk_hour_allocation
 
 export MetricsResult, compute_metrics
 export compute_lolh, compute_lolp, compute_lole_days
