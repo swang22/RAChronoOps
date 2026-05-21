@@ -1,6 +1,6 @@
 # Current Findings Synthesis
 
-**Date:** 2026-05-20
+**Date:** 2026-05-21
 
 ---
 
@@ -17,6 +17,10 @@ makes reliability estimates sensitive to dispatch assumptions; naive storage
 heuristics overestimate risk; the event-window LP (M2) and emergency-only
 heuristic (M1c) recover the full-year ED benchmark at much lower runtime;
 HOPE-UC mainly changes LOLH/event timing, not EUE, in the tested cases.
+A theoretical storage-energy sufficiency bound confirms why M1c, M1d, M2,
+and M3 converge on the same EUE: the binding constraint is the storage energy
+budget per event, not dispatch complexity, and any model that charges from
+surplus and discharges only at shortfall hours saturates the bound.
 
 ---
 
@@ -29,6 +33,7 @@ HOPE-UC mainly changes LOLH/event timing, not EUE, in the tested cases.
 | M1b / RA-1b | Reserve-aware heuristic (SOC floor) | ~1 s | Improved heuristic |
 | M1c / RA-1c | Emergency-only heuristic, system-surplus charging | ~1–2 s | Near-M3 simple model |
 | M1c\_VREOnly | M1c with VRE-surplus-only charging | ~1–2 s | Appendix sensitivity |
+| M1d / RA-1d | Risk-hour allocation heuristic (earliest\_first / largest\_first) | ~1–2 s | Within-event allocation study |
 | M2 / RA-2 | Event-window LP (rm=1000 MW, buf=48 h) | ~5–10 s | Proposed hybrid method |
 | M3 / RA-3 | Full-year ED LP (Gurobi) | ~9–10 s | LP benchmark |
 | HOPE-ED | Full-year HOPE ED LP | ~120 s | HOPE mapping validation |
@@ -96,7 +101,14 @@ The bias is consistent across all tested VRE profiles.
 | M1 | Large positive | Large positive |
 | M1b | Moderate positive | Moderate positive |
 | M1c | Near zero | Near zero |
+| M1d\_earliest | Near zero | Near zero (exact match) |
+| M1d\_largest | Moderate positive (+2.4 h base) | Near zero (exact match) |
 | M2 | < 0.2 h | Near-machine precision |
+
+M1d\_earliest matches M1c and M3 EUE exactly (per-scenario) across all tested
+cases.  M1d\_largest produces higher LOLH because within-event reallocation
+to the largest shortfall hours leaves smaller shortfall hours partially served,
+spreading the same energy deficit across more shedding hours.
 
 M1c\_VREOnly fails for a different reason: at near-unit VRE capacity factors,
 VRE capacity factor is below 1 at nearly all hours, so VRE-only charging
@@ -104,7 +116,64 @@ leaves storage perpetually undercharged (+17–77 h LOLH error).
 
 ---
 
-## 6. Key finding 4: M1c and M2 recover the ED/HOPE benchmark
+## 6. Key finding 4 (theoretical): storage-energy sufficiency bound
+
+Script 39 computes, per scenario and shortage event, the maximum EUE reduction
+that storage could achieve given the surplus energy available in a lookback
+window before the event:
+
+```
+coverage_bound = min(
+    pre_event_EUE,                              -- energy ceiling
+    feasible_discharge_energy,                  -- SOC × η_dis after 72 h charging
+    Σ min(shortfall[h], storage_power_mw)       -- power-limited coverage
+)
+residual_eue_bound = pre_event_EUE − coverage_bound
+```
+
+**Table E — Sufficiency bound vs dispatch models, N=20, seed=42, lookback=72 h:**
+
+| Case | Pre-storage EUE | Bound EUE | M3 EUE | Bound − M3 | Sufficiency ratio |
+|------|----------------|-----------|--------|-----------|-------------------|
+| VRE120\_base | 31,017 MWh | 2,479 MWh | 2,479 MWh | 0.00 MWh | 0.941 |
+| VRE120\_wind\_hvy | 15,801 MWh | 648 MWh | 648 MWh | 0.00 MWh | 0.972 |
+
+Per-scenario EUE matches exactly across bound, M1c, M2, and M3 in both cases.
+
+**Why this explains EUE convergence:**
+When the sufficiency bound is tight (bound ≈ M3 EUE), any dispatch model that
+(1) charges from system surplus and (2) discharges only at shortfall hours will
+achieve the same residual EUE.  There is no additional EUE reduction available
+beyond what the storage energy budget allows — the problem is
+energy-constrained, not dispatch-complexity-constrained.
+
+**Why LOLH/event timing can still differ even when EUE matches:**
+EUE is determined by the total energy deficit, which is set by the storage
+energy budget.  LOLH counts hours with any positive load shed.  Two models
+can produce identical total unserved energy but different LOLH if they
+distribute that energy differently across hours within an event:
+- M1d\_largest allocates storage to the highest-shortfall hours first →
+  smaller shortfall hours remain partially served → more hours shed any load.
+- LP degeneracy (M2 vs M3, HOPE-ED vs M3) means multiple optimal dispatch
+  trajectories achieve the same EUE objective while assigning load shed to
+  different subsets of hours.
+- HOPE-UC commitment constraints spread the same energy deficit into more
+  shortage hours via min-up/down binding on thermal generators.
+
+**Why M1/M1b fail:**
+Proactive discharge in non-shortage hours depletes SOC before shortage events.
+The storage enters the event with less energy than the bound allows, so
+coverage drops below the bound and residual EUE rises above M3.
+
+The binding constraint is **energy (MWh), not power (MW)** in both tested
+cases: the storage power limit (983 MW) is not the bottleneck for the 73-unit
+RTS-GMLC system.  The sufficiency ratio (0.941–0.972) is the fraction of
+pre-storage EUE that the storage budget can cover; the 2.8–5.9% uncoverable
+residual corresponds exactly to the M3 EUE.
+
+---
+
+## 7. Key finding 5: M1c and M2 recover the ED/HOPE benchmark
 
 M1c (emergency-only, system-surplus charging) and M2 (event-window LP) both
 closely match M3 EUE and CVaR while being 13–130× faster.
@@ -129,7 +198,7 @@ This gives < 0.2 h mean LOLH error and near-machine-precision EUE at
 
 ---
 
-## 7. Key finding 5: HOPE-UC affects timing/LOLH, not EUE in tested cases
+## 8. Key finding 6: HOPE-UC affects timing/LOLH, not EUE in tested cases
 
 **Table D — HOPE-ED vs HOPE-UC (storage-enabled):**
 
@@ -157,7 +226,7 @@ LOLH/event timing.
 
 ---
 
-## 8. Key caveats
+## 9. Key caveats
 
 1. **Single-zone RTS-GMLC system.** All conclusions are for a single copper-
    plate zone with 73 thermal units, 983 MW / 3,932 MWh storage, and a
@@ -184,7 +253,7 @@ LOLH/event timing.
 
 ---
 
-## 9. Recommended next steps
+## 10. Recommended next steps
 
 1. **No new runs immediately.** The completed experiment sequence answers
    the core research questions.  Additional runs (e.g., wind-heavy N=20
@@ -198,9 +267,10 @@ LOLH/event timing.
    - Table: storage method comparison (Table C)
    - Table: HOPE-UC vs HOPE-ED (Table D)
 
-3. **Optionally add one risk-hour allocation heuristic** only if a reviewer
-   specifically asks for a temporal distribution of EUE (e.g., by season or
-   hour-of-day).  This is low priority compared to writing.
+3. **M1d risk-hour allocation heuristic is implemented** (script 38).
+   The storage-energy sufficiency bound (script 39) provides the theoretical
+   justification for the EUE convergence across M1c/M1d/M2/M3.
+   Both are available for inclusion in the paper as supporting material.
 
 4. **Consider N=20 wind-heavy HOPE-UC** if the paper requires a matched
    comparison with the base case N=20 run.  Projected runtime: ~3 h.

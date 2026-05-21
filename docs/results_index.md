@@ -250,3 +250,58 @@ pattern as base case; milder because fewer tight scenarios).
 **Committed:** `all_model_aggregate_metrics.csv`, `all_model_metrics_by_scenario.csv`,
 `errors_vs_m3.csv`, `errors_vs_hope_ed.csv`, `summary.txt`,
 `hope_metrics_by_scenario.csv`, `hope_run_status.csv`.
+
+---
+
+## 12. M1d within-event allocation comparison
+
+**Folder:** `results/m1d_storage_heuristic_comparison/`
+
+**Script:** `scripts/38_compare_m1d_storage_heuristics.jl`
+
+**Status:** Complete (VRE120\_base and VRE120\_wind\_hvy, N=20, seed=42).
+
+**Key results:**
+
+| Model | LOLH (h) | EUE (MWh) | RT (s) | Case |
+|-------|----------|-----------|--------|------|
+| M1c | 6.0 | 2,479 | 1.3 | VRE120\_base |
+| M1d\_earliest | 6.0 | 2,479 | 1.0 | VRE120\_base |
+| M1d\_largest | 8.4 | 2,479 | 1.2 | VRE120\_base |
+| M2 | 5.8 | 2,479 | 8.7 | VRE120\_base |
+| M3 | 6.0 | 2,479 | 191 | VRE120\_base |
+
+EUE is identical per scenario across all modes (ΔEUE = 0.00 MWh exactly).
+M1d\_largest has higher LOLH because within-event reallocation to the largest
+shortfall hours leaves smaller shortfall hours partially served, spreading the
+same energy deficit across more shedding hours.
+
+**Committed:** `m1d_aggregate_metrics.csv`, `m1d_metrics_by_scenario.csv`,
+`m1d_errors_vs_m3.csv`, `summary.txt`.
+
+---
+
+## 13. Storage-energy sufficiency bound
+
+**Folder:** `results/storage_energy_sufficiency_bound/`
+
+**Script:** `scripts/39_storage_energy_sufficiency_bound.jl`
+
+**Documentation:** `docs/storage_energy_sufficiency_bound.md`
+
+**Status:** Complete (VRE120\_base and VRE120\_wind\_hvy, N=20, seed=42, lookback=72 h).
+
+**Key results:**
+
+| Case | Pre-storage EUE | Bound EUE | M3 EUE | Bound − M3 | Sufficiency ratio |
+|------|----------------|-----------|--------|-----------|-------------------|
+| VRE120\_base | 31,017 MWh | 2,479 MWh | 2,479 MWh | 0.00 MWh | 0.941 |
+| VRE120\_wind\_hvy | 15,801 MWh | 648 MWh | 648 MWh | 0.00 MWh | 0.972 |
+
+The bound matches M3 EUE exactly per scenario in both cases.
+The binding constraint is storage energy (MWh), not power (MW).
+VRE120\_wind\_hvy has a higher sufficiency ratio because its shortage events
+are smaller relative to the storage budget.
+
+**Committed:** `event_level_storage_bound.csv`, `scenario_level_storage_bound.csv`,
+`bound_vs_models.csv`, `summary.txt`.

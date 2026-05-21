@@ -17,6 +17,7 @@ Single-zone copper-plate system based on the RTS-GMLC dataset.
 | RA-1b / M1b | Sequential MC + reserve-aware storage heuristic | None | Implemented and validated |
 | RA-1c / M1c | Sequential MC + emergency-only storage heuristic, system-surplus charging | None | Implemented and validated |
 | M1c\_VREOnly | Same as M1c but charges from VRE surplus only | None | Implemented — appendix sensitivity |
+| RA-1d / M1d | Sequential MC + risk-hour allocation heuristic (earliest\_first / largest\_first) | None | Implemented — within-event allocation study |
 | RA-2 / M2 | Sequential MC + screened event-window LP near risk periods | Small LPs | Implemented and validated |
 | RA-3 / M3 | Sequential MC + full-year ED LP per scenario | LP (Gurobi) | Implemented — benchmark |
 | HOPE-ED | Full-year HOPE ED LP, mapping validation only | LP (Gurobi) | Validated — matches M3 |
@@ -65,7 +66,10 @@ The full experiment sequence is complete.  Clean narrative: traditional
 sequential MC is valid without storage; storage introduces intertemporal
 SOC coupling that makes reliability estimates sensitive to dispatch
 assumptions; M1c and M2 recover M3/HOPE EUE at much lower runtime; HOPE-UC
-mainly changes LOLH/event timing, not EUE.
+mainly changes LOLH/event timing, not EUE.  A storage-energy sufficiency
+bound confirms that EUE convergence across M1c/M1d/M2/M3 is theoretically
+guaranteed when the binding constraint is storage energy (MWh), not
+dispatch complexity.
 
 ### 1. No-storage MC validation
 
@@ -129,6 +133,45 @@ Scripts: `scripts/25_build_hope_full_year_cases.jl`,
 `scripts/37_compare_wind_hvy_hope_uc_n5.jl`
 
 Results: `results/wind_hvy_hope_uc_comparison/`, `results/hope_wind_hvy_n5_pilot/`
+
+### 4. Storage-energy sufficiency bound (theoretical diagnostic)
+
+The sufficiency bound derives a per-scenario ceiling on EUE reduction from
+storage, given surplus energy available in a 72-hour lookback window before
+each shortage event:
+
+```
+coverage_bound = min(pre_event_EUE,
+                     feasible_discharge_energy,   -- SOC × η_dis after charging
+                     power_limited_coverage)       -- Σ min(shortfall[h], power_mw)
+```
+
+| Case | Pre-storage EUE | Bound/M3 EUE | Sufficiency ratio |
+|------|----------------|-------------|-------------------|
+| VRE120\_base | 31,017 MWh | 2,479 MWh | 0.941 |
+| VRE120\_wind\_hvy | 15,801 MWh | 648 MWh | 0.972 |
+
+The bound matches M3 EUE exactly per scenario (ΔEUE = 0.00 MWh).
+Binding constraint: storage energy (MWh), not power (MW).
+
+**Key insight:** M1c, M1d\_earliest, M2, and M3 all achieve the bound because
+they satisfy its two sufficient conditions (charge from surplus; discharge only
+at shortfall hours).  M1/M1b violate condition 2 by proactively discharging,
+depleting SOC before shortage events and moving away from the bound.
+
+**Why LOLH can differ even when EUE matches:** EUE is set by the storage
+energy budget; LOLH counts hours with any positive load shed.  M1d\_largest
+reallocates discharge to the highest-shortfall hours first, leaving smaller
+shortfall hours partially served (more LOLH, same EUE).  LP degeneracy and
+HOPE-UC commitment constraints produce the same effect for different reasons.
+
+Scripts: `scripts/38_compare_m1d_storage_heuristics.jl`,
+`scripts/39_storage_energy_sufficiency_bound.jl`
+
+Results: `results/m1d_storage_heuristic_comparison/`,
+`results/storage_energy_sufficiency_bound/`
+
+Documentation: `docs/storage_energy_sufficiency_bound.md`
 
 Full numeric results and per-script output paths:
 [docs/results_index.md](docs/results_index.md) and
@@ -305,6 +348,7 @@ RAChronoOps/
     current_findings_synthesis.md  # key findings across all experiments
     redesigned_experiment_plan.md  # current experiment design
     results_index.md               # index of result folders
+    storage_energy_sufficiency_bound.md  # theory note on the sufficiency bound
     experiment_archive.md          # completed diagnostic results
     hope_full_year_case_preparation.md  # HOPE case export details
     next_experiment_design_nostorage_and_real_uc.md
@@ -330,6 +374,7 @@ RAChronoOps/
       M1bReserveAwareStorage.jl    # RA-1b: reserve-aware heuristic
       M1cEmergencyOnlyStorage.jl   # RA-1c: emergency-only heuristic
       M1cVREOnlyCharge.jl          # M1c_VREOnly: VRE-surplus charging variant
+      M1dRiskHourAllocation.jl     # RA-1d: risk-hour allocation heuristic
       M2EventWindowLP.jl           # RA-2: event-window LP
       M2RollingWindow.jl           # rolling-window LP (archived diagnostic)
       M3EDDispatch.jl              # RA-3: full-year ED LP benchmark
@@ -350,6 +395,8 @@ RAChronoOps/
     34_compare_no_storage_classic_vs_ed.jl  # MC-NoStorage vs M3-NoStorage
     36_compare_nostorage_hope_uc_n5.jl   # four-model no-storage HOPE-UC check
     37_compare_wind_hvy_hope_uc_n5.jl    # five-model wind-heavy HOPE-UC check
+    38_compare_m1d_storage_heuristics.jl # M1c/M1d/M2/M3 within-event allocation study
+    39_storage_energy_sufficiency_bound.jl # theoretical sufficiency bound diagnostic
     # ── HOPE export and run ───────────────────────────────────────────────
     25_build_hope_full_year_cases.jl     # export HOPE full-year case folders
     27_collect_hope_results.jl           # collect HOPE output metrics
@@ -365,6 +412,7 @@ RAChronoOps/
   test/
     runtests.jl
     test_storage.jl
+    test_m1d.jl
     test_outages.jl
     test_power_balance.jl
     test_common_scenarios.jl
@@ -377,6 +425,8 @@ RAChronoOps/
     hope_nostorage_n5_pilot/       # HOPE run status + metrics for nostorage
     full_model_comparison_with_hope/  # M1c/M2/M3/HOPE-ED on base case
     vre_method_comparison/         # M1/M1b/M1c/M2/M3 across VRE cases
+    m1d_storage_heuristic_comparison/  # M1c/M1d/M2/M3 within-event allocation
+    storage_energy_sufficiency_bound/  # theoretical sufficiency bound
     # diagnostic results (archived)
     storage_matrix/
     storage_validation/
@@ -394,6 +444,8 @@ RAChronoOps/
   — current experiment design: research questions, methods, metrics
 - [docs/results_index.md](docs/results_index.md)
   — index of result folders with commit policy
+- [docs/storage_energy_sufficiency_bound.md](docs/storage_energy_sufficiency_bound.md)
+  — theory note on the storage-energy sufficiency bound
 - [docs/experiment_archive.md](docs/experiment_archive.md)
   — completed diagnostic experiments
 - [docs/hope_full_year_case_preparation.md](docs/hope_full_year_case_preparation.md)

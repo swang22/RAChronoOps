@@ -1,6 +1,6 @@
 # Current Experiment Design
 
-**Last updated:** 2026-05-20
+**Last updated:** 2026-05-21
 
 ---
 
@@ -93,6 +93,8 @@ level of operational detail is needed to match the full-year ED benchmark.
 | M1b / RA-1b | Reserve-aware heuristic (SOC floor on P2) | Practical improved heuristic |
 | M1c / RA-1c | Emergency-only heuristic, system-surplus charging | Near-M3 simple model |
 | M1c\_VREOnly | Same as M1c, charges from VRE surplus only | Appendix sensitivity |
+| M1d\_earliest / RA-1d | Risk-hour allocation, earliest\_first mode | Within-event allocation study |
+| M1d\_largest / RA-1d | Risk-hour allocation, largest\_first mode | Within-event allocation study |
 | M2 / RA-2 | Event-window LP (risk\_margin=1000 MW, buffer=48 h) | Proposed hybrid method |
 | M3 / RA-3 | Full-year ED LP | Reliability benchmark |
 
@@ -107,6 +109,11 @@ level of operational detail is needed to match the full-year ED benchmark.
   storage SOC before shortage events; SOC reserve in M1b reduces but does
   not eliminate the bias.
 - M1c: matches M3 EUE and CVaR closely at ~130× speedup.
+- M1d\_earliest: matches M1c and M3 EUE exactly per scenario (ΔEUE = 0.00 MWh).
+  With a 72-hour lookback, charging and chronological discharge replicate M1c.
+- M1d\_largest: same EUE as M3 but higher LOLH (+2.4 h base, +0.4 h wind-heavy)
+  because within-event reallocation to largest shortfall hours leaves smaller
+  shortfall hours partially served, spreading the same energy deficit.
 - M2: matches M3 EUE to near-machine-precision; LOLH within 0.2 h mean error;
   5–10 s/scenario (20–37× faster than M3).
 - M1c\_VREOnly: +17–77 h LOLH error because VRE capacity factor is below 1
@@ -184,7 +191,65 @@ Script: `scripts/37_compare_wind_hvy_hope_uc_n5.jl`
 
 ---
 
-## 8. Core metrics
+## 8. Experiment E — M1d risk-hour allocation and storage-energy sufficiency bound
+
+**Purpose:** (1) Characterise the within-event storage allocation mode as a
+research diagnostic; (2) derive a theoretical bound that explains why M1c,
+M1d, M2, and M3 converge on the same EUE.
+
+### E1 — M1d within-event allocation comparison
+
+**Models:** M1c, M1d\_earliest, M1d\_largest, M2, M3
+
+**Key finding (N=20, VRE120\_base and VRE120\_wind\_hvy):**
+
+| Model | LOLH (h) | EUE (MWh) | RT (s) | Case |
+|-------|----------|-----------|--------|------|
+| M1c | 6.0 | 2,479 | 1.3 | base |
+| M1d\_earliest | 6.0 | 2,479 | 1.0 | base |
+| M1d\_largest | 8.4 | 2,479 | 1.2 | base |
+| M2 | 5.8 | 2,479 | 8.7 | base |
+| M3 | 6.0 | 2,479 | 191 | base |
+
+EUE is identical across all modes (exact per-scenario match).
+The allocation mode affects only within-event LOLH, not total unserved energy.
+
+Script: `scripts/38_compare_m1d_storage_heuristics.jl`
+
+### E2 — Storage-energy sufficiency bound
+
+The bound quantifies the maximum EUE reduction achievable by storage given
+the surplus energy available in a lookback window before each shortage event:
+
+```
+coverage_bound = min(pre_event_EUE,
+                     feasible_discharge_energy,  -- SOC × η_dis after 72 h charging
+                     power_limited_coverage)      -- Σ min(shortfall[h], power_mw)
+residual_eue_bound = pre_event_EUE − coverage_bound
+```
+
+**Key finding (N=20, seed=42, lookback=72 h):**
+
+| Case | Pre-storage EUE | Bound EUE | M3 EUE | Bound − M3 | Sufficiency ratio |
+|------|----------------|-----------|--------|-----------|-------------------|
+| VRE120\_base | 31,017 MWh | 2,479 MWh | 2,479 MWh | 0.00 MWh | 0.941 |
+| VRE120\_wind\_hvy | 15,801 MWh | 648 MWh | 648 MWh | 0.00 MWh | 0.972 |
+
+The bound matches M3 EUE exactly per scenario.  The binding constraint is
+storage energy (MWh), not power (MW), in both cases.
+
+**Theoretical implication:** When the bound is tight, any dispatch model
+that charges from surplus and discharges only at shortage hours achieves the
+optimum.  M1/M1b violate condition (2) by discharging proactively, depleting
+SOC before shortage events and moving away from the bound.
+
+Script: `scripts/39_storage_energy_sufficiency_bound.jl`
+
+Documentation: `docs/storage_energy_sufficiency_bound.md`
+
+---
+
+## 9. Core metrics
 
 | Category | Metrics |
 |----------|---------|
@@ -200,7 +265,7 @@ Primary paper tables show LOLH, EUE, CVaR-EUE, and runtime.
 
 ---
 
-## 9. Out-of-scope for core experiments
+## 10. Out-of-scope for core experiments
 
 The following are explicitly **not** part of the core RA benchmark:
 
@@ -217,7 +282,7 @@ comparable to published LOLP/EUE studies.
 
 ---
 
-## 10. Status summary
+## 11. Status summary
 
 | Experiment | Status |
 |------------|--------|
@@ -226,4 +291,6 @@ comparable to published LOLP/EUE studies.
 | C: HOPE-ED/UC base case validation (N=20) | Complete |
 | D: wind-heavy HOPE-UC profile check (N=5) | Complete |
 | D: full VRE sweep HOPE-UC (N=20) | Optional — feasible (~3 h) |
+| E1: M1d within-event allocation comparison | Complete |
+| E2: storage-energy sufficiency bound | Complete |
 | Paper tables and figures | Next step |
