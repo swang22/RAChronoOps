@@ -1,0 +1,139 @@
+Storage-Energy Sufficiency Bound
+Generated: 2026-05-21T00:55:31.683
+Cases: VRE120_base, VRE120_wind_hvy  |  N=20, seed=42
+Lookback window: 72 h
+
+──────────────────────────────────────────────────────────────────────
+Case: VRE120_base
+──────────────────────────────────────────────────────────────────────
+  Pre-storage EUE (mean):          31017.14 MWh
+  Bound residual EUE (mean):        2479.17 MWh
+  M3 EUE (mean):                    2479.17 MWh
+  Bound − M3 (mean):                  -0.00 MWh
+  M1c EUE (mean):                   2479.17 MWh
+  M2 EUE (mean):                    2479.17 MWh
+  Storage sufficiency ratio:          0.941  (mean)
+    (fraction of pre-storage EUE coverable by storage)
+
+  s_id         pre_EUE     bound_EUE        M3_EUE       M1c_EUE        M2_EUE
+  ------------------------------------------------------------------
+  s001        29464.53       1779.48       1779.48       1779.48       1779.48
+  s002        40276.92       2522.27       2522.27       2522.27       2522.27
+  s003        35615.93       2519.04       2519.04       2519.04       2519.04
+  s004        49491.39       7004.09       7004.09       7004.09       7004.09
+  s005        54383.21       9712.36       9712.36       9712.36       9712.36
+  s006        39633.04       8239.84       8239.84       8239.84       8239.84
+  s007        36566.71        676.58        676.58        676.58        676.58
+  s008        24945.44          0.00          0.00          0.00          0.00
+  s009        13900.73          0.00          0.00          0.00          0.00
+  s010        19638.35          0.00          0.00          0.00          0.00
+  s011        40313.85       3237.74       3237.74       3237.74       3237.74
+  s012        19869.13          0.00          0.00          0.00          0.00
+  s013        23746.44          0.00          0.00          0.00          0.00
+  s014        18393.80        839.77        839.77        839.77        839.77
+  s015        43791.14       9853.51       9853.51       9853.51       9853.51
+  s016        23056.62        102.98        102.98        102.98        102.98
+  s017        14618.26          0.00          0.00          0.00          0.00
+  s018        34907.47       3095.75       3095.75       3095.75       3095.75
+  s019        27280.86          0.00          0.00          0.00          0.00
+  s020        30448.88          0.00          0.00          0.00          0.00
+
+──────────────────────────────────────────────────────────────────────
+Case: VRE120_wind_hvy
+──────────────────────────────────────────────────────────────────────
+  Pre-storage EUE (mean):          15801.11 MWh
+  Bound residual EUE (mean):         648.24 MWh
+  M3 EUE (mean):                     648.24 MWh
+  Bound − M3 (mean):                  +0.00 MWh
+  M1c EUE (mean):                    648.24 MWh
+  M2 EUE (mean):                     648.24 MWh
+  Storage sufficiency ratio:          0.972  (mean)
+    (fraction of pre-storage EUE coverable by storage)
+
+  s_id         pre_EUE     bound_EUE        M3_EUE       M1c_EUE        M2_EUE
+  ------------------------------------------------------------------
+  s001        14628.05        514.14        514.14        514.14        514.14
+  s002        20296.35        537.14        537.14        537.14        537.14
+  s003        18790.93          0.00          0.00          0.00          0.00
+  s004        23930.23       1722.01       1722.01       1722.01       1722.01
+  s005        28366.46       2792.63       2792.63       2792.63       2792.63
+  s006        25375.69       1513.24       1513.24       1513.24       1513.24
+  s007        16674.48          0.00          0.00          0.00          0.00
+  s008        12729.83          0.00          0.00          0.00          0.00
+  s009         7325.05          0.00          0.00          0.00          0.00
+  s010         8240.91          0.00          0.00          0.00          0.00
+  s011        22093.02        814.80        814.80        814.80        814.80
+  s012        10285.42          0.00          0.00          0.00          0.00
+  s013        13048.29          0.00          0.00          0.00          0.00
+  s014         5580.08          0.00          0.00          0.00          0.00
+  s015        24003.50       4264.14       4264.14       4264.14       4264.14
+  s016        10673.11          0.00          0.00          0.00          0.00
+  s017         5699.14          0.00          0.00          0.00          0.00
+  s018        17867.81        806.63        806.63        806.63        806.63
+  s019        14673.61          0.00          0.00          0.00          0.00
+  s020        15740.25          0.00          0.00          0.00          0.00
+
+──────────────────────────────────────────────────────────────────────
+Q&A
+──────────────────────────────────────────────────────────────────────
+
+Q1. Does the storage-energy sufficiency bound match M3 EUE?
+  VRE120_base:
+    Bound EUE = 2479.17 MWh,  M3 EUE = 2479.17 MWh,  Δ = -0.00 MWh
+    YES — bound and M3 agree to within 1 MWh.
+  VRE120_wind_hvy:
+    Bound EUE = 648.24 MWh,  M3 EUE = 648.24 MWh,  Δ = +0.00 MWh
+    YES — bound and M3 agree to within 1 MWh.
+
+Q2. Does the bound explain why M1c / M1d / M2 match M3?
+  VRE120_base:
+    M1c − M3 = -0.00 MWh,  M2 − M3 = -0.00 MWh
+    YES — all models agree (ΔEUE < 1 MWh).  When the bound is tight,
+    any reasonable dispatch that charges from surplus and discharges
+    during shortage events will approach the same optimum.
+  VRE120_wind_hvy:
+    M1c − M3 = +0.00 MWh,  M2 − M3 = +0.00 MWh
+    YES — all models agree (ΔEUE < 1 MWh).  When the bound is tight,
+    any reasonable dispatch that charges from surplus and discharges
+    during shortage events will approach the same optimum.
+
+Q3. Are remaining differences due to power limits, energy limits, or chronology?
+  VRE120_base:
+    The bound min() is applied over three terms:
+      (a) pre-storage event EUE (always largest — upper ceiling)
+      (b) feasible discharge energy (storage energy × η_dis + charged MWh)
+      (c) power-limited coverage (sum of min(shortfall, power_mw) per hour)
+    When bound ≈ M3 EUE, the binding constraint is energy, not power.
+    See event_level_storage_bound.csv columns to identify which term binds.
+  VRE120_wind_hvy:
+    The bound min() is applied over three terms:
+      (a) pre-storage event EUE (always largest — upper ceiling)
+      (b) feasible discharge energy (storage energy × η_dis + charged MWh)
+      (c) power-limited coverage (sum of min(shortfall, power_mw) per hour)
+    When bound ≈ M3 EUE, the binding constraint is energy, not power.
+    See event_level_storage_bound.csv columns to identify which term binds.
+
+Q4. Is VRE120_base harder (larger pre-storage shortfall energy)?
+  VRE120_base:     pre-storage EUE = 31017.14 MWh (mean)
+  VRE120_wind_hvy: pre-storage EUE = 15801.11 MWh (mean)
+  VRE120_base:     M3 EUE = 2479.17 MWh
+  VRE120_wind_hvy: M3 EUE = 648.24 MWh
+  YES — VRE120_base has higher pre-storage EUE.  The heavier wind
+  penetration in VRE120_wind_hvy reduces net load and therefore
+  shortage event severity.
+
+Q5. Is VRE120_wind_hvy easier because shortage events are smaller?
+  VRE120_base:     storage sufficiency ratio = 0.941
+  VRE120_wind_hvy: storage sufficiency ratio = 0.972
+  YES — wind-heavy has a higher sufficiency ratio; storage covers a
+  larger fraction of its (smaller) pre-storage EUE.
+
+Q6. Does this support the theory that storage-aware MC must preserve energy for scarcity hours?
+  YES — the sufficiency bound shows that storage energy budget and its
+  pre-positioning relative to shortage events is the primary determinant
+  of EUE.  Models that charge from surplus (M1c, M1d, M2) naturally
+  pre-position energy before events and achieve the bound.  Models that
+  proactively discharge in non-shortage hours (M1, M1b) deplete SOC
+  before shortage events, moving away from the bound — explaining their
+  LOLH overestimation bias.  The bound is the theoretical justification
+  for the M1c design principle: discharge only at shortfall hours.
