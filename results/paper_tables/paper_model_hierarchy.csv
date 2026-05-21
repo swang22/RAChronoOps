@@ -1,11 +1,11 @@
-model,label,storage,optimization_type,temporal_detail,benchmark_role,main_or_appendix
-MC-NoStorage,Classical MC,No,None,Hourly capacity check (no SOC),No-storage baseline,main
-M1,RA-1a,Yes,Heuristic,Naive 3-priority peak-shaving,Cautionary failure case,main
-M1b,RA-1b,Yes,Heuristic,Reserve-aware heuristic (SOC floor),Improved heuristic,main
-M1c,RA-1c,Yes,Heuristic,"Emergency-only discharge, surplus charging",Near-benchmark simple model,main
-M1d_earliest,RA-1d (earliest),Yes,Heuristic,"Risk-hour allocation, earliest-first",Within-event allocation study,appendix
-M1d_largest,RA-1d (largest),Yes,Heuristic,"Risk-hour allocation, largest-first",Within-event allocation study,appendix
-M2,RA-2,Yes,LP (windowed),"Event-window LP (rm=1000 MW, buf=48 h)",Proposed hybrid method,main
-M3,RA-3,Yes,LP (full year),Full-year economic dispatch LP,LP reliability benchmark,main
-HOPE-ED,HOPE-ED,Yes,LP (full year),Full-year HOPE economic dispatch LP,HOPE mapping validation,main
-HOPE-UC,HOPE-UC / M4,Yes,MILP (full yr),Full-year HOPE unit commitment MILP,High-fidelity UC benchmark,main
+model_internal,model_paper_name,model_short_label,storage,optimization_type,temporal_detail,benchmark_role,main_or_appendix
+MC-NoStorage,Traditional Monte Carlo,Traditional MC,No,None,Hourly capacity check (no SOC),No-storage baseline,main
+M1,Naive Storage Monte Carlo,Naive Storage MC,Yes,Heuristic,Naive 3-priority peak-shaving,Cautionary failure case,main
+M1b,Reserve-Floor Storage Monte Carlo,Reserve-Floor MC,Yes,Heuristic,Reserve-aware heuristic (SOC floor),Improved heuristic,main
+M1c,Emergency-Only Storage Monte Carlo,Emergency-Only MC,Yes,Heuristic,"Emergency-only discharge, surplus charging",Near-benchmark simple model,main
+M1d_earliest,Risk-Hour-Earliest Monte Carlo,Risk-Hour-Earliest MC,Yes,Heuristic,"Risk-hour allocation, earliest-first",Within-event allocation study,appendix
+M1d_largest,Risk-Hour-Largest Monte Carlo,Risk-Hour-Largest MC,Yes,Heuristic,"Risk-hour allocation, largest-first",Within-event allocation study,appendix
+M2,Event-Window LP Monte Carlo,Event-Window LP-MC,Yes,LP (windowed),"Event-window LP (rm=1000 MW, buf=48 h)",Proposed hybrid method,main
+M3,Full-Year ED Monte Carlo,Full-Year ED-MC,Yes,LP (full year),Full-year economic dispatch LP,LP reliability benchmark,main
+HOPE-ED,PCM Economic Dispatch,PCM-ED,Yes,LP (full year),Full-year HOPE economic dispatch LP,PCM validation (ED mode),main
+HOPE-UC,PCM Unit-Commitment Economic Dispatch,PCM-UCED,Yes,MILP (full yr),Full-year HOPE unit commitment MILP,High-fidelity UC benchmark,main

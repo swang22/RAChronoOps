@@ -185,8 +185,8 @@ exact.
 |-------|----------|-----------|-------------|
 | MC-NoStorage | 115.6 | 41,846 | 0.5 |
 | M3-NoStorage | 115.6 | 41,846 | 40.0 |
-| HOPE-ED-NoStorage | 115.6 | 41,846 | 614.3 |
-| HOPE-UC-NoStorage | 115.6 | 41,846 | 4,331.1 |
+| PCM-ED-NS (HOPE-ED-NoStorage) | 115.6 | 41,846 | 614.3 |
+| PCM-UCED-NS (HOPE-UC-NoStorage) | 115.6 | 41,846 | 4,331.1 |
 
 UC adds 7× runtime with zero reliability benefit in the no-storage case.
 
@@ -213,11 +213,11 @@ UC adds 7× runtime with zero reliability benefit in the no-storage case.
 
 | Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | Runtime (s) |
 |-------|----------|-----------|-----------|-------------|
-| HOPE-ED | 6.2 | 2,479 | 9,783 | 2,356 |
-| HOPE-UC | 7.2 | 2,479 | 9,783 | 11,438 |
+| PCM-ED (HOPE-ED) | 6.2 | 2,479 | 9,783 | 2,356 |
+| PCM-UCED (HOPE-UC) | 7.2 | 2,479 | 9,783 | 11,438 |
 
-HOPE-UC uses real Pmin/ramp/startup/min-up/down from RTS-GMLC.
-HOPE-UC increases LOLH by ~1 h but leaves EUE unchanged.
+PCM-UCED uses real Pmin/ramp/startup/min-up/down from RTS-GMLC.
+PCM-UCED increases LOLH by ~1 h but leaves EUE unchanged.
 
 **Committed:** `all_model_aggregate_metrics.csv`, `summary.txt`.
 
@@ -240,11 +240,11 @@ HOPE-UC increases LOLH by ~1 h but leaves EUE unchanged.
 | M1c | 4.4 | 1,113 | 0.6 |
 | M2 | 3.8 | 1,113 | 2.5 |
 | M3 | 4.4 | 1,113 | 44.3 |
-| HOPE-ED | 3.8 | 1,113 | 588 |
-| HOPE-UC | 4.2 | 1,113 | 2,712 |
+| PCM-ED (HOPE-ED) | 3.8 | 1,113 | 588 |
+| PCM-UCED (HOPE-UC) | 4.2 | 1,113 | 2,712 |
 
 EUE identical across all five models (exact match per scenario).
-HOPE-UC shifts LOLH +0.4 h vs HOPE-ED (same temporal redistribution
+PCM-UCED shifts LOLH +0.4 h vs PCM-ED (same temporal redistribution
 pattern as base case; milder because fewer tight scenarios).
 
 **Committed:** `all_model_aggregate_metrics.csv`, `all_model_metrics_by_scenario.csv`,

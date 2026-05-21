@@ -9,14 +9,14 @@
 This document summarises the key findings from the completed RAChronoOps
 experiment sequence.  The project tests a ladder of storage dispatch
 approximations — from naive heuristics to event-window LPs to full-year
-HOPE UC/PCM — against a common Monte Carlo scenario set for an
+production-cost models (PCM) — against a common Monte Carlo scenario set for an
 RTS-GMLC-based single-zone system.  The clean narrative is:
 
 Traditional sequential MC is valid without storage; storage SOC coupling
 makes reliability estimates sensitive to dispatch assumptions; naive storage
 heuristics overestimate risk; the event-window LP (M2) and emergency-only
 heuristic (M1c) recover the full-year ED benchmark at much lower runtime;
-HOPE-UC mainly changes LOLH/event timing, not EUE, in the tested cases.
+PCM-UCED (HOPE-UC) mainly changes LOLH/event timing, not EUE, in the tested cases.
 A theoretical storage-energy sufficiency bound explains why M1c, M1d, M2,
 and M3 converge on the same EUE in these tested cases: in the tested
 RTS-GMLC single-zone configuration, the binding constraint is storage energy
@@ -28,18 +28,18 @@ approaches the bound.
 
 ## 2. Model hierarchy
 
-| Label | Method | Runtime/scenario | Role |
-|-------|--------|-----------------|------|
-| MC-NoStorage | Classical hourly capacity check, no storage | < 1 s | No-storage baseline |
-| M1 / RA-1a | Naive peak-shaving heuristic | ~1 s | Cautionary failure case |
-| M1b / RA-1b | Reserve-aware heuristic (SOC floor) | ~1 s | Improved heuristic |
-| M1c / RA-1c | Emergency-only heuristic, system-surplus charging | ~1–2 s | Near-M3 simple model |
-| M1c\_VREOnly | M1c with VRE-surplus-only charging | ~1–2 s | Appendix sensitivity |
-| M1d / RA-1d | Risk-hour allocation heuristic (earliest\_first / largest\_first) | ~1–2 s | Within-event allocation study |
-| M2 / RA-2 | Event-window LP (rm=1000 MW, buf=48 h) | ~5–10 s | Proposed hybrid method |
-| M3 / RA-3 | Full-year ED LP (Gurobi) | ~9–10 s | LP benchmark |
-| HOPE-ED | Full-year HOPE ED LP | ~120 s | HOPE mapping validation |
-| HOPE-UC / M4 | Full-year HOPE UC MILP | ~540–570 s | High-fidelity UC benchmark |
+| Label | Paper name | Method | Runtime/scenario | Role |
+|-------|-----------|--------|-----------------|------|
+| MC-NoStorage | Traditional MC | Classical hourly capacity check, no storage | < 1 s | No-storage baseline |
+| M1 / RA-1a | Naive Storage MC | Naive peak-shaving heuristic | ~1 s | Cautionary failure case |
+| M1b / RA-1b | Reserve-Floor MC | Reserve-aware heuristic (SOC floor) | ~1 s | Improved heuristic |
+| M1c / RA-1c | Emergency-Only MC | Emergency-only heuristic, system-surplus charging | ~1–2 s | Near-M3 simple model |
+| M1c\_VREOnly | VRE-Surplus MC | M1c with VRE-surplus-only charging | ~1–2 s | Appendix sensitivity |
+| M1d / RA-1d | Risk-Hour MC | Risk-hour allocation heuristic (earliest\_first / largest\_first) | ~1–2 s | Within-event allocation study |
+| M2 / RA-2 | Event-Window LP-MC | Event-window LP (rm=1000 MW, buf=48 h) | ~5–10 s | Proposed hybrid method |
+| M3 / RA-3 | Full-Year ED-MC | Full-year ED LP (Gurobi) | ~9–10 s | LP benchmark |
+| HOPE-ED | PCM-ED | Full-year HOPE ED LP | ~120 s | PCM validation (ED mode) |
+| HOPE-UC / M4 | PCM-UCED | Full-year HOPE UC MILP | ~540–570 s | High-fidelity UC benchmark |
 
 All methods use identical Monte Carlo outage scenarios (common random numbers).
 
@@ -178,20 +178,20 @@ residual corresponds exactly to the M3 EUE.
 
 ---
 
-## 7. Key finding 5: M1c and M2 recover the ED/HOPE benchmark
+## 7. Key finding 5: M1c and M2 recover the ED/PCM benchmark
 
 M1c (emergency-only, system-surplus charging) and M2 (event-window LP) both
 closely match M3 EUE and CVaR while being 13–130× faster.
 
-**Table C — Storage wind-heavy HOPE comparison, N=5 (VRE120\_wind\_hvy):**
+**Table C — Storage wind-heavy PCM comparison, N=5 (VRE120\_wind\_hvy):**
 
 | Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | Runtime (s) |
 |-------|----------|-----------|-----------|-------------|
 | M1c | 4.4 | 1,113 | 2,793 | 0.6 |
 | M2 | 3.8 | 1,113 | 2,793 | 2.5 |
 | M3 | 4.4 | 1,113 | 2,793 | 44.3 |
-| HOPE-ED | 3.8 | 1,113 | 2,793 | 587.6 |
-| HOPE-UC | 4.2 | 1,113 | 2,793 | 2,712.2 |
+| PCM-ED | 3.8 | 1,113 | 2,793 | 587.6 |
+| PCM-UCED | 4.2 | 1,113 | 2,793 | 2,712.2 |
 
 EUE is identical across all five models (exact per-scenario match).
 LOLH varies by up to 0.6 h across models, reflecting LP degeneracy
@@ -203,28 +203,28 @@ This gives < 0.2 h mean LOLH error and near-machine-precision EUE at
 
 ---
 
-## 8. Key finding 6: HOPE-UC affects timing/LOLH, not EUE in tested cases
+## 8. Key finding 6: PCM-UCED affects timing/LOLH, not EUE in tested cases
 
-**Table D — HOPE-ED vs HOPE-UC (storage-enabled):**
+**Table D — PCM-ED vs PCM-UCED (storage-enabled):**
 
 | Case | Model | LOLH (h) | EUE (MWh) | Runtime (s) |
 |------|-------|----------|-----------|-------------|
-| VRE120\_base, N=20 | HOPE-ED | 6.2 | 2,479 | 2,356 |
-| VRE120\_base, N=20 | HOPE-UC | 7.2 | 2,479 | 11,438 |
-| VRE120\_wind\_hvy, N=5 | HOPE-ED | 3.8 | 1,113 | 588 |
-| VRE120\_wind\_hvy, N=5 | HOPE-UC | 4.2 | 1,113 | 2,712 |
+| VRE120\_base, N=20 | PCM-ED | 6.2 | 2,479 | 2,356 |
+| VRE120\_base, N=20 | PCM-UCED | 7.2 | 2,479 | 11,438 |
+| VRE120\_wind\_hvy, N=5 | PCM-ED | 3.8 | 1,113 | 588 |
+| VRE120\_wind\_hvy, N=5 | PCM-UCED | 4.2 | 1,113 | 2,712 |
 
-In both tested cases, HOPE-UC and HOPE-ED produce identical EUE.  HOPE-UC
-increases LOLH by 1.0 h (base) or 0.4 h (wind-heavy): the same total energy
-deficit is redistributed into more shortage hours by min-up/down constraints
-on committed generators.
+In both tested cases, PCM-UCED (HOPE-UC) and PCM-ED (HOPE-ED) produce
+identical EUE.  PCM-UCED increases LOLH by 1.0 h (base) or 0.4 h
+(wind-heavy): the same total energy deficit is redistributed into more
+shortage hours by min-up/down constraints on committed generators.
 
 **Mechanism:** UC commitment constraints bind intertemporal storage dispatch.
 Storage must charge/discharge around the thermal commitment schedule, which
 can shift the timing of storage discharge and spread the same energy shortage
 across more hours.  Without storage this effect is absent (Phase H result).
 
-**Runtime penalty:** HOPE-UC is 4–5× slower than HOPE-ED with zero EUE
+**Runtime penalty:** PCM-UCED is 4–5× slower than PCM-ED with zero EUE
 benefit in the tested cases.  Running UC for every scenario is not warranted
 based on current evidence; UC is recommended only as a sensitivity check on
 LOLH/event timing.

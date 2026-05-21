@@ -1,0 +1,14 @@
+internal_name,paper_name,short_label,category,main_or_appendix,description
+MC-NoStorage,Traditional Monte Carlo,Traditional MC,Heuristic (no storage),main,Classical hourly capacity check; no SOC state variable
+M1,Naive Storage Monte Carlo,Naive Storage MC,Heuristic,main,Naive 3-priority peak-shaving; proactive discharge depletes SOC before shortage events
+M1b,Reserve-Floor Storage Monte Carlo,Reserve-Floor MC,Heuristic,main,Reserve-aware heuristic with SOC floor on priority-2 discharge
+M1c,Emergency-Only Storage Monte Carlo,Emergency-Only MC,Heuristic,main,Emergency-only discharge with system-surplus charging; no proactive dispatch
+M1c_VREOnly,VRE-Surplus-Only Charging Monte Carlo,VRE-Surplus MC,Heuristic,appendix,M1c variant that charges from VRE-surplus hours only; charging-source sensitivity
+M1d_earliest,Risk-Hour-Earliest Monte Carlo,Risk-Hour-Earliest MC,Heuristic,appendix,Risk-hour allocation; discharge allocated to earliest shortage hours first
+M1d_largest,Risk-Hour-Largest Monte Carlo,Risk-Hour-Largest MC,Heuristic,appendix,Risk-hour allocation; discharge allocated to largest-shortfall hours first
+M2,Event-Window LP Monte Carlo,Event-Window LP-MC,LP (windowed),main,LP solved over screened event windows (risk_margin=1000 MW; buffer=48 h)
+M3,Full-Year ED Monte Carlo,Full-Year ED-MC,LP (full year),main,Full-year economic dispatch LP per scenario; Gurobi solver
+HOPE-ED,PCM Economic Dispatch,PCM-ED,PCM (full year),main,Production-cost model in economic dispatch mode; full-year HOPE LP (Gurobi)
+HOPE-UC,PCM Unit-Commitment Economic Dispatch,PCM-UCED,PCM (full year),main,Production-cost model with unit commitment and economic dispatch; full-year HOPE MILP (Gurobi)
+HOPE-ED-NoStorage,PCM Economic Dispatch (No Storage),PCM-ED-NS,PCM (full year),appendix,PCM-ED applied to no-storage case variant
+HOPE-UC-NoStorage,PCM Unit-Commitment Economic Dispatch (No Storage),PCM-UCED-NS,PCM (full year),appendix,PCM-UCED applied to no-storage case variant

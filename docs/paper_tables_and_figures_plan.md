@@ -33,8 +33,8 @@ and `results/wind_hvy_hope_uc_comparison/n5/all_model_aggregate_metrics.csv`.
 | M1d / RA-1d | Yes | No | Risk-hour allocation (earliest\_first / largest\_first) | ~1–2 s/scenario | Within-event allocation diagnostic |
 | M2 / RA-2 | Yes | LP (event windows only) | Event-window LP (rm=1000 MW, buf=48 h) | ~5–10 s/scenario | Proposed hybrid method |
 | M3 / RA-3 | Yes | LP (full year) | Full-year economic dispatch LP (Gurobi) | ~9–10 s/scenario | LP reliability benchmark |
-| HOPE-ED | Yes | LP (full year) | Full-year HOPE economic dispatch LP | ~120 s/scenario | HOPE mapping validation |
-| HOPE-UC / M4 | Yes | MILP (full year) | Full-year HOPE unit commitment MILP | ~540–580 s/scenario | High-fidelity UC benchmark |
+| PCM-ED | Yes | LP (full year) | Full-year HOPE economic dispatch LP | ~120 s/scenario | PCM validation (ED mode) |
+| PCM-UCED | Yes | MILP (full year) | Full-year HOPE unit commitment MILP | ~540–580 s/scenario | High-fidelity UC benchmark |
 
 **Construction notes:**
 - Runtime column reports per-scenario mean from N=20 runs where available;
@@ -189,13 +189,13 @@ at N=3; regenerate at N=20 from `scripts/16` before submitting).
 
 ---
 
-### Table 5 — HOPE validation
+### Table 5 — PCM validation (PCM-ED and PCM-UCED)
 
 **Placement:** Main text (Results, Experiments C and D).
 
-**Takeaway:** HOPE-UC produces identical EUE to HOPE-ED in both tested cases
-but increases LOLH by 0.4–1.0 h, incurring a 4–5× runtime penalty with no
-EUE benefit; HOPE-ED and M3 agree to within 1 MWh.
+**Takeaway:** PCM-UCED (HOPE-UC) produces identical EUE to PCM-ED (HOPE-ED)
+in both tested cases but increases LOLH by 0.4–1.0 h, incurring a 4–5×
+runtime penalty with no EUE benefit; PCM-ED and M3 agree to within 1 MWh.
 
 **Source result folders:**
 - `results/full_model_comparison_with_hope/base_n5/` — N=5 M1/M2/M3/HOPE-ED/HOPE-UC, base
@@ -214,29 +214,29 @@ EUE benefit; HOPE-ED and M3 agree to within 1 MWh.
 | Case | Model | N | LOLH (h) | EUE (MWh) | CVaR (MWh) | RT (s/scen) |
 |------|-------|---|----------|-----------|-----------|------------|
 | VRE120\_base | M3 | 5 | 11.2 | 4,707 | 9,712 | 9.5 |
-| VRE120\_base | HOPE-ED | 5 | 11.8 | 4,707 | 9,712 | 121.4 |
-| VRE120\_base | HOPE-UC | 5 | 15.2 | 4,707 | 9,712 | 576.6 |
+| VRE120\_base | PCM-ED | 5 | 11.8 | 4,707 | 9,712 | 121.4 |
+| VRE120\_base | PCM-UCED | 5 | 15.2 | 4,707 | 9,712 | 576.6 |
 | VRE120\_wind\_hvy | M3 | 5 | 4.4 | 1,113 | 2,793 | 8.9 |
-| VRE120\_wind\_hvy | HOPE-ED | 5 | 3.8 | 1,113 | 2,793 | 117.5 |
-| VRE120\_wind\_hvy | HOPE-UC | 5 | 4.2 | 1,113 | 2,793 | 542.4 |
+| VRE120\_wind\_hvy | PCM-ED | 5 | 3.8 | 1,113 | 2,793 | 117.5 |
+| VRE120\_wind\_hvy | PCM-UCED | 5 | 4.2 | 1,113 | 2,793 | 542.4 |
 
-**Panel B — N=20 HOPE-ED vs HOPE-UC, VRE120\_base (from committed docs):**
+**Panel B — N=20 PCM-ED vs PCM-UCED, VRE120\_base (from committed docs):**
 
 | Model | N | LOLH (h) | EUE (MWh) | CVaR (MWh) | RT (s/scen) |
 |-------|---|----------|-----------|-----------|------------|
-| HOPE-ED | 20 | 6.2 | 2,479 | 9,783 | 117.8 |
-| HOPE-UC | 20 | 7.2 | 2,479 | 9,783 | 571.9 |
+| PCM-ED | 20 | 6.2 | 2,479 | 9,783 | 117.8 |
+| PCM-UCED | 20 | 7.2 | 2,479 | 9,783 | 571.9 |
 
 **Construction notes:**
 - Panel A uses N=5; higher absolute LOLH and EUE vs N=20 reflect sampling
-  variance, not systematic differences.  Differences between HOPE-ED and
-  HOPE-UC are the paper point.
+  variance, not systematic differences.  Differences between PCM-ED and
+  PCM-UCED are the paper point.
 - Panel B N=20 values come from `docs/current_findings_synthesis.md` (Table D);
   regenerate from `scripts/30` with N=20 if the aggregate CSV is needed for
   the final paper.
-- EUE values are identical across M3, HOPE-ED, HOPE-UC to within 1 MWh in
+- EUE values are identical across M3, PCM-ED, PCM-UCED to within 1 MWh in
   both panels — note "EUE exact match" explicitly.
-- HOPE-UC/HOPE-ED runtime ratio ~4–5× in both cases; add a "Runtime ratio" row
+- PCM-UCED/PCM-ED runtime ratio ~4–5× in both cases; add a "Runtime ratio" row
   or footnote.
 
 ---
@@ -266,7 +266,7 @@ gap to full-year ED/UC at a fraction of the runtime.
                           M1/M1b  →  overestimate risk
                           M1c/M2  →  match M3 EUE
                           M3      →  LP benchmark
-                          HOPE-UC →  +LOLH, same EUE
+                          PCM-UCED →  +LOLH, same EUE
 ```
 
 **Source:** Conceptual; consult `docs/redesigned_experiment_plan.md` §1–2 for
@@ -351,9 +351,9 @@ two groups for base and wind-heavy cases).
 
 **Takeaway:** M1c achieves near-zero EUE error at ~1 s/scenario (130× faster
 than M3); M2 achieves near-machine-precision EUE error at ~8 s/scenario (20–37×
-faster); HOPE-UC adds 4–5× runtime over M3 with no EUE benefit.
+faster); PCM-UCED adds 4–5× runtime over M3 with no EUE benefit.
 
-**Type:** Log–log scatter plot (x: runtime per scenario, y: |EUE − HOPE-UC EUE|
+**Type:** Log–log scatter plot (x: runtime per scenario, y: |EUE − PCM-UCED EUE|
 or |EUE − M3 EUE|).
 
 **Source result folders:**
@@ -376,8 +376,8 @@ or |EUE − M3 EUE|).
 | M1d\_earliest | 0.05 | 0.00 | N=20 |
 | M2 | 0.43 | 0.00 | N=20 |
 | M3 | 9.6 | 0.00 | N=20, reference |
-| HOPE-ED | ~120 | ~0 | N=5 |
-| HOPE-UC | ~570 | ~0 | N=5 |
+| PCM-ED | ~120 | ~0 | N=5 |
+| PCM-UCED | ~570 | ~0 | N=5 |
 
 **Construction notes:**
 - Use log scale on both axes.
@@ -436,7 +436,7 @@ not just aggregate).
 
 **Placement:** Main text (Results, Experiments C–D or Discussion).
 
-**Takeaway:** EUE is identical across M3, HOPE-ED, and HOPE-UC; LOLH shifts
+**Takeaway:** EUE is identical across M3, PCM-ED, and PCM-UCED; LOLH shifts
 by 0.4–1.0 h as UC commitment constraints redistribute the same energy deficit
 into more shortage hours, illustrating LP degeneracy and the distinction between
 energy-based and frequency-based reliability metrics.
@@ -457,19 +457,19 @@ for both VRE120\_base and VRE120\_wind\_hvy.
 | Case | Model | LOLH (h) | EUE (MWh) |
 |------|-------|----------|-----------|
 | VRE120\_base | M3 | 11.2 | 4,707 |
-| VRE120\_base | HOPE-ED | 11.8 | 4,707 |
-| VRE120\_base | HOPE-UC | 15.2 | 4,707 |
+| VRE120\_base | PCM-ED | 11.8 | 4,707 |
+| VRE120\_base | PCM-UCED | 15.2 | 4,707 |
 | VRE120\_wind\_hvy | M3 | 4.4 | 1,113 |
-| VRE120\_wind\_hvy | HOPE-ED | 3.8 | 1,113 |
-| VRE120\_wind\_hvy | HOPE-UC | 4.2 | 1,113 |
+| VRE120\_wind\_hvy | PCM-ED | 3.8 | 1,113 |
+| VRE120\_wind\_hvy | PCM-UCED | 4.2 | 1,113 |
 
 **Construction notes:**
 - Panel A (EUE): all bars equal — add a label "exact match" or use a single
   horizontal line with dots per model.
-- Panel B (LOLH): bars differ — HOPE-UC above HOPE-ED in both cases.
-- Add CI95 error bars for M3 from the aggregate metrics CSV; HOPE lacks CI95
-  (N=5 fixed scenarios from HOPE export).
-- Annotate HOPE-UC vs HOPE-ED runtime ratio in the caption.
+- Panel B (LOLH): bars differ — PCM-UCED above PCM-ED in both cases.
+- Add CI95 error bars for M3 from the aggregate metrics CSV; PCM models lack
+  CI95 (N=5 fixed scenarios from HOPE export).
+- Annotate PCM-UCED vs PCM-ED runtime ratio in the caption.
 
 ---
 

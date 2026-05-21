@@ -18,7 +18,8 @@ using DataFrames, CSV, Statistics, Dates
 
 const PROJ_DIR  = joinpath(@__DIR__, "..")
 const RESULTS   = joinpath(PROJ_DIR, "results")
-const OUT_DIR   = joinpath(RESULTS, "paper_tables")
+const OUT_DIR    = joinpath(RESULTS, "paper_tables")
+const CONFIG_DIR = joinpath(PROJ_DIR, "config")
 
 mkpath(OUT_DIR)
 
@@ -117,34 +118,64 @@ function sort_by_model!(df::DataFrame, order_vec::Vector{String})
     return df
 end
 
+# ── model display names ───────────────────────────────────────────────────────
+
+const DISPLAY_NAMES = let path = joinpath(CONFIG_DIR, "model_display_names.csv")
+    if isfile(path)
+        note!("Loading model_display_names.csv")
+        CSV.read(path, DataFrame)
+    else
+        warn!("config/model_display_names.csv missing — paper name columns will be empty")
+        DataFrame(internal_name = String[], paper_name = String[], short_label = String[])
+    end
+end
+
+function attach_paper_names(df::DataFrame)::DataFrame
+    out = rename(df, :model => :model_internal)
+    isempty(DISPLAY_NAMES) && return out
+    dn = select(DISPLAY_NAMES,
+                :internal_name => :model_internal,
+                :paper_name    => :model_paper_name,
+                :short_label   => :model_short_label)
+    out = leftjoin(out, dn; on = :model_internal)
+    cols     = propertynames(out)
+    idx      = findfirst(==(:model_internal), cols)
+    new_cols = vcat(
+        cols[1:idx],
+        filter(c -> c ∈ (:model_paper_name, :model_short_label), cols),
+        filter(c -> c ∉ (:model_internal, :model_paper_name, :model_short_label), cols[idx+1:end]),
+    )
+    return select(out, new_cols)
+end
+
 # ─────────────────────────────────────────────────────────────────────────────
 # TABLE 1 — Model hierarchy (static, hand-coded from documentation)
 # ─────────────────────────────────────────────────────────────────────────────
 
 function build_model_hierarchy()::DataFrame
     entries = [
-        ("MC-NoStorage", "Classical MC",     "No",  "None",           "Hourly capacity check (no SOC)",             "No-storage baseline",            "main"),
-        ("M1",           "RA-1a",            "Yes", "Heuristic",      "Naive 3-priority peak-shaving",              "Cautionary failure case",        "main"),
-        ("M1b",          "RA-1b",            "Yes", "Heuristic",      "Reserve-aware heuristic (SOC floor)",        "Improved heuristic",             "main"),
-        ("M1c",          "RA-1c",            "Yes", "Heuristic",      "Emergency-only discharge, surplus charging", "Near-benchmark simple model",    "main"),
-        ("M1d_earliest", "RA-1d (earliest)", "Yes", "Heuristic",      "Risk-hour allocation, earliest-first",       "Within-event allocation study",  "appendix"),
-        ("M1d_largest",  "RA-1d (largest)",  "Yes", "Heuristic",      "Risk-hour allocation, largest-first",        "Within-event allocation study",  "appendix"),
-        ("M2",           "RA-2",             "Yes", "LP (windowed)",  "Event-window LP (rm=1000 MW, buf=48 h)",     "Proposed hybrid method",         "main"),
-        ("M3",           "RA-3",             "Yes", "LP (full year)", "Full-year economic dispatch LP",             "LP reliability benchmark",       "main"),
-        ("HOPE-ED",      "HOPE-ED",          "Yes", "LP (full year)", "Full-year HOPE economic dispatch LP",        "HOPE mapping validation",        "main"),
-        ("HOPE-UC",      "HOPE-UC / M4",     "Yes", "MILP (full yr)", "Full-year HOPE unit commitment MILP",        "High-fidelity UC benchmark",     "main"),
+        ("MC-NoStorage", "No",  "None",           "Hourly capacity check (no SOC)",             "No-storage baseline",          "main"),
+        ("M1",           "Yes", "Heuristic",      "Naive 3-priority peak-shaving",              "Cautionary failure case",      "main"),
+        ("M1b",          "Yes", "Heuristic",      "Reserve-aware heuristic (SOC floor)",        "Improved heuristic",           "main"),
+        ("M1c",          "Yes", "Heuristic",      "Emergency-only discharge, surplus charging", "Near-benchmark simple model",  "main"),
+        ("M1d_earliest", "Yes", "Heuristic",      "Risk-hour allocation, earliest-first",       "Within-event allocation study","appendix"),
+        ("M1d_largest",  "Yes", "Heuristic",      "Risk-hour allocation, largest-first",        "Within-event allocation study","appendix"),
+        ("M2",           "Yes", "LP (windowed)",  "Event-window LP (rm=1000 MW, buf=48 h)",     "Proposed hybrid method",       "main"),
+        ("M3",           "Yes", "LP (full year)", "Full-year economic dispatch LP",             "LP reliability benchmark",     "main"),
+        ("HOPE-ED",      "Yes", "LP (full year)", "Full-year HOPE economic dispatch LP",        "PCM validation (ED mode)",     "main"),
+        ("HOPE-UC",      "Yes", "MILP (full yr)", "Full-year HOPE unit commitment MILP",        "High-fidelity UC benchmark",   "main"),
     ]
     df = DataFrame(
         model             = [e[1] for e in entries],
-        label             = [e[2] for e in entries],
-        storage           = [e[3] for e in entries],
-        optimization_type = [e[4] for e in entries],
-        temporal_detail   = [e[5] for e in entries],
-        benchmark_role    = [e[6] for e in entries],
-        main_or_appendix  = [e[7] for e in entries],
+        storage           = [e[2] for e in entries],
+        optimization_type = [e[3] for e in entries],
+        temporal_detail   = [e[4] for e in entries],
+        benchmark_role    = [e[5] for e in entries],
+        main_or_appendix  = [e[6] for e in entries],
     )
-    save_table(df, "paper_model_hierarchy.csv")
-    return df
+    out = attach_paper_names(df)
+    save_table(out, "paper_model_hierarchy.csv")
+    return out
 end
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -181,7 +212,7 @@ function build_no_storage_validation()::Union{DataFrame, Nothing}
     for c in [:lolh, :eue_mwh, :cvar_eue_mwh, :mean_runtime_s]
         hasproperty(out, c) && (out[!, c] = round2.(out[!, c]))
     end
-    save_table(out, "paper_no_storage_validation.csv")
+    save_table(attach_paper_names(out), "paper_no_storage_validation.csv")
     return out
 end
 
@@ -257,7 +288,7 @@ function build_storage_method_comparison()::Union{DataFrame, Nothing}
     for c in [:lolh, :eue_mwh, :cvar_eue_mwh, :mean_runtime_s, :eue_error_vs_m3, :lolh_error_vs_m3]
         hasproperty(out, c) && (out[!, c] = round2.(out[!, c]))
     end
-    save_table(out, "paper_storage_method_comparison.csv")
+    save_table(attach_paper_names(out), "paper_storage_method_comparison.csv")
     return out
 end
 
@@ -353,7 +384,7 @@ function build_hope_validation()::Union{DataFrame, Nothing}
               :eue_error_vs_hope_uc, :lolh_error_vs_hope_uc]
         hasproperty(out, c) && (out[!, c] = round2.(out[!, c]))
     end
-    save_table(out, "paper_hope_validation.csv")
+    save_table(attach_paper_names(out), "paper_hope_validation.csv")
     return out
 end
 
@@ -411,7 +442,7 @@ function build_runtime_accuracy(storage_df::Union{DataFrame, Nothing},
                 :abs_eue_error_mwh, :abs_lolh_error_h,
                 :mean_runtime_s, :speedup_vs_benchmark]
     out      = select(combined, intersect(wanted, propertynames(combined)))
-    save_table(out, "paper_runtime_accuracy.csv")
+    save_table(attach_paper_names(out), "paper_runtime_accuracy.csv")
     return out
 end
 

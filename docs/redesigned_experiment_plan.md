@@ -59,8 +59,8 @@ cases is attributable to storage dispatch, not MC sampling.
 **Models:**
 - MC-NoStorage: classical hourly capacity check (no LP, no storage)
 - M3-NoStorage: full-year ED LP on no-storage case
-- HOPE-ED-NoStorage: HOPE ED LP on no-storage case
-- HOPE-UC-NoStorage: HOPE UC MILP on no-storage case
+- PCM-ED-NS (HOPE-ED-NoStorage): PCM in economic dispatch mode, no-storage case
+- PCM-UCED-NS (HOPE-UC-NoStorage): PCM with unit commitment, no-storage case
 
 **Cases:** VRE120\_base\_nostorage, VRE120\_wind\_hvy\_nostorage
 (built by `scripts/33_build_no_storage_cases.jl`)
@@ -71,7 +71,7 @@ cases is attributable to storage dispatch, not MC sampling.
 - `scripts/36_compare_nostorage_hope_uc_n5.jl` — four-model HOPE-UC check, N=5
 
 **Key result:** All four models produce identical LOLH and EUE.
-MC-NoStorage = M3-NoStorage = HOPE-ED-NoStorage = HOPE-UC-NoStorage
+MC-NoStorage = M3-NoStorage = PCM-ED-NS = PCM-UCED-NS
 (ΔEUE = 0.00 MWh, ΔLOLH = 0.0 h).
 
 Without storage there is no intertemporal state variable linking hours
@@ -123,13 +123,13 @@ Recommended M2 config: `risk_margin_mw=1000, window_buffer_hours=48`.
 
 ---
 
-## 6. Experiment C — Full-year HOPE UC validation
+## 6. Experiment C — Full-year PCM validation (PCM-ED and PCM-UCED)
 
-**Purpose:** Validate the M3 ED benchmark against HOPE full-year ED, then
-test whether HOPE-UC unit commitment changes EUE or mainly reshapes
+**Purpose:** Validate the M3 ED benchmark against PCM full-year ED, then
+test whether PCM-UCED unit commitment changes EUE or mainly reshapes
 LOLH/event timing.
 
-**Models:** M3, HOPE-ED, HOPE-UC
+**Models:** M3, PCM-ED (HOPE-ED), PCM-UCED (HOPE-UC)
 
 **UC parameters used (real RTS-GMLC values):**
 
@@ -148,12 +148,12 @@ LOLH/event timing.
 - `scripts/30_compare_all_models_hope_n5.jl` — M1c/M2/M3/HOPE-ED comparison
 
 **Key result:**
-- HOPE-ED matches M3 once ED-mode ramp constraints are disabled (ΔEUE < 1 MWh).
-- HOPE-UC raises LOLH by ~1 h relative to HOPE-ED but leaves EUE unchanged
+- PCM-ED (HOPE-ED) matches M3 once ED-mode ramp constraints are disabled (ΔEUE < 1 MWh).
+- PCM-UCED (HOPE-UC) raises LOLH by ~1 h relative to PCM-ED but leaves EUE unchanged
   in the VRE120\_base N=20 run (same total energy deficit, redistributed into
   more shortage hours by min-up/down constraints on committed generators and
   storage pre-positioning).
-- Runtime: HOPE-UC is ~5× slower than HOPE-ED with zero EUE benefit in the
+- Runtime: PCM-UCED is ~5× slower than PCM-ED with zero EUE benefit in the
   tested cases.
 
 ---
@@ -181,10 +181,10 @@ different VRE profiles (wind-heavy vs balanced vs solar-heavy).
 | M1c | 4.4 | 1,113 | 0.6 |
 | M2 | 3.8 | 1,113 | 2.5 |
 | M3 | 4.4 | 1,113 | 44.3 |
-| HOPE-ED | 3.8 | 1,113 | 588 |
-| HOPE-UC | 4.2 | 1,113 | 2,712 |
+| PCM-ED | 3.8 | 1,113 | 588 |
+| PCM-UCED | 4.2 | 1,113 | 2,712 |
 
-EUE identical across all models; HOPE-UC shifts LOLH +0.4 h vs HOPE-ED
+EUE identical across all models; PCM-UCED shifts LOLH +0.4 h vs PCM-ED
 (same pattern as base case but milder LOLH effect).
 
 Script: `scripts/37_compare_wind_hvy_hope_uc_n5.jl`
@@ -289,9 +289,9 @@ comparable to published LOLP/EUE studies.
 |------------|--------|
 | A: no-storage MC validation (N=20 + N=5 HOPE) | Complete |
 | B: storage-aware MC methods (VRE sweep N=20) | Complete |
-| C: HOPE-ED/UC base case validation (N=20) | Complete |
-| D: wind-heavy HOPE-UC profile check (N=5) | Complete |
-| D: full VRE sweep HOPE-UC (N=20) | Optional — feasible (~3 h) |
+| C: PCM-ED / PCM-UCED base case validation (N=20) | Complete |
+| D: wind-heavy PCM-UCED profile check (N=5) | Complete |
+| D: full VRE sweep PCM-UCED (N=20) | Optional — feasible (~3 h) |
 | E1: M1d within-event allocation comparison | Complete |
 | E2: storage-energy sufficiency bound | Complete |
 | Paper tables and figures | Next step |

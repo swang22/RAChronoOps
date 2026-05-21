@@ -4,24 +4,24 @@ RAChronoOps evaluates how much operational detail is needed inside
 probabilistic sequential Monte Carlo resource adequacy assessment for
 high-VRE, storage-rich power systems.  The project compares fast
 RA-compatible dispatch approximations against full-year economic dispatch
-and HOPE UC/PCM benchmarks.
+and production-cost model (PCM) benchmarks.
 
 Single-zone copper-plate system based on the RTS-GMLC dataset.
 
 ## Method hierarchy
 
-| Label | Method | Optimization | Status |
-|-------|--------|--------------|--------|
-| MC-NoStorage | Traditional hourly sequential MC without storage | None | Implemented — no-storage baseline |
-| RA-1a / M1 | Sequential MC + naive peak-shaving storage heuristic | None | Implemented — cautionary baseline |
-| RA-1b / M1b | Sequential MC + reserve-aware storage heuristic | None | Implemented and validated |
-| RA-1c / M1c | Sequential MC + emergency-only storage heuristic, system-surplus charging | None | Implemented and validated |
-| M1c\_VREOnly | Same as M1c but charges from VRE surplus only | None | Implemented — appendix sensitivity |
-| RA-1d / M1d | Sequential MC + risk-hour allocation heuristic (earliest\_first / largest\_first) | None | Implemented — within-event allocation study |
-| RA-2 / M2 | Sequential MC + screened event-window LP near risk periods | Small LPs | Implemented and validated |
-| RA-3 / M3 | Sequential MC + full-year ED LP per scenario | LP (Gurobi) | Implemented — benchmark |
-| HOPE-ED | Full-year HOPE ED LP, mapping validation only | LP (Gurobi) | Validated — matches M3 |
-| HOPE-UC / M4 | Full-year HOPE UC/PCM, real Pmin/ramp/startup/min-up/down | MILP (Gurobi) | Validated — N=5 and N=20 |
+| Label | Paper name | Method | Optimization | Status |
+|-------|-----------|--------|--------------|--------|
+| MC-NoStorage | Traditional MC | Traditional hourly sequential MC without storage | None | Implemented — no-storage baseline |
+| RA-1a / M1 | Naive Storage MC | Sequential MC + naive peak-shaving storage heuristic | None | Implemented — cautionary baseline |
+| RA-1b / M1b | Reserve-Floor MC | Sequential MC + reserve-aware storage heuristic | None | Implemented and validated |
+| RA-1c / M1c | Emergency-Only MC | Sequential MC + emergency-only storage heuristic, system-surplus charging | None | Implemented and validated |
+| M1c\_VREOnly | VRE-Surplus MC | Same as M1c but charges from VRE surplus only | None | Implemented — appendix sensitivity |
+| RA-1d / M1d | Risk-Hour MC | Sequential MC + risk-hour allocation heuristic (earliest\_first / largest\_first) | None | Implemented — within-event allocation study |
+| RA-2 / M2 | Event-Window LP-MC | Sequential MC + screened event-window LP near risk periods | Small LPs | Implemented and validated |
+| RA-3 / M3 | Full-Year ED-MC | Sequential MC + full-year ED LP per scenario | LP (Gurobi) | Implemented — benchmark |
+| HOPE-ED | PCM-ED | Full-year HOPE ED LP (PCM economic dispatch mode) | LP (Gurobi) | Validated — matches M3 |
+| HOPE-UC / M4 | PCM-UCED | Full-year HOPE UC/PCM with real Pmin/ramp/startup/min-up/down | MILP (Gurobi) | Validated — N=5 and N=20 |
 
 All implemented methods use **common random numbers**: one shared
 `ScenarioSet` of thermal outage draws is passed to every method, so
@@ -75,7 +75,7 @@ storage energy availability (MWh) rather than dispatch complexity.
 
 MC-NoStorage = M3-NoStorage exactly for VRE120\_base and VRE120\_wind\_hvy
 at N=20.  For VRE120\_base\_nostorage at N=5, all four models agree:
-MC-NoStorage = M3-NoStorage = HOPE-ED-NoStorage = HOPE-UC-NoStorage
+MC-NoStorage = M3-NoStorage = PCM-ED-NS (HOPE-ED-NoStorage) = PCM-UCED-NS (HOPE-UC-NoStorage)
 (ΔEUE = 0.00 MWh, ΔLOLH = 0.0 h).
 
 **Interpretation:** traditional sequential MC is valid in the classic
@@ -107,23 +107,24 @@ Recommended M2 config: `risk_margin_mw=1000, window_buffer_hours=48`.
 Scripts: `scripts/14_run_ra1b_validation.jl`,
 `scripts/16_run_vre_method_comparison.jl`, `scripts/30_compare_all_models_hope_n5.jl`
 
-### 3. HOPE full-year UC validation
+### 3. PCM full-year validation (PCM-ED and PCM-UCED)
 
-HOPE-ED matches M3 once ED-mode ramp constraints are disabled (ΔEUE < 1 MWh).
-HOPE-UC uses real Pmin, ramp rates, startup costs, and min up/down times from
-the RTS-GMLC dataset.
+PCM-ED (HOPE-ED internally) matches M3 once ED-mode ramp constraints are
+disabled (ΔEUE < 1 MWh).
+PCM-UCED (HOPE-UC internally) uses real Pmin, ramp rates, startup costs,
+and min up/down times from the RTS-GMLC dataset.
 
-In tested cases (VRE120\_base N=20; VRE120\_wind\_hvy N=5), HOPE-UC mainly
+In tested cases (VRE120\_base N=20; VRE120\_wind\_hvy N=5), PCM-UCED mainly
 changes LOLH/event timing, not EUE:
 
 | Case | Model | LOLH (h) | EUE (MWh) | Runtime (s) |
 |------|-------|----------|-----------|-------------|
-| VRE120\_base | HOPE-ED | 6.2 | 2,479 | 2,356 |
-| VRE120\_base | HOPE-UC | 7.2 | 2,479 | 11,438 |
-| VRE120\_wind\_hvy | HOPE-ED | 3.8 | 1,113 | 588 |
-| VRE120\_wind\_hvy | HOPE-UC | 4.2 | 1,113 | 2,712 |
+| VRE120\_base | PCM-ED | 6.2 | 2,479 | 2,356 |
+| VRE120\_base | PCM-UCED | 7.2 | 2,479 | 11,438 |
+| VRE120\_wind\_hvy | PCM-ED | 3.8 | 1,113 | 588 |
+| VRE120\_wind\_hvy | PCM-UCED | 4.2 | 1,113 | 2,712 |
 
-**Runtime note:** HOPE-UC is 4–5× slower than HOPE-ED with zero EUE
+**Runtime note:** PCM-UCED is 4–5× slower than PCM-ED with zero EUE
 benefit in the tested cases.  UC is worth running only when storage is
 present (storage SOC is the intertemporal link that activates UC timing
 effects).

@@ -1,9 +1,9 @@
-case,n_scenarios,model,lolh,eue_mwh,cvar_eue_mwh,mean_runtime_s
-VRE120_base,20,MC-NoStorage,95.4,31017.14,51937.3,0.06
-VRE120_base,20,M3-NoStorage,95.4,31017.14,51937.3,7.58
-VRE120_wind_hvy,20,MC-NoStorage,52.4,15801.11,26871.07,0.09
-VRE120_wind_hvy,20,M3-NoStorage,52.4,15801.11,26871.07,7.32
-VRE120_base_nostorage,5,MC-NoStorage,115.6,41846.4,54383.21,0.1
-VRE120_base_nostorage,5,M3-NoStorage,115.6,41846.4,54383.21,7.99
-VRE120_base_nostorage,5,HOPE-ED-NoStorage,115.6,41846.4,54383.21,122.85
-VRE120_base_nostorage,5,HOPE-UC-NoStorage,115.6,41846.4,54383.21,866.22
+case,n_scenarios,model_internal,model_paper_name,model_short_label,lolh,eue_mwh,cvar_eue_mwh,mean_runtime_s
+VRE120_base,20,MC-NoStorage,Traditional Monte Carlo,Traditional MC,95.4,31017.14,51937.3,0.06
+VRE120_wind_hvy,20,MC-NoStorage,Traditional Monte Carlo,Traditional MC,52.4,15801.11,26871.07,0.09
+VRE120_base_nostorage,5,MC-NoStorage,Traditional Monte Carlo,Traditional MC,115.6,41846.4,54383.21,0.1
+VRE120_base_nostorage,5,HOPE-ED-NoStorage,PCM Economic Dispatch (No Storage),PCM-ED-NS,115.6,41846.4,54383.21,122.85
+VRE120_base_nostorage,5,HOPE-UC-NoStorage,PCM Unit-Commitment Economic Dispatch (No Storage),PCM-UCED-NS,115.6,41846.4,54383.21,866.22
+VRE120_base,20,M3-NoStorage,,,95.4,31017.14,51937.3,7.58
+VRE120_wind_hvy,20,M3-NoStorage,,,52.4,15801.11,26871.07,7.32
+VRE120_base_nostorage,5,M3-NoStorage,,,115.6,41846.4,54383.21,7.99
