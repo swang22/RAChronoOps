@@ -1,0 +1,29 @@
+Paper Table Builder Summary
+Generated: 2026-05-21T14:14:21.332
+Elapsed: 6.7 s
+
+── Collected ────────────────────────────────────────────────
+  OK  Wrote paper_model_hierarchy.csv (10 rows × 7 cols)
+  OK  Loaded no_storage_aggregate_metrics.csv from no_storage_comparison (N=20) (6 rows)
+  OK  Loaded all_model_aggregate_metrics.csv from nostorage_hope_uc_comparison/base_n5 (N=5) (4 rows)
+  OK  Wrote paper_no_storage_validation.csv (8 rows × 7 cols)
+  OK  Loaded all_model_aggregate_metrics.csv from full_model_comparison_with_hope/base_n20 (7 rows)
+  OK  Loaded m1d_aggregate_metrics.csv from m1d_storage_heuristic_comparison (N=20) (10 rows)
+  OK  Loaded vre_method_comparison_results.csv from vre_method_comparison (M1/M1b pilot N=3) (12 rows)
+  OK  Wrote paper_storage_method_comparison.csv (14 rows × 10 cols)
+  OK  Loaded bound_vs_models.csv from storage_energy_sufficiency_bound (40 rows)
+  OK  Wrote paper_sufficiency_bound.csv (2 rows × 9 cols)
+  OK  Loaded all_model_aggregate_metrics.csv from full_model_comparison_with_hope/base_n20 (7 rows)
+  OK  Loaded all_model_aggregate_metrics.csv from wind_hvy_hope_uc_comparison/n5 (5 rows)
+  OK  Wrote paper_hope_validation.csv (10 rows × 9 cols)
+  OK  Wrote paper_runtime_accuracy.csv (18 rows × 8 cols)
+
+No warnings.
+
+── Output files ─────────────────────────────────────────────
+  paper_hope_validation.csv                    10 rows × 9 cols
+  paper_model_hierarchy.csv                    10 rows × 7 cols
+  paper_no_storage_validation.csv              8 rows × 7 cols
+  paper_runtime_accuracy.csv                   18 rows × 8 cols
+  paper_storage_method_comparison.csv          14 rows × 10 cols
+  paper_sufficiency_bound.csv                  2 rows × 9 cols
