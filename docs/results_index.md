@@ -299,7 +299,8 @@ same energy deficit across more shedding hours.
 | VRE120\_wind\_hvy | 15,801 MWh | 648 MWh | 648 MWh | 0.00 MWh | 0.972 |
 
 The bound matches M3 EUE exactly per scenario in both cases.
-The binding constraint is storage energy (MWh), not power (MW).
+In the tested RTS-GMLC cases, the binding constraint is storage energy (MWh)
+rather than power (MW).
 VRE120\_wind\_hvy has a higher sufficiency ratio because its shortage events
 are smaller relative to the storage budget.
 

@@ -67,9 +67,9 @@ sequential MC is valid without storage; storage introduces intertemporal
 SOC coupling that makes reliability estimates sensitive to dispatch
 assumptions; M1c and M2 recover M3/HOPE EUE at much lower runtime; HOPE-UC
 mainly changes LOLH/event timing, not EUE.  A storage-energy sufficiency
-bound confirms that EUE convergence across M1c/M1d/M2/M3 is theoretically
-guaranteed when the binding constraint is storage energy (MWh), not
-dispatch complexity.
+bound explains why EUE convergence across M1c/M1d/M2/M3 is observed in the
+tested RTS-GMLC cases: in these configurations, the binding constraint is
+storage energy availability (MWh) rather than dispatch complexity.
 
 ### 1. No-storage MC validation
 
@@ -152,7 +152,7 @@ coverage_bound = min(pre_event_EUE,
 | VRE120\_wind\_hvy | 15,801 MWh | 648 MWh | 0.972 |
 
 The bound matches M3 EUE exactly per scenario (ΔEUE = 0.00 MWh).
-Binding constraint: storage energy (MWh), not power (MW).
+Binding constraint in tested cases: storage energy (MWh), not power (MW).
 
 **Key insight:** M1c, M1d\_earliest, M2, and M3 all achieve the bound because
 they satisfy its two sufficient conditions (charge from surplus; discharge only

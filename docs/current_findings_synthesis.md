@@ -17,10 +17,12 @@ makes reliability estimates sensitive to dispatch assumptions; naive storage
 heuristics overestimate risk; the event-window LP (M2) and emergency-only
 heuristic (M1c) recover the full-year ED benchmark at much lower runtime;
 HOPE-UC mainly changes LOLH/event timing, not EUE, in the tested cases.
-A theoretical storage-energy sufficiency bound confirms why M1c, M1d, M2,
-and M3 converge on the same EUE: the binding constraint is the storage energy
-budget per event, not dispatch complexity, and any model that charges from
-surplus and discharges only at shortfall hours saturates the bound.
+A theoretical storage-energy sufficiency bound explains why M1c, M1d, M2,
+and M3 converge on the same EUE in these tested cases: in the tested
+RTS-GMLC single-zone configuration, the binding constraint is storage energy
+availability around shortage events rather than detailed dispatch complexity,
+and any model that charges from surplus and discharges only at shortfall hours
+approaches the bound.
 
 ---
 
@@ -140,12 +142,15 @@ residual_eue_bound = pre_event_EUE − coverage_bound
 
 Per-scenario EUE matches exactly across bound, M1c, M2, and M3 in both cases.
 
-**Why this explains EUE convergence:**
+**Why this explains EUE convergence in the tested cases:**
 When the sufficiency bound is tight (bound ≈ M3 EUE), any dispatch model that
 (1) charges from system surplus and (2) discharges only at shortfall hours will
-achieve the same residual EUE.  There is no additional EUE reduction available
-beyond what the storage energy budget allows — the problem is
-energy-constrained, not dispatch-complexity-constrained.
+achieve the same residual EUE.  In these tested RTS-GMLC cases, there is no
+additional EUE reduction available beyond what the storage energy budget allows —
+the residual EUE is governed by storage energy availability rather than dispatch
+model complexity.  This finding is empirical and scoped to the tested system
+configurations; other systems with different storage-to-load ratios or shortage
+patterns may not exhibit the same convergence.
 
 **Why LOLH/event timing can still differ even when EUE matches:**
 EUE is determined by the total energy deficit, which is set by the storage
@@ -165,9 +170,9 @@ Proactive discharge in non-shortage hours depletes SOC before shortage events.
 The storage enters the event with less energy than the bound allows, so
 coverage drops below the bound and residual EUE rises above M3.
 
-The binding constraint is **energy (MWh), not power (MW)** in both tested
-cases: the storage power limit (983 MW) is not the bottleneck for the 73-unit
-RTS-GMLC system.  The sufficiency ratio (0.941–0.972) is the fraction of
+In both tested RTS-GMLC cases, the binding constraint is **energy (MWh), not
+power (MW)**: the storage power limit (983 MW) is not the bottleneck for the
+73-unit system.  The sufficiency ratio (0.941–0.972) is the fraction of
 pre-storage EUE that the storage budget can cover; the 2.8–5.9% uncoverable
 residual corresponds exactly to the M3 EUE.
 

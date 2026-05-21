@@ -235,13 +235,14 @@ residual_eue_bound = pre_event_EUE − coverage_bound
 | VRE120\_base | 31,017 MWh | 2,479 MWh | 2,479 MWh | 0.00 MWh | 0.941 |
 | VRE120\_wind\_hvy | 15,801 MWh | 648 MWh | 648 MWh | 0.00 MWh | 0.972 |
 
-The bound matches M3 EUE exactly per scenario.  The binding constraint is
-storage energy (MWh), not power (MW), in both cases.
+The bound matches M3 EUE exactly per scenario.  In both tested cases,
+the binding constraint is storage energy (MWh) rather than power (MW).
 
-**Theoretical implication:** When the bound is tight, any dispatch model
-that charges from surplus and discharges only at shortage hours achieves the
-optimum.  M1/M1b violate condition (2) by discharging proactively, depleting
-SOC before shortage events and moving away from the bound.
+**Empirical implication (tested RTS-GMLC cases):** When the bound is tight,
+any dispatch model that charges from surplus and discharges only at shortage
+hours approaches M3 EUE in these tested configurations.  M1/M1b violate this
+by discharging proactively, depleting SOC before shortage events and moving
+away from the bound.
 
 Script: `scripts/39_storage_energy_sufficiency_bound.jl`
 

@@ -75,15 +75,18 @@ The bound has three terms inside `min()`:
 | `feasible_discharge_energy` | Storage energy limit (MWh × η_dis) |
 | `power_limited_coverage` | Storage power limit (sum of MW caps per hour) |
 
-When **bound ≈ M3 EUE**, the system is operating near the energy limit and
-any dispatch model that:
+When **bound ≈ M3 EUE**, the system is operating near the energy limit.
+In the tested RTS-GMLC single-zone cases, any dispatch model that:
 1. charges from surplus before shortage events, and
 2. discharges only during shortage events,
 
-will recover essentially all of M3's EUE accuracy — because there is no
-additional EUE reduction available beyond what the energy budget allows.
+will approach M3's EUE — because in these tested cases there is no additional
+EUE reduction available beyond what the energy budget allows.  This finding is
+empirical and scoped to the tested system configurations; it should not be
+interpreted as a universal equivalence for all storage configurations or
+shortage patterns.
 
-This is the theoretical justification for the **M1c design principle**:
+This observation motivates the **M1c design principle**:
 _discharge only at shortfall hours, charge from system surplus_.  Proactive
 discharge (M1, M1b) depletes SOC before shortage events, moving away from the
 bound and introducing a positive LOLH bias without changing the actual energy
