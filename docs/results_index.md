@@ -1,11 +1,24 @@
 # Results Index
 
-Generated output folders and their classification.  Large dispatch CSVs
-are not committed to the repository; only small summary CSVs and text
-summaries are tracked when needed for reproducibility.
+Generated output folders and their classification.  Large dispatch CSVs,
+HOPE case folders, and solver logs are not committed; only small aggregate
+CSVs and text summaries are tracked.
 
-For narrative interpretation of any result set, see
-[docs/experiment_archive.md](experiment_archive.md).
+For narrative interpretation, see
+[docs/current_findings_synthesis.md](current_findings_synthesis.md).
+
+---
+
+## Commit policy
+
+- **Commit:** aggregate CSVs (< ~500 rows), `summary.txt` files, and
+  `hope_metrics_by_scenario.csv` / `hope_run_status.csv` files that are the
+  primary output of a comparison script.
+- **Do not commit:** full HOPE case folders (`exports/hope_model_cases/`),
+  per-hour dispatch CSVs for large runs, hourly load-shed CSVs larger than
+  ~10 k rows, solver logs, or Julia depot caches.
+- Large output files are regenerable from committed scripts and seed-fixed
+  scenario generation; reproducibility does not require committing them.
 
 ---
 
@@ -13,29 +26,31 @@ For narrative interpretation of any result set, see
 
 **Folder:** `results/data_summary/`
 
-**Contents:** system summary CSV and per-generator tables written by
-`scripts/04_summarize_processed_data.jl`.
+**Script:** `scripts/04_summarize_processed_data.jl`
 
-**Status:** Small files; useful as the source for paper data tables.
-Regenerate with:
+**Status:** Diagnostic — completed.  System summary CSV; useful as source
+for paper data tables.  Regenerate with:
+
 ```bash
 julia --project=. scripts/04_summarize_processed_data.jl
 ```
+
+**Committed:** Yes (small summary CSVs).
 
 ---
 
 ## 2. Load-scaling calibration
 
 **Files:**
-- `results/load_scaling/load_scaling_calibration.csv` — base five-point sweep (α = 1.00–1.20)
-- `results/load_scaling/load_scaling_calibration_extended.csv` — extended six-point sweep (α = 1.20–1.35)
+- `results/load_scaling/load_scaling_calibration.csv`
+- `results/load_scaling/load_scaling_calibration_extended.csv`
 
 **Script:** `scripts/09_calibrate_load_scaling.jl`
 
-**Status:** Diagnostic — completed.  Used to select `load_scale = 1.20`
-as the calibrated stress case.  M3 LOLH ≈ 6–8 h/yr at that scale.
+**Status:** Diagnostic — completed.  Established `load_scale = 1.20` as the
+calibrated stress case.  M3 LOLH ≈ 6–8 h/yr at that scale.
 
-**Committed:** Yes (small summary CSVs).
+**Committed:** Yes.
 
 ---
 
@@ -43,16 +58,11 @@ as the calibrated stress case.  M3 LOLH ≈ 6–8 h/yr at that scale.
 
 **Folder:** `results/storage_matrix/`
 
-**Files:**
-- `storage_matrix_results.csv` — one row per (case, model); LOLH, EUE, runtime
-- `storage_matrix_errors.csv` — M1 vs M3 delta and runtime ratio per case
-
 **Script:** `scripts/10_run_storage_matrix.jl`
 
 **Status:** Diagnostic — completed.  10-scenario run across 12 storage
 configurations at `load_scale = 1.20`.  Revealed that M1 LOLH is
-identical across all storage sizes (later confirmed as a heuristic
-limitation by the M1 debug run).  Not the final main experiment.
+insensitive to storage size (later confirmed as a heuristic limitation).
 
 **Committed:** Yes (small summary CSVs).
 
@@ -62,23 +72,13 @@ limitation by the M1 debug run).  Not the final main experiment.
 
 **Folder:** `results/storage_debug/`
 
-**Files (per case):**
-- `<case>/m3_dispatch.csv` — full hourly dispatch for all scenarios (large; not committed)
-- `<case>/scenario_metrics.csv` — per-scenario LOLH, EUE, n\_events
-- `<case>/shortage_hours.csv` — rows where load\_shed\_mw > 0
-
-**Cross-case file:**
-- `p10d4_vs_p20d2_shortage_comparison.csv`
-
 **Script:** `scripts/11_debug_storage_cases.jl`
 
-**Status:** Diagnostic — completed.  Investigated the EUE anomaly between
-`storage120_p10_d4` and `storage120_p20_d2`, which produced identical
-metrics at N=10.  Confirmed as a small-sample coincidence; the two cases
-have disjoint shortage (scenario, hour) sets.
+**Status:** Diagnostic — completed.  Investigated EUE anomaly between
+`storage120_p10_d4` and `storage120_p20_d2` (confirmed as small-sample
+coincidence with disjoint shortage sets).
 
-**Committed:** Summary and comparison CSVs only; large dispatch files
-are not committed.
+**Committed:** Summary and comparison CSVs only.
 
 ---
 
@@ -86,18 +86,12 @@ are not committed.
 
 **Folder:** `results/storage_validation/`
 
-**Files:**
-- `selected_storage_validation_results.csv` — one row per (case, model); all metrics
-- `selected_storage_validation_errors.csv` — M1 vs M3 delta, CI95, runtime ratio
-- `selected_storage_validation_summary.txt` — auto-generated narrative answering six research sub-questions
-
 **Script:** `scripts/12_run_selected_storage_validation.jl`
 
-**Status:** Diagnostic — completed.  50-scenario validation of six
-selected storage cases at `load_scale = 1.20`.  These are the authoritative
-M3 benchmark numbers for the diagnostic phase.
+**Status:** Diagnostic — completed.  50-scenario M3 benchmark numbers for
+six storage configurations at `load_scale = 1.20`.
 
-Key results (M3, N=50, seed=42):
+**Key results (M3, N=50, seed=42):**
 
 | Case | LOLH (h/yr) | EUE (MWh) |
 |------|-------------|-----------|
@@ -108,7 +102,7 @@ Key results (M3, N=50, seed=42):
 | p20\_d2 | 4.90 | 2,889 |
 | p20\_d4 | 0.30 | 215 |
 
-**Committed:** Yes (all three files; no dispatch CSVs).
+**Committed:** Yes.
 
 ---
 
@@ -116,25 +110,13 @@ Key results (M3, N=50, seed=42):
 
 **Folder:** `results/m1_debug/`
 
-**Files (per case):**
-- `<case>_dispatch.csv` — full hourly dispatch with priority-action labels (large)
-- `<case>_scenario_metrics.csv` — per-scenario priority tallies and SOC statistics
-- `<case>_shortage_hours.csv` — rows where load\_shed\_mw > 0
-- `<case>_priority_stats.csv` — P1/P2/P3 hour and MWh counts per scenario
-
-**Cross-case files:**
-- `cross_case_comparison.csv`
-- `diagnosis.txt` — narrative root-cause diagnosis
-
 **Script:** `scripts/13_debug_m1_storage_sensitivity.jl`
 
 **Status:** Diagnostic — completed.  Confirms that M1 (RA-1a) priority-2
 proactive discharge depletes storage SOC to zero before 100% of shortage
-events; priority-1 emergency discharge fires zero times.  This is a
-heuristic limitation, not a data-loading bug.  Motivates RA-1b and RA-2.
+events; priority-1 emergency discharge fires zero times.
 
-**Committed:** Summary CSVs and `diagnosis.txt`; large dispatch CSVs are
-committed here because they are small (N=5 scenarios).
+**Committed:** Summary CSVs and `diagnosis.txt`.
 
 ---
 
@@ -142,71 +124,129 @@ committed here because they are small (N=5 scenarios).
 
 **Folder:** `results/vre_method_comparison/`
 
-**Files:**
-- `vre_case_summary.csv` — one row per VRE case; system-level penetration metrics
-  computed at case-build time (see column list below).  Independent of dispatch method.
-- `vre_method_comparison_results.csv` — one row per (VRE case, method); full metric suite
-- `vre_method_comparison_errors.csv` — error vs RA-3 benchmark, runtime ratio per (case, method)
-- `summary.txt` — auto-generated Q1–Q5 narrative and runtime table
-- `accuracy_runtime_frontier.csv` — aggregated accuracy × runtime statistics for Figure 4 *(planned)*
+**Scripts:**
+- `scripts/15_summarize_vre_cases.jl` — builds `vre_case_summary.csv`
+- `scripts/16_run_vre_method_comparison.jl` — runs M1/M1b/M1c/M2/M3
 
-**`vre_case_summary.csv` columns:**
+**Status:** N=20 priority-case runs complete.
 
-| Column | Description |
-|--------|-------------|
-| `case_name` | Case identifier (e.g. `VRE120_bal20`) |
-| `load_scale` | Load multiplier (1.20 for all main cases) |
-| `wind_scale` | Wind capacity scale factor relative to RTS-GMLC base |
-| `solar_scale` | Solar capacity scale factor relative to RTS-GMLC base |
-| `thermal_capacity_mw` | Total installed thermal capacity (MW) |
-| `wind_capacity_mw` | Total installed wind capacity (MW) |
-| `solar_capacity_mw` | Total installed solar capacity (MW) |
-| `storage_power_mw` | Storage power rating (MW) |
-| `storage_energy_mwh` | Storage energy rating (MWh) |
-| `vre_capacity_share_incl_storage` | (P\_wind + P\_solar) / (P\_thermal + P\_wind + P\_solar + P\_storage) |
-| `vre_capacity_share_no_storage` | (P\_wind + P\_solar) / (P\_thermal + P\_wind + P\_solar) |
-| `available_vre_energy_share` | sum\_h(wind\_avail\_h + solar\_avail\_h) / sum\_h(load\_h) |
-| `net_load_min_mw` | Minimum net load over all 8760 hours (MW) |
-| `net_load_mean_mw` | Mean net load (MW) |
-| `net_load_peak_mw` | Maximum net load (MW) |
-| `negative_net_load_hours` | Hours where net load < 0 |
-| `vre_exceeds_load_hours` | Hours where wind\_avail\_h + solar\_avail\_h > load\_h |
+**Key results (M3 benchmark, N=20, seed=42):**
 
-**`vre_method_comparison_results.csv` columns** (per-method reliability metrics):
+| Case | M3 LOLH (h) | M3 EUE (MWh) |
+|------|------------|--------------|
+| VRE120\_base | 6.2 | 2,479 |
+| VRE120\_wind\_hvy | variable | variable |
 
-| Group | Columns |
-|-------|---------|
-| ID / case metadata | `case_name`, `model`, `n_scenarios`, `seed`, `load_scale`, `wind_scale`, `solar_scale`, `available_vre_energy_share`, `vre_capacity_share_no_storage`, `vre_capacity_share_incl_storage`, `negative_net_load_hours`, `vre_exceeds_load_hours`, `net_load_peak_mw` |
-| Frequency | `lolh_hours`, `lolp`, `lolp_percent`, `lole_days` |
-| Energy | `eue_mwh`, `neue_ppm` |
-| Event structure | `n_shortage_events`, `mean_shortage_duration_h`, `max_shortage_duration_h`, `p95_shortage_duration_h` |
-| Severity | `max_shortfall_mw`, `mean_shortfall_when_shedding_mw` |
-| Tail risk | `p50_scenario_eue_mwh`, `p90_scenario_eue_mwh`, `p95_scenario_eue_mwh`, `p99_scenario_eue_mwh`, `cvar_eue_mwh` |
-| MC uncertainty | `lolh_ci95_halfwidth`, `lolh_ci95_rel_halfwidth`, `eue_ci95_halfwidth_mwh`, `eue_ci95_rel_halfwidth` |
-| Storage heuristic | `p1_fire_scenarios`, `p1_fire_hours` |
-| Run info | `runtime_s`, `status`, `error_message` |
+M1/M1b: biased high.  M1c: matches M3 EUE/CVaR.
+M2 (rm=1000, buf=48): matches M3 EUE to near-precision; LOLH within 0.2 h.
 
-**Scripts:** `scripts/15_summarize_vre_cases.jl` (builds `vre_case_summary.csv`),
-`scripts/16_run_vre_method_comparison.jl` (runs methods, writes all other files)
-
-**Status:** Initial N=5 sanity run complete (Phase C); N=20 priority-case runs planned
-after RA-2 implementation.  See `docs/vre_method_comparison_memo.md` for analysis.
-
-**Commit policy:** Commit `vre_case_summary.csv`, `vre_method_comparison_results.csv`,
-`vre_method_comparison_errors.csv`, and `summary.txt`.  Do not commit per-scenario
-dispatch files or log files.
+**Committed:** `vre_case_summary.csv`, `vre_method_comparison_results.csv`,
+`vre_method_comparison_errors.csv`, `summary.txt`.
 
 ---
 
-## General commit policy for results
+## 8. No-storage comparison
 
-- **Commit:** small aggregate CSVs (< ~500 rows), text summaries, and
-  `diagnosis.txt` files that are the primary output of a script.
-- **Do not commit:** per-hour dispatch CSVs for large runs (8760 h × many
-  scenarios × multiple models), intermediate debug files, or solver logs.
-- Large dispatch files are regenerable from committed scripts and seed-fixed
-  scenario generation; reproducibility does not require committing them.
-- The `.gitignore` already excludes `results/cases/`, `results/runs/`,
-  `results/dispatch/`, `results/logs/`, and `results/metrics/`.  New result
-  subfolders that contain large files should be added to `.gitignore` as
-  they are created.
+**Folder:** `results/no_storage_comparison/`
+
+**Script:** `scripts/34_compare_no_storage_classic_vs_ed.jl`
+
+**Status:** Complete (N=20, VRE120\_base and VRE120\_wind\_hvy).
+
+**Key result:** MC-NoStorage = M3-NoStorage exactly.  Storage introduces the
+temporal operation challenge; without it the classical capacity check is
+exact.
+
+| Case | MC-NoStorage EUE (MWh) | ΔEUE vs M3 |
+|------|----------------------|------------|
+| VRE120\_base | 31,017 | 0.00 MWh |
+| VRE120\_wind\_hvy | 15,801 | 0.00 MWh |
+
+**Committed:** Aggregate and per-scenario CSVs, `summary.txt`.
+
+---
+
+## 9. HOPE no-storage validation
+
+**Folders:**
+- `results/nostorage_hope_uc_comparison/base_n5/` — four-model aggregate
+- `results/hope_nostorage_n5_pilot/` — HOPE run status and metrics
+
+**Scripts:**
+- `scripts/36_compare_nostorage_hope_uc_n5.jl`
+- `scripts/27_collect_hope_results.jl`
+- `scripts/29_run_hope_n5_pilot.jl`
+
+**Status:** Complete (N=5, VRE120\_base\_nostorage, scenarios 1–5).
+
+**Key result:** All four models produce identical LOLH and EUE.
+
+| Model | LOLH (h) | EUE (MWh) | Runtime (s) |
+|-------|----------|-----------|-------------|
+| MC-NoStorage | 115.6 | 41,846 | 0.5 |
+| M3-NoStorage | 115.6 | 41,846 | 40.0 |
+| HOPE-ED-NoStorage | 115.6 | 41,846 | 614.3 |
+| HOPE-UC-NoStorage | 115.6 | 41,846 | 4,331.1 |
+
+UC adds 7× runtime with zero reliability benefit in the no-storage case.
+
+**Committed:** `hope_metrics_by_scenario.csv`, `hope_run_status.csv`,
+`all_model_aggregate_metrics.csv`, `summary.txt`.
+
+---
+
+## 10. HOPE full-year storage-enabled base validation
+
+**Folders:**
+- `results/full_model_comparison_with_hope/base_n5/` — five-model N=5
+- `results/hope_smoke_runs/` — HOPE ED/UC run outputs
+
+**Scripts:**
+- `scripts/25_build_hope_full_year_cases.jl`
+- `scripts/29_run_hope_n5_pilot.jl`
+- `scripts/27_collect_hope_results.jl`
+- `scripts/30_compare_all_models_hope_n5.jl`
+
+**Status:** Complete (VRE120\_base, N=5 and N=20).
+
+**Key result (VRE120\_base, N=20):**
+
+| Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | Runtime (s) |
+|-------|----------|-----------|-----------|-------------|
+| HOPE-ED | 6.2 | 2,479 | 9,783 | 2,356 |
+| HOPE-UC | 7.2 | 2,479 | 9,783 | 11,438 |
+
+HOPE-UC uses real Pmin/ramp/startup/min-up/down from RTS-GMLC.
+HOPE-UC increases LOLH by ~1 h but leaves EUE unchanged.
+
+**Committed:** `all_model_aggregate_metrics.csv`, `summary.txt`.
+
+---
+
+## 11. Wind-heavy HOPE-UC profile check
+
+**Folders:**
+- `results/wind_hvy_hope_uc_comparison/n5/` — five-model aggregate
+- `results/hope_wind_hvy_n5_pilot/` — HOPE run status and metrics
+
+**Script:** `scripts/37_compare_wind_hvy_hope_uc_n5.jl`
+
+**Status:** Complete (VRE120\_wind\_hvy, N=5, scenarios 1–5).
+
+**Key result:**
+
+| Model | LOLH (h) | EUE (MWh) | Runtime (s) |
+|-------|----------|-----------|-------------|
+| M1c | 4.4 | 1,113 | 0.6 |
+| M2 | 3.8 | 1,113 | 2.5 |
+| M3 | 4.4 | 1,113 | 44.3 |
+| HOPE-ED | 3.8 | 1,113 | 588 |
+| HOPE-UC | 4.2 | 1,113 | 2,712 |
+
+EUE identical across all five models (exact match per scenario).
+HOPE-UC shifts LOLH +0.4 h vs HOPE-ED (same temporal redistribution
+pattern as base case; milder because fewer tight scenarios).
+
+**Committed:** `all_model_aggregate_metrics.csv`, `all_model_metrics_by_scenario.csv`,
+`errors_vs_m3.csv`, `errors_vs_hope_ed.csv`, `summary.txt`,
+`hope_metrics_by_scenario.csv`, `hope_run_status.csv`.
