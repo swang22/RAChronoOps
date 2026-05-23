@@ -134,29 +134,27 @@ events rather than dispatch model complexity.
 **Placement:** Main text (Results, Experiment B / core comparison table).
 
 **Takeaway:** M1c, M1d\_earliest, and M2 each recover M3 EUE and CVaR exactly,
-while M1 and M1b overestimate risk by one to two orders of magnitude in LOLH
-and EUE, demonstrating that emergency-only or LP-based dispatch is necessary
-once storage is present.
+while M1 and M1b substantially overestimate reliability risk, demonstrating
+that emergency-only or LP-based dispatch is necessary once storage is present.
 
 **Source result folders:**
+- `results/m1_m1b_n20_paper/` — M1, M1b at N=20 (paper consistency run)
 - `results/m1d_storage_heuristic_comparison/` — M1c, M1d, M2, M3 at N=20
-- `results/vre_method_comparison/` — M1, M1b at N=3 (diagnostic pilot)
 
 **Source scripts:**
-- `scripts/38_compare_m1d_storage_heuristics.jl` — M1c/M1d/M2/M3, N=20
-- `scripts/16_run_vre_method_comparison.jl` — M1/M1b (N=3 pilot in committed file;
-  run with `n_scenarios=20` to regenerate at N=20 before final paper)
+- `scripts/41_run_m1_m1b_n20_for_paper.jl` — M1/M1b at N=20
+- `scripts/38_compare_m1d_storage_heuristics.jl` — M1c/M1d/M2/M3 at N=20
 
 **Exact CSV files:**
+- `results/m1_m1b_n20_paper/m1_m1b_aggregate_metrics.csv` — M1, M1b
 - `results/m1d_storage_heuristic_comparison/m1d_aggregate_metrics.csv` — M1c, M1d, M2, M3
-- `results/vre_method_comparison/vre_method_comparison_results.csv` — M1, M1b
 
 **Panel A — VRE120\_base:**
 
 | Model | N | LOLH (h) | ΔLOLH vs M3 | EUE (MWh) | ΔEUE vs M3 (MWh) | CVaR (MWh) | RT (s/scen) |
 |-------|---|----------|------------|-----------|-----------------|-----------|------------|
-| M1 | 3† | 107.0 | +101.1 | 35,119 | +32,640 | 40,277 | 0.23 |
-| M1b | 3† | 94.7 | +88.7 | 32,369 | +29,890 | 37,527 | 0.10 |
+| M1 | 20 | 95.4 | +89.5 | 31,017 | +28,538 | 51,937 | 0.06 |
+| M1b | 20 | 83.5 | +77.6 | 28,272 | +25,793 | 49,455 | 0.05 |
 | M1c | 20 | 6.0 | 0.0 | 2,479 | 0.00 | 9,783 | 0.06 |
 | M1d\_earliest | 20 | 6.0 | 0.0 | 2,479 | 0.00 | 9,783 | 0.05 |
 | M1d\_largest | 20 | 8.5 | +2.5 | 2,479 | 0.00 | 9,783 | 0.06 |
@@ -167,16 +165,13 @@ once storage is present.
 
 | Model | N | LOLH (h) | ΔLOLH vs M3 | EUE (MWh) | ΔEUE vs M3 (MWh) | CVaR (MWh) | RT (s/scen) |
 |-------|---|----------|------------|-----------|-----------------|-----------|------------|
-| M1 | 3† | 61.0 | +58.8 | 17,905 | +17,257 | 20,296 | 0.03 |
-| M1b | 3† | 32.3 | +30.1 | 11,357 | +10,708 | 13,622 | 0.03 |
+| M1 | 20 | 52.4 | +50.1 | 15,801 | +15,153 | 26,871 | 0.06 |
+| M1b | 20 | 25.0 | +22.8 | 8,982 | +8,334 | 20,155 | 0.05 |
 | M1c | 20 | 2.3 | 0.0 | 648 | 0.00 | 3,528 | 0.07 |
 | M1d\_earliest | 20 | 2.3 | 0.0 | 648 | 0.00 | 3,528 | 0.11 |
 | M1d\_largest | 20 | 2.7 | +0.4 | 648 | 0.00 | 3,528 | 0.05 |
 | M2 | 20 | 2.0 | −0.3 | 648 | 0.00 | 3,528 | 0.38 |
 | M3 (ref) | 20 | 2.3 | — | 648 | — | 3,528 | 9.2 |
-
-†M1 and M1b were run at N=3 in the committed pilot (clear failure established
-at N=3; regenerate at N=20 from `scripts/16` before submitting).
 
 **Construction notes:**
 - ΔEUE is per-scenario exact (not just mean); note "exact per-scenario match" in
@@ -318,19 +313,19 @@ matches HOPE-ED EUE.
 two groups for base and wind-heavy cases).
 
 **Source result folders:**
+- `results/m1_m1b_n20_paper/` — M1/M1b at N=20
 - `results/m1d_storage_heuristic_comparison/` — M1c/M1d/M2/M3
-- `results/vre_method_comparison/` — M1/M1b
 
 **Exact CSVs:**
+- `results/m1_m1b_n20_paper/m1_m1b_aggregate_metrics.csv`
 - `results/m1d_storage_heuristic_comparison/m1d_aggregate_metrics.csv`
-- `results/vre_method_comparison/vre_method_comparison_results.csv`
 
 **Data to plot:**
 
 | Model | EUE VRE120\_base (MWh) | EUE VRE120\_wind\_hvy (MWh) |
 |-------|----------------------|-----------------------------|
-| M1 | 35,119 (N=3) | 17,905 (N=3) |
-| M1b | 32,369 (N=3) | 11,357 (N=3) |
+| M1 | 31,017 (N=20) | 15,801 (N=20) |
+| M1b | 28,272 (N=20) | 8,982 (N=20) |
 | M1c | 2,479 (N=20) | 648 (N=20) |
 | M1d\_earliest | 2,479 (N=20) | 648 (N=20) |
 | M1d\_largest | 2,479 (N=20) | 648 (N=20) |
@@ -341,7 +336,7 @@ two groups for base and wind-heavy cases).
 - Use a log scale on the y-axis to show M1/M1b and M1c/M3 together.
 - Alternatively, use a split y-axis or two panels (top: M1/M1b; bottom: M1c+).
 - Mark M3 as a horizontal reference line; all M1c/M1d/M2 bars should reach it.
-- Annotate the M1/M1b bars with "N=3 pilot" to flag smaller sample size.
+- All models are now at N=20; no "pilot" annotation is needed.
 
 ---
 
@@ -357,21 +352,21 @@ faster); PCM-UCED adds 4–5× runtime over M3 with no EUE benefit.
 or |EUE − M3 EUE|).
 
 **Source result folders:**
+- `results/m1_m1b_n20_paper/` — M1, M1b at N=20
 - `results/m1d_storage_heuristic_comparison/` — M1c/M1d/M2/M3
 - `results/wind_hvy_hope_uc_comparison/n5/` — HOPE-ED, HOPE-UC
-- `results/vre_method_comparison/` — M1, M1b
 
 **Exact CSVs:**
+- `results/m1_m1b_n20_paper/m1_m1b_aggregate_metrics.csv`
 - `results/m1d_storage_heuristic_comparison/m1d_aggregate_metrics.csv`
 - `results/wind_hvy_hope_uc_comparison/n5/all_model_aggregate_metrics.csv`
-- `results/vre_method_comparison/vre_method_comparison_results.csv`
 
 **Data to plot (VRE120\_base, |ΔEUE| vs M3, representative runtimes):**
 
 | Model | RT (s/scen) | |ΔEUE| vs M3 (MWh) | Note |
 |-------|------------|---------------------|------|
-| M1 | ~0.2 | ~32,640 | N=3 pilot |
-| M1b | ~0.1 | ~29,890 | N=3 pilot |
+| M1 | 0.06 | 28,538 | N=20 |
+| M1b | 0.05 | 25,793 | N=20 |
 | M1c | 0.06 | 0.00 | N=20 |
 | M1d\_earliest | 0.05 | 0.00 | N=20 |
 | M2 | 0.43 | 0.00 | N=20 |
@@ -565,18 +560,14 @@ large HOPE case folders or per-hour dispatch CSVs.
 | Table 2 Panel B | `nostorage_hope_uc_comparison/base_n5/` | `all_model_aggregate_metrics.csv` | 36 | 5 | Complete |
 | Table 3 | `storage_energy_sufficiency_bound/` | `bound_vs_models.csv` | 39 | 20 | Complete |
 | Table 4 (M1c/M1d/M2/M3) | `m1d_storage_heuristic_comparison/` | `m1d_aggregate_metrics.csv` | 38 | 20 | Complete |
-| Table 4 (M1/M1b) | `vre_method_comparison/` | `vre_method_comparison_results.csv` | 16 | 3† | Pilot only — regenerate at N=20 |
+| Table 4 (M1/M1b) | `m1_m1b_n20_paper/` | `m1_m1b_aggregate_metrics.csv` | 41 | 20 | Complete |
 | Table 5 | `full_model_comparison_with_hope/base_n5/` + `wind_hvy_hope_uc_comparison/n5/` | `all_model_aggregate_metrics.csv` | 30, 37 | 5 | Complete |
 | Figure 2 | `nostorage_hope_uc_comparison/base_n5/` | `all_model_aggregate_metrics.csv` | 36 | 5 | Complete |
-| Figure 3 | `m1d_storage_heuristic_comparison/` + `vre_method_comparison/` | `m1d_aggregate_metrics.csv` | 38, 16 | 20/3† | M1/M1b pilot only |
-| Figure 4 | all of above | all of above | — | 20/3† | M1/M1b pilot only |
+| Figure 3 | `m1d_storage_heuristic_comparison/` + `m1_m1b_n20_paper/` | `m1d_aggregate_metrics.csv`, `m1_m1b_aggregate_metrics.csv` | 38, 41 | 20 | Complete |
+| Figure 4 | all of above | all of above | — | 20 | Complete |
 | Figure 5 | `storage_energy_sufficiency_bound/` | `bound_vs_models.csv`, `scenario_level_storage_bound.csv` | 39 | 20 | Complete |
 | Figure 6 | `full_model_comparison_with_hope/base_n5/` + `wind_hvy_hope_uc_comparison/n5/` | `all_model_aggregate_metrics.csv` | 30, 37 | 5 | Complete |
-| App A | `vre_method_comparison/` | `vre_method_comparison_results.csv` | 16 | 3† | Verify M1c\_VREOnly rows present |
+| App A | `vre_method_comparison/` | `vre_method_comparison_results.csv` | 16 | 20 | Verify M1c\_VREOnly rows present |
 | App B | `m1d_storage_heuristic_comparison/` | `m1d_metrics_by_scenario.csv` | 38 | 20 | Complete |
 | App C | `full_model_comparison_with_hope/base_n5/` | `all_model_aggregate_metrics.csv` | 25, 30 | 5 | Complete |
 | App D | — | `docs/results_index.md` | — | — | Complete |
-
-†M1/M1b at N=3: sufficient to establish the failure pattern, but regenerate
-at N=20 from `scripts/16_run_vre_method_comparison.jl` before final paper
-submission if a uniform N is preferred for Table 4.

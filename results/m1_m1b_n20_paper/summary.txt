@@ -1,0 +1,36 @@
+M1 / M1b Naive and Reserve-Floor Storage MC at N=20
+Generated: 2026-05-22T20:28:06.530
+Cases: VRE120_base, VRE120_wind_hvy  |  N=20, seed=42
+Purpose: paper consistency run — replace N=3 diagnostic pilot data
+
+──────────────────────────────────────────────────────────────────────
+Case: VRE120_base
+──────────────────────────────────────────────────────────────────────
+Model   LOLH (h)     EUE (MWh)    CVaR (MWh)     p95 (MWh)     RT (s)
+----------------------------------------------------------------------
+M1          95.4      31017.14      51937.30      49735.98        1.3
+M1b         83.5      28272.40      49454.93      47494.31        1.0
+
+──────────────────────────────────────────────────────────────────────
+Case: VRE120_wind_hvy
+──────────────────────────────────────────────────────────────────────
+Model   LOLH (h)     EUE (MWh)    CVaR (MWh)     p95 (MWh)     RT (s)
+----------------------------------------------------------------------
+M1          52.4      15801.11      26871.07      25525.23        1.1
+M1b         25.0       8982.38      20155.20      19716.42        1.0
+
+──────────────────────────────────────────────────────────────────────
+Errors vs Full-Year ED-MC (M3) benchmark
+──────────────────────────────────────────────────────────────────────
+Case                       Model    ΔLOLH (h)  ΔEUE (MWh)  ΔCVaR (MWh)    RT ratio
+----------------------------------------------------------------------
+VRE120_base                M1           +89.5    +28538.0    +42154.4       141.6×
+VRE120_base                M1b          +77.6    +25793.2    +39672.0       197.9×
+VRE120_wind_hvy            M1           +50.1    +15152.9    +23342.7       162.6×
+VRE120_wind_hvy            M1b          +22.8     +8334.1    +16626.8       182.5×
+
+Interpretation:
+  M1 (naive peak-shaving) and M1b (reserve-floor) substantially
+  overestimate reliability risk relative to Full-Year ED-MC (M3).
+  Both are retained as diagnostic failure cases showing the
+  consequence of proactive storage discharge before shortage events.

@@ -223,36 +223,24 @@ end
 function build_storage_method_comparison()::Union{DataFrame, Nothing}
     parts = DataFrame[]
 
-    # VRE120_base: M1, M1b, M1c, M2, M3 at N=20 (full_model_comparison/base_n20)
-    base20 = try_read(
-        joinpath(RESULTS, "full_model_comparison_with_hope", "base_n20",
-                 "all_model_aggregate_metrics.csv");
-        label = "full_model_comparison_with_hope/base_n20")
-    if !isnothing(base20)
-        base20 = select_core(base20, "VRE120_base", 20)
-        push!(parts, filter(r -> r.model in ("M1", "M1b", "M1c", "M2", "M3"), base20))
+    # M1 and M1b at N=20 for VRE120_base and VRE120_wind_hvy
+    # (paper consistency run; replaces the old N=3 diagnostic pilot data)
+    m1m1b = try_read(
+        joinpath(RESULTS, "m1_m1b_n20_paper", "m1_m1b_aggregate_metrics.csv");
+        label = "m1_m1b_n20_paper (N=20)")
+    if !isnothing(m1m1b)
+        m1m1b = select_core(m1m1b, "", 20)
+        push!(parts, filter(r -> r.model in ("M1", "M1b"), m1m1b))
     end
 
-    # VRE120_base + VRE120_wind_hvy: M1c, M1d_earliest, M1d_largest, M2, M3 at N=20
+    # M1c, M1d_earliest, M1d_largest, M2, M3 at N=20 for both cases
     m1d = try_read(
         joinpath(RESULTS, "m1d_storage_heuristic_comparison", "m1d_aggregate_metrics.csv");
         label = "m1d_storage_heuristic_comparison (N=20)")
     if !isnothing(m1d)
         m1d = select_core(m1d, "", 20)
         hasproperty(m1d, :case) || warn!("m1d_aggregate_metrics.csv: missing 'case' column")
-        # add wind_hvy rows and the M1d rows (base M1c/M2/M3 already in base20)
-        push!(parts, filter(r -> r.case == "VRE120_wind_hvy" ||
-                                 r.model in ("M1d_earliest", "M1d_largest"), m1d))
-    end
-
-    # VRE120_wind_hvy: M1, M1b at N=3 (only available sample size)
-    vmc = try_read(
-        joinpath(RESULTS, "vre_method_comparison", "vre_method_comparison_results.csv");
-        label = "vre_method_comparison (M1/M1b pilot N=3)")
-    if !isnothing(vmc)
-        norm_cols!(vmc, 3)
-        hasproperty(vmc, :case) || (vmc[!, :case] = vmc[!, :case_name])
-        push!(parts, filter(r -> r.model in ("M1", "M1b") && r.case == "VRE120_wind_hvy", vmc))
+        push!(parts, m1d)
     end
 
     isempty(parts) && (warn!("TABLE 3 (storage method comparison): all source files missing — skipped"); return nothing)

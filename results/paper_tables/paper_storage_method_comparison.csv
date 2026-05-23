@@ -1,13 +1,13 @@
 case,n_scenarios,model_internal,model_paper_name,model_short_label,lolh,eue_mwh,cvar_eue_mwh,mean_runtime_s,eue_error_vs_m3,lolh_error_vs_m3,runtime_ratio_vs_m3
-VRE120_base,20,M1,Naive Storage Monte Carlo,Naive Storage MC,95.4,31017.14,51937.3,0.06,28537.97,89.45,148.5
-VRE120_base,20,M1b,Reserve-Floor Storage Monte Carlo,Reserve-Floor MC,83.55,28272.4,49454.93,0.05,25793.24,77.6,210.2
-VRE120_base,20,M1c,Emergency-Only Storage Monte Carlo,Emergency-Only MC,5.95,2479.17,9782.93,0.05,-0.0,0.0,207.3
-VRE120_base,20,M1d_earliest,Risk-Hour-Earliest Monte Carlo,Risk-Hour-Earliest MC,5.95,2479.17,9782.93,0.05,-0.0,0.0,185.5
-VRE120_base,20,M1d_largest,Risk-Hour-Largest Monte Carlo,Risk-Hour-Largest MC,8.45,2479.17,9782.93,0.06,-0.0,2.5,152.8
-VRE120_base,20,M2,Event-Window LP Monte Carlo,Event-Window LP-MC,5.75,2479.17,9782.93,0.44,-0.0,-0.2,21.4
-VRE120_base,20,M3,Full-Year ED Monte Carlo,Full-Year ED-MC,5.95,2479.17,9782.93,9.52,0.0,0.0,1.0
-VRE120_wind_hvy,3,M1,Naive Storage Monte Carlo,Naive Storage MC,61.0,17905.11,20296.35,0.03,17256.88,58.75,276.6
-VRE120_wind_hvy,3,M1b,Reserve-Floor Storage Monte Carlo,Reserve-Floor MC,32.33,11356.51,13621.97,0.03,10708.27,30.08,276.6
+VRE120_base,20,M1,Naive Storage Monte Carlo,Naive Storage MC,95.4,31017.14,51937.3,0.07,28537.97,89.45,141.6
+VRE120_base,20,M1b,Reserve-Floor Storage Monte Carlo,Reserve-Floor MC,83.55,28272.4,49454.93,0.05,25793.24,77.6,197.9
+VRE120_base,20,M1c,Emergency-Only Storage Monte Carlo,Emergency-Only MC,5.95,2479.17,9782.93,0.06,-0.0,0.0,151.3
+VRE120_base,20,M1d_earliest,Risk-Hour-Earliest Monte Carlo,Risk-Hour-Earliest MC,5.95,2479.17,9782.93,0.05,-0.0,0.0,186.1
+VRE120_base,20,M1d_largest,Risk-Hour-Largest Monte Carlo,Risk-Hour-Largest MC,8.45,2479.17,9782.93,0.06,-0.0,2.5,153.3
+VRE120_base,20,M2,Event-Window LP Monte Carlo,Event-Window LP-MC,5.75,2479.17,9782.93,0.43,-0.0,-0.2,22.0
+VRE120_base,20,M3,Full-Year ED Monte Carlo,Full-Year ED-MC,5.95,2479.17,9782.93,9.56,0.0,0.0,1.0
+VRE120_wind_hvy,20,M1,Naive Storage Monte Carlo,Naive Storage MC,52.4,15801.11,26871.07,0.06,15152.87,50.15,162.6
+VRE120_wind_hvy,20,M1b,Reserve-Floor Storage Monte Carlo,Reserve-Floor MC,25.0,8982.38,20155.2,0.05,8334.14,22.75,182.5
 VRE120_wind_hvy,20,M1c,Emergency-Only Storage Monte Carlo,Emergency-Only MC,2.25,648.24,3528.39,0.07,0.0,0.0,130.6
 VRE120_wind_hvy,20,M1d_earliest,Risk-Hour-Earliest Monte Carlo,Risk-Hour-Earliest MC,2.25,648.24,3528.39,0.11,0.0,0.0,80.5
 VRE120_wind_hvy,20,M1d_largest,Risk-Hour-Largest Monte Carlo,Risk-Hour-Largest MC,2.65,648.24,3528.39,0.05,0.0,0.4,171.7

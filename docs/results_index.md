@@ -281,7 +281,37 @@ same energy deficit across more shedding hours.
 
 ---
 
-## 13. Storage-energy sufficiency bound
+## 13. M1 / M1b N=20 paper consistency run
+
+**Folder:** `results/m1_m1b_n20_paper/`
+
+**Script:** `scripts/41_run_m1_m1b_n20_for_paper.jl`
+
+**Status:** Complete (VRE120\_base and VRE120\_wind\_hvy, N=20, seed=42).
+
+**Purpose:** Replaces the old N=3 diagnostic pilot data so the paper
+storage-method comparison table (Table III) is internally consistent at N=20.
+M1 and M1b are retained as cautionary failure cases; they are not used as
+the primary RA estimate.
+
+**Key results (N=20, seed=42):**
+
+| Case | Model | LOLH (h) | EUE (MWh) | CVaR (MWh) | ΔEUE vs M3 |
+|------|-------|----------|-----------|-----------|------------|
+| VRE120\_base | M1 | 95.4 | 31,017 | 51,937 | +28,538 |
+| VRE120\_base | M1b | 83.5 | 28,272 | 49,455 | +25,793 |
+| VRE120\_wind\_hvy | M1 | 52.4 | 15,801 | 26,871 | +15,153 |
+| VRE120\_wind\_hvy | M1b | 25.0 | 8,982 | 20,155 | +8,334 |
+
+M1 and M1b substantially overestimate reliability risk because proactive
+peak-shaving discharge depletes storage SOC before shortage events.
+
+**Committed:** `m1_m1b_aggregate_metrics.csv`, `m1_m1b_metrics_by_scenario.csv`,
+`m1_m1b_errors_vs_m3.csv`, `summary.txt`.
+
+---
+
+## 14. Storage-energy sufficiency bound
 
 **Folder:** `results/storage_energy_sufficiency_bound/`
 

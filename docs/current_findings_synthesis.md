@@ -95,13 +95,15 @@ The diagnostic sequence showed:
 
 ## 5. Key finding 3: naive storage heuristics fail
 
-M1 and M1b overestimate reliability risk relative to the LP benchmark M3.
+M1 and M1b substantially overestimate reliability risk relative to the LP
+benchmark M3.  Both are evaluated at N=20 (same seed and ScenarioSet as M1c/M2/M3)
+via `scripts/41_run_m1_m1b_n20_for_paper.jl`.
 The bias is consistent across all tested VRE profiles.
 
 | Model | LOLH error vs M3 | EUE error vs M3 |
 |-------|-----------------|----------------|
-| M1 | Large positive | Large positive |
-| M1b | Moderate positive | Moderate positive |
+| M1 | +89.5 h (base), +50.1 h (wind-hvy) | +28,538 MWh (base), +15,153 MWh (wind-hvy) |
+| M1b | +77.6 h (base), +22.8 h (wind-hvy) | +25,793 MWh (base), +8,334 MWh (wind-hvy) |
 | M1c | Near zero | Near zero |
 | M1d\_earliest | Near zero | Near zero (exact match) |
 | M1d\_largest | Moderate positive (+2.4 h base) | Near zero (exact match) |
