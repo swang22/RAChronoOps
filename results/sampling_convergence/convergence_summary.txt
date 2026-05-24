@@ -1,0 +1,140 @@
+Sampling Convergence and Event-Shape Validation
+Generated: 2026-05-24T01:50:16.245
+Case: VRE120_base  |  N: 20, 50, 100, 200  |  seed=42
+M2: risk_margin=1000.0 MW, buffer=48 h
+M3 max N: 200
+
+────────────────────────────────────────────────────────────────────────────────────────────────
+Aggregate metrics by model and N
+────────────────────────────────────────────────────────────────────────────────────────────────
+  Model                N   LOLH(h)   EUE(MWh)  CVaR(MWh)   CI95-EUE  CI95-rel     RT(s)
+  ------------------------------------------------------------------------------------------
+  MC-NoStorage        20      95.4    31017.1    51937.3     5036.1     0.162       1.3
+  MC-NoStorage        50      96.5    32826.2    65165.4     3643.5     0.111       3.6
+  MC-NoStorage       100      95.7    32067.7    64324.0     2380.5     0.074       7.2
+  MC-NoStorage       200      95.6    32520.2    66713.2     1765.7     0.054      20.1
+  M1c                 20       6.0     2479.2     9782.9     1500.0     0.605       1.0
+  M1c                 50       6.6     2888.5    13310.5     1090.7     0.378       2.2
+  M1c                100       6.2     2703.1    13995.0      782.1     0.289       4.7
+  M1c                200       7.0     3179.7    18127.0      643.2     0.202      12.8
+  M2                  20       5.8     2479.2     9782.9     1500.0     0.605       8.6
+  M2                  50       6.2     2888.5    13310.5     1090.7     0.378      19.2
+  M2                 100       5.8     2703.1    13995.0      782.1     0.289      41.3
+  M2                 200       6.7     3179.7    18127.0      643.2     0.202     100.1
+  M3                  20       6.0     2479.2     9782.9     1500.0     0.605     186.9
+  M3                  50       6.6     2888.5    13310.5     1090.7     0.378     459.3
+  M3                 100       6.2     2703.1    13995.0      782.1     0.289     918.7
+  M3                 200       7.0     3179.7    18127.0      643.2     0.202    1894.5
+
+────────────────────────────────────────────────────────────────────────────────────────────────
+Q&A
+────────────────────────────────────────────────────────────────────────────────────────────────
+
+Q1. Do Emergency-Only MC (M1c) and Event-Window LP-MC (M2) continue
+    to match Full-Year ED-MC (M3) EUE as N increases?
+  N= 20:  M1c−M3 =     -0.0 MWh,  M2−M3 =     -0.0 MWh
+  N= 50:  M1c−M3 =     +0.0 MWh,  M2−M3 =     +0.0 MWh
+  N=100:  M1c−M3 =     +0.0 MWh,  M2−M3 =     +0.0 MWh
+  N=200:  M1c−M3 =     +0.0 MWh,  M2−M3 =     +0.0 MWh
+  Max |M1c−M3| EUE across all N: 0.0 MWh
+  Max |M2−M3|  EUE across all N: 0.0 MWh
+  YES — EUE method errors remain < 5 MWh across all N.
+
+Q2. Does method error remain small relative to MC sampling uncertainty (CI95 EUE)?
+  N= 20:  M3 CI95-EUE =  1500.0 MWh | M1c error =    -0.0 MWh | M2 error =    -0.0 MWh
+  N= 50:  M3 CI95-EUE =  1090.7 MWh | M1c error =    +0.0 MWh | M2 error =    +0.0 MWh
+  N=100:  M3 CI95-EUE =   782.1 MWh | M1c error =    +0.0 MWh | M2 error =    +0.0 MWh
+  N=200:  M3 CI95-EUE =   643.2 MWh | M1c error =    +0.0 MWh | M2 error =    +0.0 MWh
+  When |method error| << CI95, the method cannot be distinguished from M3
+  by a statistical test at the given N — method error is negligible.
+
+Q3. How do CI95 half-widths for EUE and LOLH shrink from N=20 to N=200?
+  Model                N   CI95-LOLH    CI95-EUE    rel-LOLH     rel-EUE
+  M1c                 20        3.25      1500.0       0.547       0.605
+  M1c                 50        2.22      1090.7       0.334       0.378
+  M1c                100        1.46       782.1       0.234       0.289
+  M1c                200        1.08       643.2       0.154       0.202
+  M2                  20        3.16      1500.0       0.550       0.605
+  M2                  50        2.11      1090.7       0.339       0.378
+  M2                 100        1.42       782.1       0.245       0.289
+  M2                 200        1.10       643.2       0.165       0.202
+  M3                  20        3.25      1500.0       0.547       0.605
+  M3                  50        2.22      1090.7       0.334       0.378
+  M3                 100        1.46       782.1       0.234       0.289
+  M3                 200        1.08       643.2       0.154       0.202
+  CI95 ∝ 1/√N: N=200 should be ≈ √(200/20) = 3.2× narrower than N=20.
+
+Q4. Does LOLH remain more sensitive than EUE (larger relative CI95)?
+  N= 20 M3: rel-CI95(LOLH)=0.547,  rel-CI95(EUE)=0.605  (EUE wider)
+  N= 50 M3: rel-CI95(LOLH)=0.334,  rel-CI95(EUE)=0.378  (EUE wider)
+  N=100 M3: rel-CI95(LOLH)=0.234,  rel-CI95(EUE)=0.289  (EUE wider)
+  N=200 M3: rel-CI95(LOLH)=0.154,  rel-CI95(EUE)=0.202  (EUE wider)
+
+Q5. Do event-shape metrics differ (M1c/M2 vs M3) even when EUE matches?
+  At N=100 (reference):
+  Model                LOLH  E-dur(h)  E-nrg(MWh)  MaxSF(MW)  MeanSF(MW)
+  MC-NoStorage         95.7      3.59    1202.4    1062.7     335.0
+  M1c                   6.2      3.03    1312.2     558.9     432.5
+  M2                    5.8      2.07     965.4     650.5     466.1
+  M3                    6.2      3.03    1312.2     558.9     432.5
+  Even with identical EUE, LOLH can differ because the same total energy
+  deficit may be distributed differently across shortage-event hours.
+
+Q6. Which event-shape metrics best explain the LOLH vs EUE divergence?
+  Mean event duration:  M3 = 3.03 h, M1c = 3.03 h (Δ=+0.00 h), M2 = 2.07 h (Δ=-0.96 h)
+  LOLH = n_events × mean_duration (approximately).
+  Differences in LOLH between models typically trace to within-event
+  duration differences, not to n_events.
+
+Q7. Runtime tradeoff as N increases?
+  Model                N    Total(s)  Per-scen(s)       vs-M3
+  MC-NoStorage        20         1.3        0.06     ×   144
+  MC-NoStorage        50         3.6        0.07     ×   127
+  MC-NoStorage       100         7.2        0.07     ×   128
+  MC-NoStorage       200        20.1        0.10     ×    94
+  M1c                 20         1.0        0.05     ×   194
+  M1c                 50         2.2        0.04     ×   205
+  M1c                100         4.7        0.05     ×   197
+  M1c                200        12.8        0.06     ×   148
+  M2                  20         8.6        0.43     ×    22
+  M2                  50        19.2        0.38     ×    24
+  M2                 100        41.3        0.41     ×    22
+  M2                 200       100.1        0.50     ×    19
+  M3                  20       186.9        9.35     ×     1
+  M3                  50       459.3        9.19     ×     1
+  M3                 100       918.7        9.19     ×     1
+  M3                 200      1894.5        9.47     ×     1
+
+Q8. Should the paper include this convergence experiment in main text or appendix?
+  Recommendation: Appendix.
+  Rationale:
+  - The N=20 common-random-number method comparison is the primary contribution.
+    It shows method error is zero regardless of N.
+  - Showing CI95 shrinkage quantifies how reliable the N=20 absolute estimates
+    are — a useful robustness check, but secondary to the method comparison.
+  - Event-shape metrics (duration, energy, shortfall) can go in an appendix
+    table to support the paper's use of multiple reliability metrics.
+  - If reviewers ask about statistical convergence, this experiment provides
+    a complete answer.
+
+────────────────────────────────────────────────────────────────────────────────────────────────
+CI95 half-width shrinkage (Full-Year ED-MC = M3)
+────────────────────────────────────────────────────────────────────────────────────────────────
+      N     LOLH(h)   CI95-LOLH    EUE(MWh)    CI95-EUE
+     20        5.95        3.25      2479.2      1500.0
+     50        6.64        2.22      2888.5      1090.7
+    100        6.25        1.46      2703.1       782.1
+    200        7.00        1.08      3179.7       643.2
+
+────────────────────────────────────────────────────────────────────────────────────────────────
+Method error vs M3 (M1c and M2)
+────────────────────────────────────────────────────────────────────────────────────────────────
+  Model        N    ΔLOLH(h)   ΔEUE(MWh)  ΔCVaR(MWh)   Δn_events     Speedup
+  M1c         20        0.00       -0.00        0.00        0.00         194×
+  M1c         50        0.00        0.00        0.00        0.00         205×
+  M1c        100        0.00        0.00        0.00        0.00         197×
+  M1c        200        0.00        0.00        0.00       -0.00         148×
+  M2          20       -0.20       -0.00        0.00        0.90          22×
+  M2          50       -0.40        0.00        0.00        1.02          24×
+  M2         100       -0.45        0.00        0.00        0.74          22×
+  M2         200       -0.33        0.00        0.00        0.79          19×

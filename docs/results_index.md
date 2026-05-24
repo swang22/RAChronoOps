@@ -395,9 +395,14 @@ beyond LOLH and EUE.
 | Metric | Result |
 |--------|--------|
 | M1c−M3 EUE max \|Δ\| across all N | 0.0 MWh |
+| M1c−M3 LOLH max \|Δ\| across all N | 0.00 h (exact match) |
 | M2−M3 EUE max \|Δ\| across all N | 0.0 MWh |
-| CI95 EUE shrinkage N=20→N=200 | ≈ 3.2× (consistent with 1/√N) |
+| M2−M3 LOLH range across all N | −0.2 to −0.45 h |
+| CI95 EUE shrinkage N=20→N=200 | 2.3× (1500→643 MWh; heavy-tailed) |
+| CI95 LOLH shrinkage N=20→N=200 | 3.0× (3.25→1.08 h; near 1/√N = 3.2×) |
 | Method error vs CI95 | \|error\| ≪ CI95 at all N |
+| M1c speedup vs M3 | ×148–205× across N |
+| M2 speedup vs M3 | ×19–24× across N |
 
 EUE convergence holds at N=20, 50, 100, and 200 with nested common random
 numbers; the result is not a small-sample coincidence.  CI95 half-widths

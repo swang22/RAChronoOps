@@ -630,13 +630,16 @@ M1c, M2, and M3.
 | M1c vs M3 | 0.0 | 0.0 | 0.0 | 0.0 |
 | M2 vs M3 | 0.0 | 0.0 | 0.0 | 0.0 |
 
-**Panel B — CI95 EUE half-width by N:**
+**Panel B — CI95 EUE and LOLH half-width by N (M3):**
 
-| Model | N=20 CI95 (MWh) | N=50 CI95 (MWh) | N=100 CI95 (MWh) | N=200 CI95 (MWh) |
-|-------|----------------|----------------|-----------------|-----------------|
-| M3 | — | — | — | — |
+| N | LOLH (h) | CI95-LOLH (h) | EUE (MWh) | CI95-EUE (MWh) |
+|---|----------|---------------|-----------|----------------|
+| 20 | 5.95 | 3.25 | 2,479 | 1,500 |
+| 50 | 6.64 | 2.22 | 2,889 | 1,091 |
+| 100 | 6.25 | 1.46 | 2,703 | 782 |
+| 200 | 7.00 | 1.08 | 3,180 | 643 |
 
-_(Fill from `convergence_aggregate_metrics.csv` column `eue_ci95_hw_mwh`.)_
+CI95-LOLH shrinks 3.0× (N=20→200); CI95-EUE shrinks 2.3× (heavy-tailed).
 
 **Construction notes:**
 - Panel A confirms EUE convergence is not a small-sample coincidence.

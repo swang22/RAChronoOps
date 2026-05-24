@@ -356,16 +356,18 @@ sampling variance.
 
 **Key result (N=20, 50, 100, 200, seed=42):**
 
-- M1c−M3 EUE: 0.0 MWh across all N (exact per-scenario match maintained).
-- M2−M3 EUE: 0.0 MWh across all N.
-- CI95 EUE half-width shrinks ≈ 3.2× from N=20 to N=200 (consistent with
-  1/√N scaling); N=20 is adequate for method comparisons when the goal is
-  distinguishing EUE errors of ≥ 100 MWh.
-- Event-shape metrics (mean event duration, p95 event energy, p95 shortfall)
-  are consistent across M1c, M2, and M3 at the same N, confirming that
-  identical EUE reflects identical event structure, not coincident cancellation.
+- M1c−M3 EUE: 0.0 MWh across all N; M1c ΔLOLH = 0.00 h across all N
+  (exact per-scenario EUE and LOLH match maintained as N increases).
+- M2−M3 EUE: 0.0 MWh across all N; M2 LOLH within −0.2 to −0.45 h of M3.
+- CI95-EUE shrinks 2.3× from N=20 (1500 MWh) to N=200 (643 MWh); CI95-LOLH
+  shrinks 3.0× from N=20 (3.25 h) to N=200 (1.08 h).  EUE CI95 shrinks
+  slower than 1/√N = 3.2× due to the heavy-tailed EUE distribution.
 - Method error is negligible relative to MC sampling uncertainty at all N:
-  |M1c−M3| EUE ≪ CI95-EUE, and |M2−M3| EUE ≪ CI95-EUE.
+  |M1c−M3| EUE = 0.0 MWh vs CI95-EUE = 1500 MWh at N=20.
+- M1c and M3 produce identical event-shape metrics (mean event duration 3.0 h,
+  n_events per scenario).  M2 concentrates the same total energy deficit into
+  more but shorter events (mean 2.1 h), explaining its slightly lower LOLH.
+- Speedup: M1c ×148–205× vs M3; M2 ×19–24× vs M3 (stable across N).
 
 ---
 

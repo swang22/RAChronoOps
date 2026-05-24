@@ -371,27 +371,44 @@ common N=200 parent set, seed=42).  This confirms that the method-error
 results from prior experiments are not small-sample artifacts.
 
 **Result: M1c and M2 match M3 EUE exactly (ΔEUE = 0.0 MWh) at N=20,
-50, 100, and 200 — the EUE convergence result is stable across N.**
+50, 100, and 200 — the EUE convergence result is stable across N.
+M1c also matches M3 LOLH exactly (ΔLOLH = 0.00 h) at all N.**
 
-**CI95 shrinkage:**
+**CI95 shrinkage (N=20 → N=200):**
 
-CI95 half-widths shrink approximately as 1/√N from N=20 to N=200.
-N=200 gives CI95 ≈ 3.2× narrower than N=20.  N=20 is sufficient for
-method comparisons when the EUE error target is ≥ 100 MWh — the method
-errors are 0.0 MWh, far below the CI95 at every N tested.
+| N | LOLH (h) | CI95-LOLH | EUE (MWh) | CI95-EUE |
+|---|----------|-----------|-----------|----------|
+| 20 | 5.95 | 3.25 h | 2,479 | 1,500 MWh |
+| 50 | 6.64 | 2.22 h | 2,889 | 1,091 MWh |
+| 100 | 6.25 | 1.46 h | 2,703 | 782 MWh |
+| 200 | 7.00 | 1.08 h | 3,180 | 643 MWh |
+
+CI95-LOLH shrinks 3.0× (N=20→200), near the theoretical 1/√N = 3.2×.
+CI95-EUE shrinks 2.3× — slower than 1/√N because EUE has a heavy-tailed
+distribution; the sample variance itself grows as new extreme scenarios are
+included at higher N.
 
 **Method error vs sampling uncertainty:**
 
-At every N, the method errors |M1c−M3| and |M2−M3| are ≪ CI95-EUE.
-A statistical test at N=20 cannot distinguish M1c or M2 from M3 on EUE;
-the method errors are indistinguishable from zero relative to MC noise.
+At every N, |M1c−M3| EUE = 0.0 MWh vs CI95-EUE = 1,500 MWh (N=20).
+M2 EUE error = 0.0 MWh at all N; M2 LOLH is −0.2 to −0.45 h below M3
+(LP degeneracy — M2 concentrates the deficit into shorter events).
+A statistical test at N=20 cannot distinguish M1c or M2 from M3 on EUE.
 
-**Event-shape metrics:**
+**Event-shape metrics (at N=100):**
 
-Mean event duration, p95 event energy, p95 conditional shortfall, and
-event count per scenario are consistent across M1c, M2, and M3 at the same
-N.  The identical EUE reflects identical event structure, not coincidental
-cancellation of opposite errors across scenarios.
+| Model | LOLH (h) | Mean event dur. (h) | Mean event E (MWh) | Max shortfall (MW) |
+|-------|----------|--------------------|--------------------|-------------------|
+| MC-NoStorage | 95.7 | 3.59 | 1,202 | 1,063 |
+| M1c | 6.2 | 3.03 | 1,312 | 559 |
+| M2 | 5.8 | 2.07 | 965 | 651 |
+| M3 | 6.2 | 3.03 | 1,312 | 559 |
+
+M1c and M3 produce identical event-shape metrics.  M2's lower LOLH (−0.45 h
+vs M3 at N=100) traces to shorter mean event duration (2.07 vs 3.03 h) with
+more events — LP degeneracy allows M2 to spread the same energy deficit
+across more but shorter events.  EUE is identical because total deficit is
+unchanged.
 
 **Source:** `results/sampling_convergence/` (script 44).
 
