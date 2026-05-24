@@ -336,3 +336,41 @@ are smaller relative to the storage budget.
 
 **Committed:** `event_level_storage_bound.csv`, `scenario_level_storage_bound.csv`,
 `bound_vs_models.csv`, `summary.txt`.
+
+---
+
+## 15. Storage robustness sweep
+
+**Folders:**
+- `data_processed/storage_robustness_cases/` — 18 variant case directories
+- `results/storage_robustness/case_variant_summary.csv` — variant metadata
+- `results/storage_robustness_sweep/` — M1c/M2/M3/bound results
+
+**Scripts:**
+- `scripts/42_build_storage_robustness_cases.jl` — builds variant cases
+- `scripts/43_run_storage_robustness_sweep.jl` — runs M1c/M2/M3/bound sweep
+
+**Status:** Complete (18 variants, N=20, seed=42).
+
+**Variants:** Experiment A (duration 2/4/8/12h), B (power 0.5×/1×/2×),
+C (load stress 1.225/1.25 + combos), across VRE120\_base and
+VRE120\_wind\_hvy source cases.
+
+**Key results:**
+
+| Metric | Result |
+|--------|--------|
+| M1c−M3 EUE max \|Δ\| | 0.0 MWh (all 18 variants) |
+| M2−M3 EUE max \|Δ\| | 0.0 MWh (all 18 variants) |
+| M2 LOLH vs M3 max \|Δ\| | 1.5 h (dur2h + load stress) |
+| Sufficiency ratio range | 0.681 – 1.000 |
+| M1c speedup vs M3 | ×101 (mean) |
+| M2 speedup vs M3 | ×22 (mean) |
+
+EUE convergence holds at suf\_ratio = 0.681 (short 2h storage + load
+stress): the bound is tight enough that any dispatch preserving energy for
+shortfall hours achieves the same residual EUE.
+
+**Committed:** `metrics_all.csv`, `scenario_eue_all.csv`,
+`bound_comparison_all.csv`, `runtime_all.csv`, `summary.txt`,
+`case_variant_summary.csv`.

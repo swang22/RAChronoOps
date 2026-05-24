@@ -1,6 +1,6 @@
 # Current Experiment Design
 
-**Last updated:** 2026-05-21
+**Last updated:** 2026-05-23
 
 ---
 
@@ -289,7 +289,40 @@ comparable to published LOLP/EUE studies.
 
 ---
 
-## 11. Status summary
+## 11. Experiment F — Storage robustness sweep
+
+**Purpose:** Test whether the EUE convergence result (M1c = M2 = M3) and
+the sufficiency-bound explanation hold under a range of storage configurations
+and load-stress levels beyond the single baseline case.
+
+**Models:** M1c, M2 (rm=1000 MW, buf=48 h), M3, sufficiency bound
+
+**Variants (18 total across two source cases):**
+
+| Group | Label | Change from base | Source case |
+|-------|-------|-----------------|-------------|
+| Exp A | dur2h, dur4h, dur8h, dur12h | Storage duration | base + wind-hvy |
+| Exp B | pwr0p5x, pwr1p0x, pwr2p0x | Storage power (fixed 4h duration) | base + wind-hvy |
+| Exp C | ls1p225, ls1p25, dur2h\_ls1p225, pwr0p5x\_ls1p225 | Load scale 1.225–1.25 ± weak storage | base only |
+
+**Case builder:** `scripts/42_build_storage_robustness_cases.jl`
+**Run script:** `scripts/43_run_storage_robustness_sweep.jl`
+**Cases dir:** `data_processed/storage_robustness_cases/`
+**Results:** `results/storage_robustness_sweep/`
+
+**Key result (N=20, seed=42):**
+
+- M1c−M3 EUE: max |Δ| = 0.0 MWh across all 18 variants.
+- M2−M3 EUE: max |Δ| = 0.0 MWh across all 18 variants.
+- M2 LOLH vs M3: within ±1.5 h across all variants.
+- Sufficiency ratio range: 0.681 (dur2h + load stress) – 1.000 (2× power).
+- EUE convergence holds even at suf\_ratio = 0.681 — the bound remains
+  tight enough that any reasonable dispatch achieves the same minimum.
+- M1c ×101 speedup vs M3; M2 ×22 speedup vs M3.
+
+---
+
+## 12. Status summary
 
 | Experiment | Status |
 |------------|--------|
@@ -300,4 +333,5 @@ comparable to published LOLP/EUE studies.
 | D: full VRE sweep PCM-UCED (N=20) | Optional — feasible (~3 h) |
 | E1: M1d within-event allocation comparison | Complete |
 | E2: storage-energy sufficiency bound | Complete |
+| F: storage robustness sweep (18 variants, N=20) | Complete |
 | Paper tables and figures | Next step |

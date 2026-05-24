@@ -1,0 +1,135 @@
+Storage Robustness Sweep — Summary
+Generated: 2026-05-23T23:15:47.975
+N=20, seed=42
+M2 config: risk_margin=1000.0 MW, buffer=48 h
+Variants run: 18
+
+──────────────────────────────────────────────────────────────────────────────────────────
+Per-case results (mean across 20 scenarios)
+──────────────────────────────────────────────────────────────────────────────────────────
+  Case                                         Model    LOLH(h)   EUE(MWh)  CVaR(MWh)     Bound     RT(s)
+  ----------------------------------------------------------------------------------------
+  VRE120_base_dur12h                             M1c        2.5      359.3     1964.9        —       1.3
+  VRE120_base_dur12h                              M2        2.5      359.3     1964.9        —       8.7
+  VRE120_base_dur12h                              M3        2.5      359.3     1964.9      359.3     195.4
+  VRE120_base_dur2h                              M1c       17.1     8501.2    25258.1        —       2.4
+  VRE120_base_dur2h                               M2       17.6     8501.2    25258.1        —       8.3
+  VRE120_base_dur2h                               M3       17.1     8501.2    25258.1     8492.2     191.6
+  VRE120_base_dur2h_ls1p225                      M1c       33.1    17258.5    40369.6        —       2.2
+  VRE120_base_dur2h_ls1p225                       M2       34.6    17258.5    40369.6        —       9.5
+  VRE120_base_dur2h_ls1p225                       M3       33.1    17258.5    40369.6    17258.5     190.2
+  VRE120_base_dur4h                              M1c        6.0     2479.2     9853.5        —       2.4
+  VRE120_base_dur4h                               M2        5.8     2479.2     9853.5        —       8.0
+  VRE120_base_dur4h                               M3        6.0     2479.2     9853.5     2479.2     192.1
+  VRE120_base_dur8h                              M1c        2.5      359.3     1964.9        —       2.2
+  VRE120_base_dur8h                               M2        2.5      359.3     1964.9        —       8.6
+  VRE120_base_dur8h                               M3        2.5      359.3     1964.9      359.3     196.1
+  VRE120_base_ls1p225                            M1c       13.2     6185.4    21530.4        —       2.4
+  VRE120_base_ls1p225                             M2       13.1     6185.4    21530.4        —       8.0
+  VRE120_base_ls1p225                             M3       13.2     6185.4    21530.4     6185.4     192.7
+  VRE120_base_ls1p25                             M1c       24.8    12779.7    35460.7        —       1.4
+  VRE120_base_ls1p25                              M2       24.1    12779.7    35460.7        —       8.3
+  VRE120_base_ls1p25                              M3       24.8    12779.7    35460.7    12779.7     182.7
+  VRE120_base_pwr0p5x                            M1c       27.4     8770.1    25513.8        —       1.4
+  VRE120_base_pwr0p5x                             M2       26.9     8770.1    25513.8        —      11.1
+  VRE120_base_pwr0p5x                             M3       27.4     8770.1    25513.8     8762.6     182.4
+  VRE120_base_pwr0p5x_ls1p225                    M1c       50.3    17734.2    40759.3        —       2.1
+  VRE120_base_pwr0p5x_ls1p225                     M2       49.1    17734.2    40759.3        —      10.4
+  VRE120_base_pwr0p5x_ls1p225                     M3       50.3    17734.2    40759.3    17734.2     181.2
+  VRE120_base_pwr1p0x                            M1c        6.0     2479.2     9853.5        —       1.2
+  VRE120_base_pwr1p0x                             M2        5.8     2479.2     9853.5        —       8.5
+  VRE120_base_pwr1p0x                             M3        6.0     2479.2     9853.5     2479.2     182.4
+  VRE120_base_pwr2p0x                            M1c        0.1       42.1      841.8        —       1.4
+  VRE120_base_pwr2p0x                             M2        0.1       42.1      841.8        —       5.6
+  VRE120_base_pwr2p0x                             M3        0.1       42.1      841.8       42.1     188.9
+  VRE120_wind_hvy_dur12h                         M1c        1.2      188.9     1563.5        —       2.1
+  VRE120_wind_hvy_dur12h                          M2        1.2      188.9     1563.5        —       7.7
+  VRE120_wind_hvy_dur12h                          M3        1.2      188.9     1563.5      188.9     181.3
+  VRE120_wind_hvy_dur2h                          M1c        6.5     2890.8    10292.2        —       1.4
+  VRE120_wind_hvy_dur2h                           M2        6.2     2890.8    10292.2        —       7.6
+  VRE120_wind_hvy_dur2h                           M3        6.5     2890.8    10292.2     2881.8     175.8
+  VRE120_wind_hvy_dur4h                          M1c        2.2      648.2     4264.1        —       2.1
+  VRE120_wind_hvy_dur4h                           M2        1.9      648.2     4264.1        —       7.5
+  VRE120_wind_hvy_dur4h                           M3        2.2      648.2     4264.1      648.2     177.9
+  VRE120_wind_hvy_dur8h                          M1c        1.2      188.9     1563.5        —       1.2
+  VRE120_wind_hvy_dur8h                           M2        1.2      188.9     1563.5        —       8.4
+  VRE120_wind_hvy_dur8h                           M3        1.2      188.9     1563.5      188.9     181.4
+  VRE120_wind_hvy_pwr0p5x                        M1c       11.3     3195.2    10645.3        —       2.1
+  VRE120_wind_hvy_pwr0p5x                         M2       11.1     3195.2    10645.3        —      10.4
+  VRE120_wind_hvy_pwr0p5x                         M3       11.3     3195.2    10645.3     3187.4     177.3
+  VRE120_wind_hvy_pwr1p0x                        M1c        2.2      648.2     4264.1        —       1.6
+  VRE120_wind_hvy_pwr1p0x                         M2        1.9      648.2     4264.1        —       7.4
+  VRE120_wind_hvy_pwr1p0x                         M3        2.2      648.2     4264.1      648.2     177.8
+  VRE120_wind_hvy_pwr2p0x                        M1c        0.1        0.5       10.9        —       2.3
+  VRE120_wind_hvy_pwr2p0x                         M2        0.1        0.5       10.9        —       6.1
+  VRE120_wind_hvy_pwr2p0x                         M3        0.1        0.5       10.9        0.5     186.1
+
+──────────────────────────────────────────────────────────────────────────────────────────
+Q&A
+──────────────────────────────────────────────────────────────────────────────────────────
+
+Q1. Does Emergency-Only MC (M1c) track Full-Year ED-MC (M3) EUE
+    across all storage duration variants (Exp A)?
+  VRE120_base_dur12h                          M1c−M3 =    +0.0 MWh  OK
+  VRE120_base_dur2h                           M1c−M3 =    +0.0 MWh  OK
+  VRE120_base_dur2h_ls1p225                   M1c−M3 =    +0.0 MWh  OK
+  VRE120_base_dur4h                           M1c−M3 =    -0.0 MWh  OK
+  VRE120_base_dur8h                           M1c−M3 =    +0.0 MWh  OK
+  VRE120_wind_hvy_dur12h                      M1c−M3 =    +0.0 MWh  OK
+  VRE120_wind_hvy_dur2h                       M1c−M3 =    +0.0 MWh  OK
+  VRE120_wind_hvy_dur4h                       M1c−M3 =    +0.0 MWh  OK
+  VRE120_wind_hvy_dur8h                       M1c−M3 =    +0.0 MWh  OK
+  YES — M1c matches M3 EUE across all duration variants.
+
+Q2. Does Event-Window LP-MC (M2) match M3 EUE and LOLH
+    across all storage duration variants (Exp A)?
+  VRE120_base_dur12h                          EUE Δ=  +0.0 MWh  LOLH Δ= +0.0 h
+  VRE120_base_dur2h                           EUE Δ=  -0.0 MWh  LOLH Δ= +0.6 h
+  VRE120_base_dur2h_ls1p225                   EUE Δ=  +0.0 MWh  LOLH Δ= +1.5 h
+  VRE120_base_dur4h                           EUE Δ=  -0.0 MWh  LOLH Δ= -0.2 h
+  VRE120_base_dur8h                           EUE Δ=  +0.0 MWh  LOLH Δ= +0.0 h
+  VRE120_wind_hvy_dur12h                      EUE Δ=  +0.0 MWh  LOLH Δ= +0.0 h
+  VRE120_wind_hvy_dur2h                       EUE Δ=  +0.0 MWh  LOLH Δ= -0.3 h
+  VRE120_wind_hvy_dur4h                       EUE Δ=  +0.0 MWh  LOLH Δ= -0.3 h
+  VRE120_wind_hvy_dur8h                       EUE Δ=  +0.0 MWh  LOLH Δ= +0.0 h
+
+Q3. Does M1c accuracy hold for short-duration storage (2h)?
+  VRE120_base_dur2h                           M1c−M3=   +0.0 MWh  suf_ratio=0.768
+  VRE120_base_dur2h_ls1p225                   M1c−M3=   +0.0 MWh  suf_ratio=0.691
+  VRE120_wind_hvy_dur2h                       M1c−M3=   +0.0 MWh  suf_ratio=0.861
+
+Q4. Does the storage-energy sufficiency ratio drop as duration decreases?
+  VRE120_base_dur12h                          suf_ratio = 0.9917
+  VRE120_base_dur2h                           suf_ratio = 0.7683
+  VRE120_base_dur2h_ls1p225                   suf_ratio = 0.6905
+  VRE120_base_dur4h                           suf_ratio = 0.9408
+  VRE120_base_dur8h                           suf_ratio = 0.9917
+  VRE120_wind_hvy_dur12h                      suf_ratio = 0.9923
+  VRE120_wind_hvy_dur2h                       suf_ratio = 0.8614
+  VRE120_wind_hvy_dur4h                       suf_ratio = 0.9724
+  VRE120_wind_hvy_dur8h                       suf_ratio = 0.9923
+
+Q5. Does M1c track M3 EUE across all power variants (Exp B)?
+  VRE120_base_pwr0p5x                         M1c−M3 =    +0.0 MWh
+  VRE120_base_pwr0p5x_ls1p225                 M1c−M3 =    +0.0 MWh
+  VRE120_base_pwr1p0x                         M1c−M3 =    -0.0 MWh
+  VRE120_base_pwr2p0x                         M1c−M3 =    +0.0 MWh
+  VRE120_wind_hvy_pwr0p5x                     M1c−M3 =    +0.0 MWh
+  VRE120_wind_hvy_pwr1p0x                     M1c−M3 =    +0.0 MWh
+  VRE120_wind_hvy_pwr2p0x                     M1c−M3 =    +0.0 MWh
+
+Q6. Under load stress (Exp C), do M1c and M2 still match M3 EUE?
+  VRE120_base_dur2h_ls1p225                   M1c−M3=   +0.0  M2−M3=   +0.0 MWh
+  VRE120_base_ls1p225                         M1c−M3=   +0.0  M2−M3=   +0.0 MWh
+  VRE120_base_ls1p25                          M1c−M3=   +0.0  M2−M3=   +0.0 MWh
+  VRE120_base_pwr0p5x_ls1p225                 M1c−M3=   +0.0  M2−M3=   +0.0 MWh
+
+Q7. Runtime speedup of M1c and M2 vs M3 (per scenario, mean across variants)?
+  Mean M3 total runtime:  185.2 s / case (20 scenarios)
+  Mean M1c total runtime: 1.8 s (×101 speedup vs M3)
+  Mean M2 total runtime:  8.3 s (×22 speedup vs M3)
+
+Q8. Overall: are the main paper conclusions robust across storage configurations?
+  M1c−M3 EUE: max |Δ| = 0.0 MWh (across 18 variants)
+  M2−M3  EUE: max |Δ| = 0.0 MWh (across 18 variants)
+  Sufficiency ratio range: 0.681 – 1.000

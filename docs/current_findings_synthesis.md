@@ -1,6 +1,6 @@
 # Current Findings Synthesis
 
-**Date:** 2026-05-21
+**Date:** 2026-05-23
 
 ---
 
@@ -325,24 +325,55 @@ and runtime; LOLP is available in all result CSVs via the `lolp` column.
 
 ---
 
-## 12. Recommended next steps
+## 12. Key finding 7: EUE convergence is robust across storage configurations
 
-1. **No new runs immediately.** The completed experiment sequence answers
-   the core research questions.  Additional runs (e.g., wind-heavy N=20
-   HOPE-UC) are feasible (~3 h) but not required before writing.
+Script 43 ran M1c, M2, M3, and the sufficiency bound across 18 storage
+robustness variants (Experiment F: two source cases × duration sweep,
+power sweep, and load-stress variants), all at N=20, seed=42.
 
-2. **Prepare paper-ready tables and figures.** The primary deliverables are:
-   - Figure 1: method accuracy vs runtime plane
-   - Figure 2/3: LOLH and EUE errors by method and VRE case
-   - Figure 4: accuracy–runtime frontier (M1c, M2, M3, HOPE-ED, HOPE-UC)
-   - Table: no-storage validation (Tables A and B above)
-   - Table: storage method comparison (Table C)
-   - Table: HOPE-UC vs HOPE-ED (Table D)
+**Result: M1c and M2 match M3 EUE exactly (ΔEUE = 0.0 MWh) across all
+18 variants.**
+
+Selected results (VRE120\_base variants):
+
+| Variant | Storage | Load scale | M1c EUE | M2 EUE | M3 EUE | Suf. ratio |
+|---------|---------|-----------|---------|--------|--------|-----------|
+| dur2h | 983 MW / 1,966 MWh | 1.20 | 8,501 | 8,501 | 8,501 | 0.768 |
+| dur4h (base) | 983 MW / 3,932 MWh | 1.20 | 2,479 | 2,479 | 2,479 | 0.941 |
+| dur8h | 983 MW / 7,864 MWh | 1.20 | 359 | 359 | 359 | 0.992 |
+| dur12h | 983 MW / 11,796 MWh | 1.20 | 359 | 359 | 359 | 0.992 |
+| pwr0p5x | 492 MW / 1,966 MWh | 1.20 | 8,770 | 8,770 | 8,770 | — |
+| pwr2p0x | 1,966 MW / 7,864 MWh | 1.20 | 42 | 42 | 42 | 1.000 |
+| ls1p225 | 983 MW / 3,932 MWh | 1.225 | 6,185 | 6,185 | 6,185 | — |
+| ls1p25 | 983 MW / 3,932 MWh | 1.25 | 12,780 | 12,780 | 12,780 | — |
+| dur2h\_ls1p225 | 983 MW / 1,966 MWh | 1.225 | 17,259 | 17,259 | 17,259 | 0.691 |
+
+The sufficiency ratio drops as low as 0.691 (short 2h storage + load stress),
+yet EUE convergence still holds.  When the bound is this tight, there is no
+additional EUE reduction achievable; any reasonable dispatch that charges from
+surplus and discharges at shortfall hours attains the same bound.
+
+**Runtime (mean across 18 variants):**
+M1c ×101 speedup vs M3; M2 ×22 speedup vs M3.
+
+M2 LOLH deviation vs M3: ≤ ±1.5 h across all variants (largest for dur2h
++ load stress, where shortage events are longer and more numerous).
+
+**Source:** `results/storage_robustness_sweep/` (scripts 42 + 43).
+
+---
+
+## 13. Recommended next steps
+
+1. **Paper tables and figures** are the primary remaining deliverable.
+   The robustness sweep results from §12 strengthen the main claims and
+   can populate an appendix or supplementary table.
+
+2. **Consider N=20 wind-heavy HOPE-UC** if the paper requires a matched
+   comparison with the base case N=20 run.  Projected runtime: ~3 h.
+   Based on current evidence this is not required for the core claims.
 
 3. **M1d risk-hour allocation heuristic is implemented** (script 38).
    The storage-energy sufficiency bound (script 39) provides the theoretical
-   justification for the EUE convergence across M1c/M1d/M2/M3.
-   Both are available for inclusion in the paper as supporting material.
-
-4. **Consider N=20 wind-heavy HOPE-UC** if the paper requires a matched
-   comparison with the base case N=20 run.  Projected runtime: ~3 h.
+   justification for EUE convergence across M1c/M1d/M2/M3.  Both are
+   available for inclusion as supporting material.

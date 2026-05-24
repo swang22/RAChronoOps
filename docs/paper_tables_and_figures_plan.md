@@ -551,6 +551,55 @@ large HOPE case folders or per-hour dispatch CSVs.
 
 ---
 
+### Appendix E — Storage robustness sweep
+
+**Placement:** Appendix (or supplementary material supporting the main claim
+that EUE convergence holds beyond the single baseline configuration).
+
+**Takeaway:** M1c and M2 each recover M3 EUE exactly (ΔEUE = 0.0 MWh) across
+all 18 tested storage variants (duration 2–12 h, power 0.5×–2×, load stress
+1.20–1.25), even when the sufficiency ratio is as low as 0.69.  The ×101
+(M1c) and ×22 (M2) runtime speedups over M3 are also stable.
+
+**Source result folders:**
+- `results/storage_robustness/case_variant_summary.csv` — 18-variant metadata
+- `results/storage_robustness_sweep/` — M1c/M2/M3/bound results
+
+**Source scripts:**
+- `scripts/42_build_storage_robustness_cases.jl`
+- `scripts/43_run_storage_robustness_sweep.jl`
+
+**Exact CSV files:**
+- `results/storage_robustness_sweep/metrics_all.csv` — aggregate LOLH/EUE/CVaR/RT
+- `results/storage_robustness_sweep/bound_comparison_all.csv` — sufficiency ratio by variant
+
+**Selected results for appendix table (VRE120\_base variants, N=20):**
+
+| Variant | Dur (h) | Power (MW) | Load scale | M1c EUE (MWh) | M3 EUE (MWh) | Suf. ratio | M1c RT (s) | M3 RT (s) |
+|---------|---------|-----------|-----------|--------------|-------------|-----------|-----------|----------|
+| dur2h | 2 | 983 | 1.20 | 8,501 | 8,501 | 0.768 | 2.4 | 192 |
+| dur4h | 4 | 983 | 1.20 | 2,479 | 2,479 | 0.941 | 2.4 | 192 |
+| dur8h | 8 | 983 | 1.20 | 359 | 359 | 0.992 | 2.2 | 196 |
+| dur12h | 12 | 983 | 1.20 | 359 | 359 | 0.992 | 1.3 | 195 |
+| pwr0p5x | 4 | 492 | 1.20 | 8,770 | 8,770 | — | 1.4 | 182 |
+| pwr1p0x | 4 | 983 | 1.20 | 2,479 | 2,479 | — | 1.2 | 182 |
+| pwr2p0x | 4 | 1,966 | 1.20 | 42 | 42 | 1.000 | 1.4 | 189 |
+| ls1p225 | 4 | 983 | 1.225 | 6,185 | 6,185 | — | 2.4 | 193 |
+| ls1p25 | 4 | 983 | 1.25 | 12,780 | 12,780 | — | 1.4 | 183 |
+| dur2h\_ls1p225 | 2 | 983 | 1.225 | 17,259 | 17,259 | 0.691 | 2.2 | 190 |
+| pwr0p5x\_ls1p225 | 4 | 492 | 1.225 | 17,734 | 17,734 | — | 2.1 | 181 |
+
+**Construction notes:**
+- All ΔEUE values are 0.0 MWh (exact per-scenario match).
+- Include the wind-heavy variants as a second panel or merged table.
+- The "Suf. ratio" column (storage-energy sufficiency ratio) is from the bound
+  computation; "—" indicates not separately computed for power variants in this run
+  (bound is shown in the full CSV).
+- Consider also including a figure: EUE convergence vs sufficiency ratio scatter
+  to show that convergence holds even at low sufficiency.
+
+---
+
 ## Data availability summary
 
 | Table/Figure | Result folder | Key CSV | Script | N | Status |
@@ -571,3 +620,4 @@ large HOPE case folders or per-hour dispatch CSVs.
 | App B | `m1d_storage_heuristic_comparison/` | `m1d_metrics_by_scenario.csv` | 38 | 20 | Complete |
 | App C | `full_model_comparison_with_hope/base_n5/` | `all_model_aggregate_metrics.csv` | 25, 30 | 5 | Complete |
 | App D | — | `docs/results_index.md` | — | — | Complete |
+| App E | `storage_robustness_sweep/` | `metrics_all.csv`, `bound_comparison_all.csv` | 42, 43 | 20 | Complete |
