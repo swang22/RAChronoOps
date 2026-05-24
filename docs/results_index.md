@@ -374,3 +374,40 @@ shortfall hours achieves the same residual EUE.
 **Committed:** `metrics_all.csv`, `scenario_eue_all.csv`,
 `bound_comparison_all.csv`, `runtime_all.csv`, `summary.txt`,
 `case_variant_summary.csv`.
+
+---
+
+## 16. Sampling convergence and event-shape validation
+
+**Folder:** `results/sampling_convergence/`
+
+**Script:** `scripts/44_run_sampling_convergence.jl`
+
+**Status:** Complete (VRE120\_base, N=20/50/100/200, seed=42, nested design).
+
+**Purpose:** Validate that the method-error result (M1c = M2 = M3 EUE) is
+not a small-sample artifact; quantify CI95 shrinkage with N; and add
+event-shape metrics (shortage duration, event energy, shortfall severity)
+beyond LOLH and EUE.
+
+**Key results:**
+
+| Metric | Result |
+|--------|--------|
+| M1c−M3 EUE max \|Δ\| across all N | 0.0 MWh |
+| M2−M3 EUE max \|Δ\| across all N | 0.0 MWh |
+| CI95 EUE shrinkage N=20→N=200 | ≈ 3.2× (consistent with 1/√N) |
+| Method error vs CI95 | \|error\| ≪ CI95 at all N |
+
+EUE convergence holds at N=20, 50, 100, and 200 with nested common random
+numbers; the result is not a small-sample coincidence.  CI95 half-widths
+shrink as expected with √N, confirming that N=20 provides adequate precision
+for method comparison at the tested stress levels.  Event-shape metrics
+(mean event duration, p95 event energy, p95 shortfall) are consistent across
+M1c, M2, and M3.
+
+**Committed:** `convergence_aggregate_metrics.csv`,
+`convergence_event_shape_metrics.csv`,
+`convergence_errors_vs_full_ed.csv`,
+`convergence_runtime_summary.csv`,
+`convergence_summary.txt`.

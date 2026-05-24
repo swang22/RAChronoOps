@@ -363,11 +363,45 @@ M2 LOLH deviation vs M3: ≤ ±1.5 h across all variants (largest for dur2h
 
 ---
 
-## 13. Recommended next steps
+## 13. Key finding 8: sampling convergence validates N=20 baseline
+
+Script 44 ran MC-NoStorage, M1c, M2, and M3 across N=20, 50, 100, and 200
+scenarios using a nested scenario design (all N share the first N rows of a
+common N=200 parent set, seed=42).  This confirms that the method-error
+results from prior experiments are not small-sample artifacts.
+
+**Result: M1c and M2 match M3 EUE exactly (ΔEUE = 0.0 MWh) at N=20,
+50, 100, and 200 — the EUE convergence result is stable across N.**
+
+**CI95 shrinkage:**
+
+CI95 half-widths shrink approximately as 1/√N from N=20 to N=200.
+N=200 gives CI95 ≈ 3.2× narrower than N=20.  N=20 is sufficient for
+method comparisons when the EUE error target is ≥ 100 MWh — the method
+errors are 0.0 MWh, far below the CI95 at every N tested.
+
+**Method error vs sampling uncertainty:**
+
+At every N, the method errors |M1c−M3| and |M2−M3| are ≪ CI95-EUE.
+A statistical test at N=20 cannot distinguish M1c or M2 from M3 on EUE;
+the method errors are indistinguishable from zero relative to MC noise.
+
+**Event-shape metrics:**
+
+Mean event duration, p95 event energy, p95 conditional shortfall, and
+event count per scenario are consistent across M1c, M2, and M3 at the same
+N.  The identical EUE reflects identical event structure, not coincidental
+cancellation of opposite errors across scenarios.
+
+**Source:** `results/sampling_convergence/` (script 44).
+
+---
+
+## 14. Recommended next steps
 
 1. **Paper tables and figures** are the primary remaining deliverable.
-   The robustness sweep results from §12 strengthen the main claims and
-   can populate an appendix or supplementary table.
+   The robustness sweep results from §12 and the sampling convergence
+   results from §13 strengthen the main claims and can populate appendices.
 
 2. **Consider N=20 wind-heavy HOPE-UC** if the paper requires a matched
    comparison with the base case N=20 run.  Projected runtime: ~3 h.

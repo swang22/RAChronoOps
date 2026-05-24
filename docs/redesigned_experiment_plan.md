@@ -322,7 +322,54 @@ and load-stress levels beyond the single baseline case.
 
 ---
 
-## 12. Status summary
+## 13. Experiment G — Sampling convergence and event-shape validation
+
+**Purpose:** (1) Confirm that the method-error conclusions (M1c = M2 = M3 EUE)
+hold as N increases from 20 to 200 — i.e., that the result is not a
+small-sample artifact; (2) quantify CI95 half-width shrinkage to establish how
+many scenarios are required for a given precision target; (3) add event-shape
+metrics (shortage duration, event energy, shortfall severity) to communicate
+the magnitude and structure of shortage events beyond LOLH and EUE.
+
+**Nested scenario design:** A parent ScenarioSet (N=200, seed=42) is generated
+once; each smaller N is the first N rows of the parent, so all N values share
+common random numbers.  Inter-N comparisons reflect pure convergence, not
+sampling variance.
+
+**Models:** MC-NoStorage, M1c, M2 (rm=1000 MW, buf=48 h), M3
+
+**Case:** VRE120\_base (no-storage case loaded automatically from
+`VRE120_base_nostorage`)
+
+**Script:** `scripts/44_run_sampling_convergence.jl`
+
+**N list:** 20, 50, 100, 200  |  seed=42
+
+**Output folder:** `results/sampling_convergence/`
+
+**Output files:**
+- `convergence_aggregate_metrics.csv` — LOLH/EUE/CVaR/CI95/RT per model and N
+- `convergence_event_shape_metrics.csv` — duration/energy/shortfall per model and N
+- `convergence_errors_vs_full_ed.csv` — M1c and M2 errors vs M3 per N
+- `convergence_runtime_summary.csv` — total and per-scenario runtimes
+- `convergence_summary.txt` — Q&A narrative with aggregate tables
+
+**Key result (N=20, 50, 100, 200, seed=42):**
+
+- M1c−M3 EUE: 0.0 MWh across all N (exact per-scenario match maintained).
+- M2−M3 EUE: 0.0 MWh across all N.
+- CI95 EUE half-width shrinks ≈ 3.2× from N=20 to N=200 (consistent with
+  1/√N scaling); N=20 is adequate for method comparisons when the goal is
+  distinguishing EUE errors of ≥ 100 MWh.
+- Event-shape metrics (mean event duration, p95 event energy, p95 shortfall)
+  are consistent across M1c, M2, and M3 at the same N, confirming that
+  identical EUE reflects identical event structure, not coincident cancellation.
+- Method error is negligible relative to MC sampling uncertainty at all N:
+  |M1c−M3| EUE ≪ CI95-EUE, and |M2−M3| EUE ≪ CI95-EUE.
+
+---
+
+## 14. Status summary
 
 | Experiment | Status |
 |------------|--------|
@@ -334,4 +381,5 @@ and load-stress levels beyond the single baseline case.
 | E1: M1d within-event allocation comparison | Complete |
 | E2: storage-energy sufficiency bound | Complete |
 | F: storage robustness sweep (18 variants, N=20) | Complete |
+| G: sampling convergence and event-shape validation (N=20–200) | Complete |
 | Paper tables and figures | Next step |
