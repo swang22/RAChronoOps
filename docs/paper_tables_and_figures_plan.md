@@ -29,9 +29,9 @@ and `results/wind_hvy_hope_uc_comparison/n5/all_model_aggregate_metrics.csv`.
 | MC-NoStorage | No | No | Classical hourly capacity check | < 1 s/scenario | No-storage baseline; validates MC sampling |
 | M1 / RA-1a | Yes | No | Naive 3-priority peak-shaving heuristic | ~1 s/scenario | Cautionary failure case |
 | M1b / RA-1b | Yes | No | Reserve-aware heuristic (SOC floor on P2) | ~1 s/scenario | Improved heuristic; partially corrects M1 |
-| M1c / RA-1c | Yes | No | Emergency-only discharge, system-surplus charging | ~1–2 s/scenario | Near-benchmark simple model |
+| M1c / RA-1c | Yes | No | Emergency-only discharge, system-surplus charging | ~1–2 s/scenario | PRAS/Evans-style conservative adequacy dispatch baseline |
 | M1d / RA-1d | Yes | No | Risk-hour allocation (earliest\_first / largest\_first) | ~1–2 s/scenario | Within-event allocation diagnostic |
-| M2 / RA-2 | Yes | LP (event windows only) | Event-window LP (rm=1000 MW, buf=48 h) | ~5–10 s/scenario | Proposed hybrid method |
+| M2 / RA-2 | Yes | LP (event windows only) | Event-window LP (rm=1000 MW, buf=48 h) | ~5–10 s/scenario | Proposed scalable optimization-assisted method |
 | M3 / RA-3 | Yes | LP (full year) | Full-year economic dispatch LP (Gurobi) | ~9–10 s/scenario | LP reliability benchmark |
 | PCM-ED | Yes | LP (full year) | Full-year HOPE economic dispatch LP | ~120 s/scenario | PCM validation (ED mode) |
 | PCM-UCED | Yes | MILP (full year) | Full-year HOPE unit commitment MILP | ~540–580 s/scenario | High-fidelity UC benchmark |

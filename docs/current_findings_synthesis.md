@@ -7,22 +7,43 @@
 ## 1. Overview
 
 This document summarises the key findings from the completed RAChronoOps
-experiment sequence.  The project tests a ladder of storage dispatch
-approximations — from naive heuristics to event-window LPs to full-year
-production-cost models (PCM) — against a common Monte Carlo scenario set for an
-RTS-GMLC-based single-zone system.  The clean narrative is:
+experiment sequence.  The project builds on prior work showing that storage
+dispatch affects adequacy metrics (Gonzato et al. 2023; PRAS/Stephen 2021) and
+provides a systematic storage-dispatch fidelity ladder for sequential Monte Carlo
+resource adequacy: from naive proactive heuristics, to PRAS/Evans-style
+emergency-only dispatch, to event-window LP, full-year ED, PCM-ED, and PCM-UCED.
+Using common random numbers on a public RTS-GMLC test system, the project
+quantifies which approximations preserve EUE, LOLH, CVaR-EUE, and runtime
+performance, and introduces a storage-energy sufficiency-bound diagnostic that
+explains when simple storage-aware MC methods recover full-year ED EUE.
 
-Traditional sequential MC is valid without storage; storage SOC coupling
-makes reliability estimates sensitive to dispatch assumptions; naive storage
-heuristics overestimate risk; the event-window LP (M2) and emergency-only
-heuristic (M1c) recover the full-year ED benchmark at much lower runtime;
-PCM-UCED (HOPE-UC) mainly changes LOLH/event timing, not EUE, in the tested cases.
-A theoretical storage-energy sufficiency bound explains why M1c, M1d, M2,
-and M3 converge on the same EUE in these tested cases: in the tested
-RTS-GMLC single-zone configuration, the binding constraint is storage energy
-availability around shortage events rather than detailed dispatch complexity,
-and any model that charges from surplus and discharges only at shortfall hours
-approaches the bound.
+The five core contributions are:
+
+1. **Traditional MC baseline validation:** Without storage, Traditional MC reproduces
+   Full-Year ED-MC, PCM-ED, and PCM-UCED reliability metrics exactly in the tested
+   single-zone system.
+
+2. **Storage-dispatch fidelity ladder:** Naive proactive dispatch, reserve-floor
+   dispatch, PRAS/Evans-style emergency-only dispatch, event-window LP, full-year
+   ED, PCM-ED, and PCM-UCED are compared under common random numbers.
+
+3. **Error and runtime quantification:** The project quantifies how storage dispatch
+   approximations affect LOLH, EUE, CVaR-EUE, event timing, and runtime.
+
+4. **Storage-energy sufficiency diagnostic:** A diagnostic bound shows why
+   emergency-only and event-window LP methods recover full-year ED-MC EUE in the
+   tested cases.
+
+5. **PCM-UCED validation:** In the tested single-zone RTS-GMLC cases, PCM-UCED
+   changes load-shedding timing and LOLH but not EUE, while requiring substantially
+   higher runtime.
+
+**Note on Emergency-Only MC (M1c):**
+Emergency-Only Storage MC is a PRAS/Evans-style conservative adequacy dispatch rule:
+it charges from system surplus and discharges only during pre-storage shortfall.
+Its role in this project is not novelty as a standalone dispatch rule — analogous
+rules appear in PRAS (Stephen 2021) and Evans et al. (2019) — but as a validated
+low-cost baseline within the broader method ladder.
 
 ---
 
@@ -180,10 +201,17 @@ residual corresponds exactly to the M3 EUE.
 
 ---
 
-## 7. Key finding 5: M1c and M2 recover the ED/PCM benchmark
+## 7. Key finding 5: emergency-only dispatch and event-window LP recover the ED/PCM benchmark
 
-M1c (emergency-only, system-surplus charging) and M2 (event-window LP) both
+Emergency-Only MC (M1c, a PRAS/Evans-style conservative dispatch baseline) and
+Event-Window LP-MC (M2, the main scalable optimization-assisted method) both
 closely match M3 EUE and CVaR while being 13–130× faster.
+
+M2 is particularly important as the proposed scalable method: it bridges the gap
+between conservative heuristic dispatch and full-year ED by solving LPs only around
+screened scarcity windows, and is the recommended approach when the simple
+emergency-only rule may not be sufficient in systems with more complex storage
+dynamics.
 
 **Table C — Storage wind-heavy PCM comparison, N=5 (VRE120\_wind\_hvy):**
 
@@ -233,7 +261,43 @@ LOLH/event timing.
 
 ---
 
-## 9. Key caveats
+## 9. Scope and assumptions
+
+The study evaluates **centralized adequacy-oriented storage dispatch** — dispatch
+that charges from system surplus and discharges to serve load during shortfall.
+The following are explicitly outside scope:
+
+- **Merchant storage behavior:** no bidding, capacity withholding, strategic
+  behavior, or decision-dependent storage availability.
+- **Operating reserves and ancillary services:** no reserve requirements, no
+  frequency regulation, no forecast-error-driven unit commitment.  These go beyond
+  the traditional MC adequacy assumptions being extended here.
+- **Network constraints:** the current validation uses a single copper-plate zone.
+  Transmission-constrained multi-area systems are future work.
+- **Imperfect foresight and investment re-optimization:** all dispatch models assume
+  full within-scenario foresight; long-run investment dynamics are outside scope.
+
+These exclusions are consistent with traditional RA conventions and do not
+invalidate the method comparisons; they define the boundary of applicability.
+
+---
+
+## 10. LOLP note
+
+LOLP (loss-of-load probability) is computed as the fraction of simulated hours with
+positive load shedding.  In hourly sequential simulations with 8760 h/yr:
+
+```
+LOLP = LOLH / 8760
+```
+
+LOLP is therefore a direct normalization of LOLH and carries no additional
+information in this setting.  Main paper tables emphasize LOLH, EUE, CVaR-EUE,
+and runtime; LOLP is available in all result CSVs via the `lolp` column.
+
+---
+
+## 11. Key caveats
 
 1. **Single-zone RTS-GMLC system.** All conclusions are for a single copper-
    plate zone with 73 thermal units, 983 MW / 3,932 MWh storage, and a
@@ -249,10 +313,11 @@ LOLH/event timing.
    MC sampling uncertainty at N=5–20.  EUE is the more statistically stable
    metric at this sample size.
 
-4. **Operating reserves and network constraints are out of scope.**
-   The core benchmark aligns with traditional RA conventions: single zone,
-   no ancillary service constraints, no transmission limits.  These are
-   future extensions and do not invalidate the current comparisons.
+4. **PCM-UCED EUE invariance is scoped to tested cases.** The finding that
+   PCM-UCED does not change EUE applies to the tested single-zone RTS-GMLC
+   cases.  Commitment constraints may have a larger effect in systems with
+   tighter flexibility, stronger ramping limits, or additional operating
+   constraints.
 
 5. **N=5 wind-heavy results are indicative only.** The HOPE-UC wind-heavy
    comparison used 5 scenarios; per-scenario EUE values are exact matches,
@@ -260,7 +325,7 @@ LOLH/event timing.
 
 ---
 
-## 10. Recommended next steps
+## 12. Recommended next steps
 
 1. **No new runs immediately.** The completed experiment sequence answers
    the core research questions.  Additional runs (e.g., wind-heavy N=20

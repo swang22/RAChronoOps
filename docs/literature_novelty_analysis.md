@@ -45,30 +45,35 @@ unit commitment for RA, (iv) storage ELCC and capacity accreditation.
 
 ## 3. Defensible Novelty Claims
 
-Claims are ordered from strongest to most incremental.
+Claims are ordered from strongest to most incremental.  The framing reflects that
+Emergency-Only MC (M1c) is a PRAS/Evans-style conservative adequacy dispatch rule —
+not a newly invented strategy — and that the novelty is the systematic ladder,
+error/runtime quantification, sufficiency bound, and PCM-UCED validation.
 
 ### Primary (anchor claim)
-RAChronoOps is the first paper to construct and empirically validate a complete
-**dispatch-method ladder** for storage-aware sequential MC resource adequacy —
-from naive proactive heuristics (peak-shaving) through an emergency-only heuristic
-(M1c) and an event-window LP (M2) to full-year economic dispatch (M3) — and to
-benchmark all levels against a **PCM-UCED solution** on the same standard test system
-(single-zone RTS-GMLC), showing explicitly which methods converge on EUE and why.
+Building on prior work showing that storage dispatch affects adequacy metrics
+(Gonzato et al. 2023; PRAS/Stephen 2021), RAChronoOps provides, to our knowledge,
+the first **systematic storage-dispatch fidelity ladder** for sequential MC RA:
+from naive proactive heuristics, to PRAS/Evans-style emergency-only dispatch, to
+event-window LP, full-year ED, PCM-ED, and PCM-UCED — all benchmarked under common
+random numbers on the public RTS-GMLC test system — with explicit quantification of
+which approximations preserve EUE, LOLH, CVaR-EUE, and runtime performance.
 
 ### Secondary
-The **storage-energy sufficiency bound** is an original analytical result that explains
-why M1c and M2 recover the full-year ED EUE at 13–130× speedup.  No prior paper
-derives or names this construct in the sequential MC RA context.
+The **storage-energy sufficiency bound** is an original diagnostic that explains
+why emergency-only and event-window LP methods recover full-year ED EUE in the tested
+cases.  To our knowledge, no prior paper derives or names this bound in the sequential
+MC RA context.
 
 ### Third
-Explicit decomposition of **PCM-UCED effects**: unit commitment changes LOLH and
-event timing but not EUE in the tested cases.  Gonzato et al. (P8) make a related
-observation about EENS stability under dispatch variation, but without a UC-level
-benchmark.
+Explicit decomposition of **PCM-UCED effects in tested storage-enabled cases**:
+unit commitment changes LOLH and event timing but not EUE.  Gonzato et al. (P8)
+make a related observation about EENS stability under dispatch variation, but without
+a UC-level benchmark.
 
 ### Fourth (incremental but real)
 The **no-storage exact equivalence** (traditional MC = LP = PCM-UCED) is implicitly
-known but not previously demonstrated cleanly as a validated baseline on a standard
+known but not previously demonstrated cleanly as a validated baseline on the RTS-GMLC
 test system.
 
 ---
@@ -80,7 +85,8 @@ test system.
 | "First to model storage in sequential MC RA" | False. PRAS (P20), Tindemans/Strbac (P4), Gonzato et al. (P8), and others do this. |
 | "First to show peak-shaving heuristics overestimate risk" | Gonzato et al. (P8) and Mantegna et al. (P14) note this qualitatively. Correct framing: "first to systematically quantify and explain this bias against a PCM-UCED benchmark on a standard test system." |
 | "First to use LP dispatch for storage in RA" | Wang et al. (P9) and Rabecq et al. (P21) use LP dispatch in RA contexts. The novelty is the comparison ladder and benchmark validation, not LP dispatch per se. |
-| "PCM-UCED does not affect EUE" (universal) | Result must be scoped: "in the tested single-zone RTS-GMLC cases." |
+| "Emergency-Only MC is a new dispatch strategy" | False. Analogous rules appear in PRAS (P20) and Evans et al. (P3). M1c's role is as a validated low-cost baseline within the ladder, not a novel standalone contribution. |
+| "PCM-UCED does not affect EUE" (universal) | Result must be scoped: "in the tested single-zone RTS-GMLC cases." Add: "Commitment constraints may have a larger effect in systems with tighter flexibility." |
 | "First sequential MC study with storage on RTS-GMLC" | Barrows et al. introduced RTS-GMLC with storage; PRAS applications use it. Novelty is the method ladder applied to it. |
 
 ---
@@ -125,16 +131,18 @@ These papers require direct technical differentiation.
 > chronological reliability evaluation [P1, P2], and recent reviews confirm it is
 > increasingly needed as storage penetration grows [P14, P15].  Production-cost
 > model tools can represent storage dispatch with full temporal fidelity but at
-> high computational cost [P13]; practical RA tools such as PRAS [P20] use greedy
-> or heuristic dispatch acknowledged as simplifications.  Several studies have
-> examined storage dispatch effects on RA metrics: Gonzato et al. [P8] show that
-> different dispatch strategies produce the same EENS but different LOLE; Tindemans
-> et al. [P4] accelerate sequential MC without changing the dispatch model;
-> Evans et al. [P3] derive optimal no-forecast dispatch policies for shortfall events.
-> What remains missing is a systematic comparison — from naive heuristics to
-> event-window LP to full-year ED — that (i) benchmarks all methods against a
-> PCM-UCED solution on a standard test system, and (ii) provides a theoretical
-> explanation for when and why simpler dispatch approximations are sufficient.
+> high computational cost [P13]; practical RA tools such as PRAS [P20] use
+> conservative adequacy-oriented dispatch (charge from surplus; discharge only to
+> serve load) acknowledged as a simplification.  Prior work has shown that storage
+> dispatch strategies affect reliability metrics: Gonzato et al. [P8] show that
+> different dispatch strategies can yield the same EENS but different LOLE; Evans
+> et al. [P3] derive optimal no-forecast dispatch policies for shortfall events.
+> Building on these findings, what remains missing is a systematic
+> storage-dispatch fidelity ladder — from naive proactive heuristics to
+> PRAS/Evans-style emergency-only dispatch to event-window LP to full-year ED —
+> that (i) benchmarks all levels against a PCM-UCED solution on a standard test
+> system under common random numbers, and (ii) provides a diagnostic explanation
+> for when and why simpler dispatch approximations recover full-year ED accuracy.
 > This paper provides both.
 
 ---

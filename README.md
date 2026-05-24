@@ -1,12 +1,14 @@
 # RAChronoOps
 
-RAChronoOps evaluates how much operational detail is needed inside
-probabilistic sequential Monte Carlo resource adequacy assessment for
-high-VRE, storage-rich power systems.  The project compares fast
-RA-compatible dispatch approximations against full-year economic dispatch
-and production-cost model (PCM) benchmarks.
-
-Single-zone copper-plate system based on the RTS-GMLC dataset.
+RAChronoOps provides a systematic **storage-dispatch fidelity ladder** for
+sequential Monte Carlo resource adequacy (RA), building on prior work showing
+that storage dispatch affects adequacy metrics (Gonzato et al. 2023; PRAS/Stephen
+2021).  The project compares naive proactive heuristics, PRAS/Evans-style
+emergency-only dispatch, event-window LP, full-year ED, PCM-ED, and PCM-UCED
+under common random numbers on the public RTS-GMLC single-zone test system.
+It quantifies which storage dispatch approximations preserve EUE, LOLH, CVaR-EUE,
+and runtime performance, and introduces a storage-energy sufficiency-bound
+diagnostic that explains when simpler methods recover full-year ED EUE.
 
 ## Method hierarchy
 
@@ -15,10 +17,10 @@ Single-zone copper-plate system based on the RTS-GMLC dataset.
 | MC-NoStorage | Traditional MC | Traditional hourly sequential MC without storage | None | Implemented — no-storage baseline |
 | RA-1a / M1 | Naive Storage MC | Sequential MC + naive peak-shaving storage heuristic | None | Implemented — cautionary baseline |
 | RA-1b / M1b | Reserve-Floor MC | Sequential MC + reserve-aware storage heuristic | None | Implemented and validated |
-| RA-1c / M1c | Emergency-Only MC | Sequential MC + emergency-only storage heuristic, system-surplus charging | None | Implemented and validated |
+| RA-1c / M1c | Emergency-Only MC | Sequential MC + PRAS/Evans-style emergency-only dispatch (system-surplus charging) | None | Implemented and validated |
 | M1c\_VREOnly | VRE-Surplus MC | Same as M1c but charges from VRE surplus only | None | Implemented — appendix sensitivity |
 | RA-1d / M1d | Risk-Hour MC | Sequential MC + risk-hour allocation heuristic (earliest\_first / largest\_first) | None | Implemented — within-event allocation study |
-| RA-2 / M2 | Event-Window LP-MC | Sequential MC + screened event-window LP near risk periods | Small LPs | Implemented and validated |
+| RA-2 / M2 | Event-Window LP-MC | Sequential MC + screened event-window LP near risk periods (proposed scalable method) | Small LPs | Implemented and validated |
 | RA-3 / M3 | Full-Year ED-MC | Sequential MC + full-year ED LP per scenario | LP (Gurobi) | Implemented — benchmark |
 | HOPE-ED | PCM-ED | Full-year HOPE ED LP (PCM economic dispatch mode) | LP (Gurobi) | Validated — matches M3 |
 | HOPE-UC / M4 | PCM-UCED | Full-year HOPE UC/PCM with real Pmin/ramp/startup/min-up/down | MILP (Gurobi) | Validated — N=5 and N=20 |
@@ -279,7 +281,7 @@ All implemented methods compute a common set of metrics stored in
 | Metric | Field | Definition |
 |--------|-------|-----------|
 | LOLH | `lolh` | Mean loss-of-load hours per year (h/yr) |
-| LOLP | `lolp` | Loss-of-load probability = LOLH / n\_hours |
+| LOLP | `lolp` | Loss-of-load probability = LOLH / 8760 (direct normalization in hourly sequential simulation) |
 | LOLE days | `lole_days` | Mean days per year with ≥ 1 shortage hour |
 
 ### Energy not served
@@ -323,19 +325,19 @@ All implemented methods compute a common set of metrics stored in
 
 ## Scope
 
-The following features are intentionally excluded from the core benchmark:
+The study evaluates **centralized adequacy-oriented storage dispatch**.
+The following are explicitly outside scope:
 
-- Transmission network (single copper-plate zone)
-- Operating reserves
-- Demand response
-- Hydro water budget
-- Network congestion
-- Imperfect foresight and investment re-optimization
+- **Merchant storage behavior:** no bidding, capacity withholding, strategic
+  behavior, or decision-dependent storage availability.
+- **Operating reserves and ancillary services:** no reserve requirements or
+  forecast-error-driven unit commitment beyond traditional RA assumptions.
+- **Network constraints:** single copper-plate zone; multi-area systems are future work.
+- **Transmission network, demand response, hydro water budget.**
+- **Imperfect foresight and investment re-optimization.**
 
-These are future extensions.  The core study aligns with traditional RA
-assumptions (single zone, copper plate, no ancillary services).
-
-Unit commitment is introduced only in HOPE-UC, which serves as the
+These exclusions align with traditional RA conventions and define the boundary of
+applicability.  Unit commitment is introduced only in PCM-UCED (HOPE-UC) as the
 high-fidelity validation benchmark.
 
 ---

@@ -6,25 +6,31 @@
 
 ## 1. Research goal
 
-Improve probabilistic sequential Monte Carlo resource adequacy (RA)
-assessment to incorporate storage temporal operation while retaining
-computational scalability.
+Building on prior work showing that storage dispatch affects adequacy metrics
+(Gonzato et al. 2023; PRAS/Stephen 2021), provide a systematic
+**storage-dispatch fidelity ladder** for sequential Monte Carlo resource adequacy
+(RA): from naive proactive heuristics, to PRAS/Evans-style emergency-only dispatch,
+to event-window LP, full-year ED, PCM-ED, and PCM-UCED.
 
-The central question is: **how much operational detail must be embedded
-inside each Monte Carlo scenario to obtain reliable estimates of LOLH and
-EUE without running a full production-cost model for every scenario?**
+The central question is: **how much storage dispatch complexity is needed inside
+each Monte Carlo scenario to obtain reliable estimates of LOLH, EUE, and CVaR-EUE,
+and at what runtime cost?**
 
 ---
 
 ## 2. Core hypothesis
 
-Monte Carlo sampling is valid; the missing piece is storage operation inside
-each scenario.  Traditional sequential MC (no storage) already matches full
-ED/UC LP in the no-storage setting.  Once storage is added, the intertemporal
-SOC state links hours together, making reliability estimates sensitive to the
-assumed dispatch rule.  Solving LPs only near screened risk periods (RA-2 /
-M2) should recover most of the full-year ED benchmark accuracy at a fraction
-of the runtime.
+Monte Carlo sampling is valid; the key variable is the storage dispatch
+representation inside each scenario.  Traditional sequential MC (no storage)
+already matches full ED/UC LP in the no-storage setting.  Once storage is added,
+the intertemporal SOC state links hours together, making reliability estimates
+sensitive to the assumed dispatch rule.
+
+Conservative adequacy dispatch (PRAS/Evans-style: charge from surplus; discharge
+only at shortfall) avoids the SOC-depletion failure of naive peak-shaving heuristics.
+Solving LPs only near screened risk periods (Event-Window LP-MC / M2) provides
+additional accuracy when simpler dispatch may not be sufficient, at a fraction of
+the full-year ED runtime.
 
 ---
 

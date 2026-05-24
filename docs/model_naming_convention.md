@@ -68,7 +68,7 @@ names for HOPE-ED and HOPE-UC respectively.
 | MC-NoStorage | Traditional Monte Carlo | Traditional MC | Heuristic (no storage) | Main |
 | M1 | Naive Storage Monte Carlo | Naive Storage MC | Heuristic | Main |
 | M1b | Reserve-Floor Storage Monte Carlo | Reserve-Floor MC | Heuristic | Main |
-| M1c | Emergency-Only Storage Monte Carlo | Emergency-Only MC | Heuristic | Main |
+| M1c | Emergency-Only Storage Monte Carlo | Emergency-Only MC | Heuristic (PRAS/Evans-style) | Main |
 | M1c\_VREOnly | VRE-Surplus-Only Charging Monte Carlo | VRE-Surplus MC | Heuristic | Appendix |
 | M1d\_earliest | Risk-Hour-Earliest Monte Carlo | Risk-Hour-Earliest MC | Heuristic | Appendix |
 | M1d\_largest | Risk-Hour-Largest Monte Carlo | Risk-Hour-Largest MC | Heuristic | Appendix |
@@ -117,11 +117,28 @@ most complex:
 1. **Traditional MC** (MC-NoStorage) — no-storage baseline
 2. **Naive Storage MC** (M1) — cautionary failure case
 3. **Reserve-Floor MC** (M1b) — improved heuristic
-4. **Emergency-Only MC** (M1c) — near-benchmark simple model
-5. **Event-Window LP-MC** (M2) — proposed hybrid method
+4. **Emergency-Only MC** (M1c) — PRAS/Evans-style conservative adequacy dispatch baseline
+5. **Event-Window LP-MC** (M2) — proposed scalable optimization-assisted method
 6. **Full-Year ED-MC** (M3) — LP reliability benchmark
 7. **PCM-ED** (HOPE-ED) — PCM validation
 8. **PCM-UCED** (HOPE-UC) — high-fidelity UC benchmark
 
 Appendix models: Risk-Hour MC (M1d\_earliest / M1d\_largest),
 VRE-Surplus MC (M1c\_VREOnly), PCM-ED-NS / PCM-UCED-NS.
+
+---
+
+## 7. Interpretation notes
+
+**Emergency-Only MC (M1c)** is a PRAS/Evans-style conservative adequacy dispatch
+rule: charge from system surplus; discharge only during pre-storage shortfall.
+Analogous rules appear in PRAS (Stephen 2021) and Evans et al. (2019).
+Its role in this project is **not** novelty as a standalone dispatch rule, but as a
+validated low-cost baseline within the broader method ladder.  Avoid language
+implying M1c is a newly invented dispatch strategy.
+
+**Event-Window LP-MC (M2)** is the main scalable optimization-assisted method
+proposed by this project.  It bridges conservative heuristic dispatch and full-year
+ED by solving small LPs only around screened scarcity windows.  It is useful when
+the simple emergency-only rule may not be sufficient — e.g., in systems with more
+complex storage dynamics or when tighter accuracy on LOLH is required.
