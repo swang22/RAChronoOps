@@ -687,3 +687,50 @@ Run with `D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe sc
 | App D | — | `docs/results_index.md` | — | — | Complete |
 | App E | `storage_robustness_sweep/` | `metrics_all.csv`, `bound_comparison_all.csv` | 42, 43 | 20 | Complete |
 | App F | `sampling_convergence/` | `convergence_aggregate_metrics.csv`, `convergence_errors_vs_full_ed.csv` | 44 | 20–200 | Complete |
+| App G (event-shape) | `full_model_comparison_with_hope/base_n20/`, `wind_hvy_hope_uc_comparison/n5/`, `hope_wind_hvy_n5_pilot/` | `event_shape_summary.csv` | 46 | 20/5 | Complete |
+
+---
+
+### Appendix G — Event-shape metrics for storage-aware methods
+
+**Placement:** Appendix B in paper (`\label{app:event_shape}`).
+
+**Takeaway:** EUE and NEUE are identical across M1c, M2, M3, PCM-ED, and PCM-UCED
+(55 ppm balanced / 25 ppm wind-heavy), but LOLH, event count, mean duration, and
+maximum shortfall differ.  PCM methods fragment the same energy deficit into more,
+shorter events with higher maximum hourly shortfall.
+
+**Source result folders:**
+- `results/full_model_comparison_with_hope/base_n20/` — balanced VRE, N=20
+- `results/wind_hvy_hope_uc_comparison/n5/` — wind-heavy VRE, N=5 (MCS methods)
+- `results/hope_wind_hvy_n5_pilot/` — wind-heavy PCM hourly data (corrects pre-computed mean_duration)
+
+**Source script:** `scripts/46_make_multimetric_tables.py`
+
+**Exact CSV:** `results/paper_tables/event_shape_summary.csv`
+
+**Table values (Appendix B, tab:event\_shape):**
+
+| Case | Method | Events/yr | Mean dur (h) | Max dur (h) | Max shortfall (MW) | EUE (MWh) | NEUE (ppm) |
+|------|--------|-----------|-------------|------------|-------------------|-----------|-----------|
+| Balanced VRE | Emergency-only storage MCS | 2.0 | 3.0 | 7 | 461 | 2,479 | 55 |
+| Balanced VRE | Event-window storage MCS | 2.9 | 2.0 | 7 | 535 | 2,479 | 55 |
+| Balanced VRE | Full-year ED | 2.0 | 3.0 | 7 | 461 | 2,479 | 55 |
+| Balanced VRE | PCM-ED cross-check | 4.3 | 1.5 | 5 | 552 | 2,479 | 55 |
+| Balanced VRE | PCM-UCED | 4.1 | 1.8 | 6 | 507 | 2,479 | 55 |
+| Wind-heavy VRE | Emergency-only storage MCS | 1.8 | 2.4 | 5 | 417 | 1,113 | 25 |
+| Wind-heavy VRE | Event-window storage MCS | 2.2 | 1.7 | 3 | 509 | 1,113 | 25 |
+| Wind-heavy VRE | Full-year ED | 1.8 | 2.4 | 5 | 417 | 1,113 | 25 |
+| Wind-heavy VRE | PCM-ED cross-check | 2.4 | 1.6 | 3 | 1,124 | 1,113 | 25 |
+| Wind-heavy VRE | PCM-UCED | 2.0 | 2.1 | 5 | 947 | 1,113 | 25 |
+
+**Construction notes:**
+- Balanced VRE uses N=20 (from `base_n20/all_model_aggregate_metrics.csv`);
+  wind-heavy uses N=5 (MCS from `n5/all_model_aggregate_metrics.csv`, PCM from hourly data).
+- The wind-heavy pre-computed mean_duration for HOPE-ED (1.4 h) and HOPE-UC (1.767 h) were
+  incorrect (LOLH check: events × mean_dur ≠ LOLH).  Corrected values (1.58 h, 2.1 h)
+  are computed from `hope_load_shed_hourly.csv` in script 46.
+- A shortage event is a maximal run of consecutive hours with load\_shed\_mw > 0 within
+  one scenario; events/yr and duration statistics are per-scenario averages.
+- PCM methods show 2–3× higher events/yr and lower mean duration than MCS methods,
+  indicating that UC/ED dispatch spreads the same energy deficit into more shorter events.

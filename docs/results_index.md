@@ -445,3 +445,47 @@ D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
 | `figure_captions.md` | LaTeX-ready captions for all 5 figures |
 
 **Committed:** all PDF, PNG, and markdown files listed above; `scripts/45_make_paper_figures.py`.
+
+---
+
+## 18. Multi-metric reporting tables (NEUE and event-shape)
+
+**Folder:** `results/paper_tables/`
+
+**Script:** `scripts/46_make_multimetric_tables.py` (Python 3.12)
+
+**Status:** Complete (2 CSVs).
+
+### 18a. `multimetric_main_results.csv`
+
+Combines no-storage validation, storage method comparison, and PCM validation
+results with NEUE (ppm) added.  Annual load back-computed from M3 N=20 row in
+`convergence_aggregate_metrics.csv`: ≈ 45,074 GWh/yr (load_scale=1.2 × RTS-GMLC).
+
+Columns: `section`, `case`, `n_scenarios`, `method`, `LOLH_h_per_yr`,
+`EUE_MWh_per_yr`, `NEUE_ppm`, `CVaR_EUE_MWh`, `runtime_s_per_scenario`.
+
+Key NEUE values (balanced VRE, storage-enabled):
+- Naive storage MCS: 688 ppm
+- SOC-floor storage MCS: 627 ppm
+- Emergency-only / Event-window / Full-year ED: 55 ppm
+
+### 18b. `event_shape_summary.csv`
+
+Event-shape metrics for M1c, M2, M3, PCM-ED, PCM-UCED.
+Balanced VRE uses N=20 (from `full_model_comparison_with_hope/base_n20/`).
+Wind-heavy VRE uses N=5 (from `wind_hvy_hope_uc_comparison/n5/`).
+PCM max_duration and p95_duration for wind-heavy are computed from
+`hope_wind_hvy_n5_pilot/hope_load_shed_hourly.csv`.
+
+Columns: `case`, `n_scenarios`, `method`, `events_per_yr`,
+`mean_event_duration_h`, `max_event_duration_h`, `p95_event_duration_h`,
+`mean_event_energy_mwh`, `max_hourly_shortfall_mw`,
+`mean_shortfall_when_shedding_mw`, `EUE_MWh_per_yr`, `NEUE_ppm`.
+
+Key finding: Emergency-only storage MCS and full-year ED produce identical
+event shapes (balanced VRE: 2.0 events/yr, 3.0 h mean, 7 h max).
+Event-window MCS produces more, shorter events (2.9/yr, 2.0 h mean) with
+the same EUE — LP degeneracy distributes deficit across more hourly slots.
+PCM-UCED produces even more, shorter events (4.1/yr, 1.8 h mean) due to
+unit-commitment constraints.

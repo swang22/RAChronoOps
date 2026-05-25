@@ -1,0 +1,29 @@
+section,case,n_scenarios,method,LOLH_h_per_yr,EUE_MWh_per_yr,NEUE_ppm,CVaR_EUE_MWh,runtime_s_per_scenario
+No-storage validation,Balanced VRE portfolio,20,Capacity-balance MCS,95.4,31017.14,688.14,51937.3,0.06
+No-storage validation,Wind-heavy VRE portfolio,20,Capacity-balance MCS,52.4,15801.11,350.56,26871.07,0.09
+No-storage validation,"Balanced VRE, PCM check (no storage)",5,Capacity-balance MCS,115.6,41846.4,928.4,54383.21,0.1
+No-storage validation,"Balanced VRE, PCM check (no storage)",5,PCM-ED cross-check,115.6,41846.4,928.4,54383.21,122.85
+No-storage validation,"Balanced VRE, PCM check (no storage)",5,PCM-UCED,115.6,41846.4,928.4,54383.21,866.22
+No-storage validation,Balanced VRE portfolio,20,Full-year ED,95.4,31017.14,688.14,51937.3,7.58
+No-storage validation,Wind-heavy VRE portfolio,20,Full-year ED,52.4,15801.11,350.56,26871.07,7.32
+No-storage validation,"Balanced VRE, PCM check (no storage)",5,Full-year ED,115.6,41846.4,928.4,54383.21,7.99
+Storage method comparison,Balanced VRE portfolio,20,Naive storage MCS,95.4,31017.14,688.14,51937.3,0.07
+Storage method comparison,Balanced VRE portfolio,20,SOC-floor storage MCS,83.55,28272.4,627.25,49454.93,0.05
+Storage method comparison,Balanced VRE portfolio,20,Emergency-only storage MCS,5.95,2479.17,55.0,9782.93,0.06
+Storage method comparison,Balanced VRE portfolio,20,Event-window storage MCS,5.75,2479.17,55.0,9782.93,0.43
+Storage method comparison,Balanced VRE portfolio,20,Full-year ED,5.95,2479.17,55.0,9782.93,9.56
+Storage method comparison,Wind-heavy VRE portfolio,20,Naive storage MCS,52.4,15801.11,350.56,26871.07,0.06
+Storage method comparison,Wind-heavy VRE portfolio,20,SOC-floor storage MCS,25.0,8982.38,199.28,20155.2,0.05
+Storage method comparison,Wind-heavy VRE portfolio,20,Emergency-only storage MCS,2.25,648.24,14.38,3528.39,0.07
+Storage method comparison,Wind-heavy VRE portfolio,20,Event-window storage MCS,1.95,648.24,14.38,3528.39,0.38
+Storage method comparison,Wind-heavy VRE portfolio,20,Full-year ED,2.25,648.24,14.38,3528.39,9.22
+PCM validation,Balanced VRE portfolio,20,Emergency-only storage MCS,5.95,2479.17,55.0,9782.93,0.05
+PCM validation,Wind-heavy VRE portfolio,5,Emergency-only storage MCS,4.4,1113.18,24.7,2792.63,0.12
+PCM validation,Balanced VRE portfolio,20,Event-window storage MCS,5.75,2479.17,55.0,9782.93,0.44
+PCM validation,Wind-heavy VRE portfolio,5,Event-window storage MCS,3.8,1113.18,24.7,2792.63,0.51
+PCM validation,Balanced VRE portfolio,20,Full-year ED,5.95,2479.17,55.0,9782.93,9.52
+PCM validation,Wind-heavy VRE portfolio,5,Full-year ED,4.4,1113.18,24.7,2792.63,8.86
+PCM validation,Balanced VRE portfolio,20,PCM-ED cross-check,6.25,2479.17,55.0,9782.93,117.78
+PCM validation,Wind-heavy VRE portfolio,5,PCM-ED cross-check,3.8,1113.18,24.7,2792.63,117.51
+PCM validation,Balanced VRE portfolio,20,PCM-UCED,7.25,2479.17,55.0,9782.93,571.92
+PCM validation,Wind-heavy VRE portfolio,5,PCM-UCED,4.2,1113.18,24.7,2792.63,542.44
