@@ -416,3 +416,32 @@ M1c, M2, and M3.
 `convergence_errors_vs_full_ed.csv`,
 `convergence_runtime_summary.csv`,
 `convergence_summary.txt`.
+
+---
+
+## 17. Paper figures
+
+**Folder:** `figures/`
+
+**Script:** `scripts/45_make_paper_figures.py` (Python 3.12, matplotlib)
+
+**Status:** Complete (5 figures + LaTeX captions).
+
+**Run command:**
+```
+D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
+  scripts/45_make_paper_figures.py
+```
+
+**Figures generated:**
+
+| File | Content |
+|------|---------|
+| `method_hierarchy.pdf/.png` | Figure 1: method hierarchy flow diagram |
+| `eue_by_method.pdf/.png` | Figure 2: EUE by dispatch method (two VRE portfolios) |
+| `runtime_accuracy_frontier.pdf/.png` | Figure 3: accuracy–runtime log–log scatter |
+| `sampling_convergence.pdf/.png` | Figure 4: EUE estimates + CI95 shrinkage by N |
+| `robustness_eue_error.pdf/.png` | Figure 5: M3 EUE across 11 storage robustness variants |
+| `figure_captions.md` | LaTeX-ready captions for all 5 figures |
+
+**Committed:** all PDF, PNG, and markdown files listed above; `scripts/45_make_paper_figures.py`.
