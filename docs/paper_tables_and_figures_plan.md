@@ -681,6 +681,7 @@ Run with `D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe sc
 | `figures/event_shape_comparison.pdf/.png` | `paper_tables/event_shape_summary.csv` | 45 | Main text (new) | Complete |
 | `figures/sampling_convergence.pdf/.png` | `sampling_convergence/convergence_aggregate_metrics.csv`, `convergence_errors_vs_full_ed.csv` | 45 | Appendix A | Complete |
 | `figures/robustness_eue_error.pdf/.png` | `storage_robustness_sweep/metrics_all.csv` | 45 | Appendix A | Complete (revised: no internal annotation) |
+| `figures/event_operation_comparison.pdf/.png` | `hope_n20_pilot/hope_load_shed_hourly.csv` | 47 | Appendix B | Complete (new) |
 | `figures/figure_captions.md` | — (LaTeX captions) | 45 | — | Complete |
 | App A | `vre_method_comparison/` | `vre_method_comparison_results.csv` | 16 | 20 | Verify M1c\_VREOnly rows present |
 | App B | `m1d_storage_heuristic_comparison/` | `m1d_metrics_by_scenario.csv` | 38 | 20 | Complete |

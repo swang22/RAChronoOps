@@ -75,7 +75,23 @@ that the EUE convergence result is not a small-sample artifact.
 
 ---
 
-**Appendix Figure 2 — Robustness across storage variants (balanced VRE, $N=20$).**
+**Appendix Figure 2 — Representative shortage-event operation.**
+Hourly load shedding during and around a representative five-hour shortage
+event (hours 4984--4988, Scenario~15, balanced VRE portfolio, $N=20$).
+Blue bars (Full-Year ED / Emergency-Only Storage MCS) and purple bars
+(PCM-UCED) are grouped by hour; the shaded region marks the main event
+window.
+Both methods produce identical total EUE in the displayed window
+(4\,572~MWh); differences reflect how PCM-UCED redistributes the same
+deficit across hours under unit-commitment constraints.
+PCM-UCED introduces one additional shedding hour (h4983) not present in
+Full-Year ED, while reducing intensity at the end of the event.
+Storage SOC and discharge are not output by the PCM model and are
+therefore not shown.
+
+---
+
+**Appendix Figure 3 — Robustness across storage variants (balanced VRE, $N=20$).**
 Full-Year ED expected unserved energy for 11 storage robustness variants
 grouped by stress dimension: Experiment~A (storage duration 2--12~h at fixed
 power), Experiment~B (storage power $0.5{\times}$--$2{\times}$ at fixed 4~h

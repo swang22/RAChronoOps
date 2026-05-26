@@ -423,9 +423,9 @@ M1c, M2, and M3.
 
 **Folder:** `figures/`
 
-**Script:** `scripts/45_make_paper_figures.py` (Python 3.12, matplotlib)
+**Scripts:** `scripts/45_make_paper_figures.py` (main figures), `scripts/47_make_event_operation_figure.py` (operation comparison; Python, powergenome conda env)
 
-**Status:** Complete (6 figures + LaTeX captions). Updated 2026-05-25.
+**Status:** Complete (7 figures + LaTeX captions). Updated 2026-05-25.
 
 **Run command:**
 ```
@@ -443,6 +443,7 @@ D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
 | `event_shape_comparison.pdf/.png` | Figure 4: four-panel event-shape metrics for balanced VRE | Main text (new) |
 | `sampling_convergence.pdf/.png` | Appendix: EUE estimates + CI95 shrinkage by N | Appendix A |
 | `robustness_eue_error.pdf/.png` | Appendix: M3 EUE across 11 storage robustness variants (no internal annotation) | Appendix A |
+| `event_operation_comparison.pdf/.png` | Appendix: representative shortage-event operation (Scenario 15, ED vs UC, h4984-4988) | Appendix B |
 | `figure_captions.md` | LaTeX-ready captions for all figures | — |
 
 **Key changes (2026-05-25):**
