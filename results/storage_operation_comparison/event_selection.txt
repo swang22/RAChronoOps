@@ -1,0 +1,15 @@
+Script: 48_generate_storage_operation_dispatch.jl
+Date:   2026-05-25T23:16:28.500
+Case:   VRE120_base  N=20  seed=42
+M2 config: risk_margin_mw=1000.0  window_buffer_hours=48
+
+Selected scenario: 15
+First shedding hour: 4983   Last: 5036
+Display window: h4959 – h5048  (90 hours)
+
+Window EUE (MWh):  M1c=8060.3  M2=8060.3  M3=8060.3
+Max shed (MW):     M1c=1347.7  M2=1439.8  M3=1347.7
+Shed hours (M1c):  13   (M2): 14
+
+Note: m1c_dispatch.csv, m2_dispatch.csv, m3_dispatch.csv are NOT
+committed (>175k rows each). Regenerate with this script.

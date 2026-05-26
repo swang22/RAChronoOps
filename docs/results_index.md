@@ -423,7 +423,7 @@ M1c, M2, and M3.
 
 **Folder:** `figures/`
 
-**Scripts:** `scripts/45_make_paper_figures.py` (main figures), `scripts/47_make_event_operation_figure.py` (operation comparison; Python, powergenome conda env)
+**Scripts:** `scripts/45_make_paper_figures.py` (main figures), `scripts/47_make_event_operation_figure.py` (ED vs UC comparison; Python, powergenome conda env), `scripts/48_generate_storage_operation_dispatch.jl` + `scripts/49_make_storage_operation_figure.py` (M1c/M2/M3 storage operation; Julia + Python)
 
 **Status:** Complete (7 figures + LaTeX captions). Updated 2026-05-25.
 
@@ -444,6 +444,7 @@ D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
 | `sampling_convergence.pdf/.png` | Appendix: EUE estimates + CI95 shrinkage by N | Appendix A |
 | `robustness_eue_error.pdf/.png` | Appendix: M3 EUE across 11 storage robustness variants (no internal annotation) | Appendix A |
 | `event_operation_comparison.pdf/.png` | Appendix: representative shortage-event operation (Scenario 15, ED vs UC, h4984-4988) | Appendix B |
+| `storage_operation_comparison.pdf/.png` | Appendix: 3-panel storage operation (load shed, discharge, SOC) for M1c/M2/M3 — Scenario 15, h4959-5048 | Appendix B |
 | `figure_captions.md` | LaTeX-ready captions for all figures | — |
 
 **Key changes (2026-05-25):**
