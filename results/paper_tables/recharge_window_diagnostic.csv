@@ -1,0 +1,3 @@
+case,n_events,total_eue_mwh,mean_event_eue_mwh,max_event_eue_mwh,n_events_need_gt72h,share_events_covered_6h,share_events_covered_12h,share_events_covered_24h,share_events_covered_48h,share_events_covered_72h,share_events_covered_168h,share_eue_covered_6h,share_eue_covered_12h,share_eue_covered_24h,share_eue_covered_48h,share_eue_covered_72h,share_eue_covered_168h
+VRE120_base,40,49583.391692688194,1239.5847923172048,4572.018550465377,1,0.025,0.65,0.975,0.975,0.975,0.975,0.0003087700917050689,0.5142298899720663,0.9077913310408011,0.9077913310408011,0.9077913310408011,0.9077913310408011
+VRE120_wind_hvy,17,12964.737305984509,762.6316062343828,3741.1403548653743,0,0.0,0.5294117647058824,1.0,1.0,1.0,1.0,0.0,0.3049335476548377,1.0,1.0,1.0,1.0

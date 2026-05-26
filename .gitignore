@@ -17,6 +17,10 @@ results/cases/*
 !results/logs/.gitkeep
 !results/data_summary/.gitkeep
 
+# ── Recharge-window diagnostic — large intermediate files ─────────────────
+results/recharge_window_diagnostic/m3_dispatch_wind_hvy.csv
+results/recharge_window_diagnostic/event_level.csv
+
 # ── Julia ─────────────────────────────────────────────────────────────────
 Manifest.toml
 *.jl.cov

@@ -423,7 +423,7 @@ M1c, M2, and M3.
 
 **Folder:** `figures/`
 
-**Scripts:** `scripts/45_make_paper_figures.py` (main figures), `scripts/47_make_event_operation_figure.py` (ED vs UC comparison; Python, powergenome conda env), `scripts/48_generate_storage_operation_dispatch.jl` + `scripts/49_make_storage_operation_figure.py` (M1c/M2/M3 storage operation; Julia + Python), `scripts/50_make_storage_operation_compact.py` (compact version for main text; Python, powergenome conda env)
+**Scripts:** `scripts/45_make_paper_figures.py` (main figures), `scripts/47_make_event_operation_figure.py` (ED vs UC comparison; Python, powergenome conda env), `scripts/48_generate_storage_operation_dispatch.jl` + `scripts/49_make_storage_operation_figure.py` (M1c/M2/M3 storage operation; Julia + Python), `scripts/50_make_storage_operation_compact.py` (compact version for main text; Python, powergenome conda env), `scripts/51_recharge_window_diagnostic.jl` + `scripts/52_make_recharge_window_figure.py` (recharge-window diagnostic; Julia + Python)
 
 **Status:** Complete (8 figures + compact variant + LaTeX captions). Updated 2026-05-26.
 
@@ -446,6 +446,7 @@ D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
 | `event_operation_comparison.pdf/.png` | Appendix: representative shortage-event operation (Scenario 15, ED vs UC, h4984-4988) | Appendix B |
 | `storage_operation_comparison.pdf/.png` | Appendix: 3-panel storage operation (load shed, discharge, SOC) for M1c/M2/M3 — Scenario 15, h4959-5048 | Appendix B |
 | `storage_operation_comparison_compact.pdf/.png` | Main text Figure 5: compact 3-panel storage operation, local window rel -8 to +10 around first shedding hour | Main text |
+| `recharge_window_diagnostic.pdf/.png` | Recharge-window diagnostic: share of event EUE covered by M3 pre-event charge within 6/12/24/48/72/168 h | Supporting |
 | `figure_captions.md` | LaTeX-ready captions for all figures | — |
 
 **Key changes (2026-05-25):**

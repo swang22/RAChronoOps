@@ -651,6 +651,35 @@ CI95-LOLH shrinks 3.0× (N=20→200); CI95-EUE shrinks 2.3× (heavy-tailed).
 
 ---
 
+### Supporting: Recharge-window diagnostic
+
+**Placement:** Supporting material / internal diagnostic (not in main paper draft).
+
+**Takeaway:** M3 storage charging accumulated within 24 h before each event is
+sufficient to cover the event EUE for 97.5% of balanced-VRE events (90.8% of
+total EUE) and 100% of wind-heavy events. One balanced-VRE event requires > 168 h
+of pre-event charging. This supports the emergency-only MCS finding: an
+emergency-only rule that charges greedily from system surplus builds up
+sufficient energy within short windows before most events.
+
+**Source:** `results/paper_tables/recharge_window_diagnostic.csv`
+
+**Scripts:**
+- `scripts/51_recharge_window_diagnostic.jl` — Julia; loads/generates M3 dispatch, computes per-event recharge windows
+- `scripts/52_make_recharge_window_figure.py` — Python (powergenome env); grouped bar chart
+
+**Key data (N=20, seed=42):**
+
+| Case | Events | EUE (20 scen) | ≤ 12 h events | ≤ 12 h EUE | ≤ 24 h events | ≤ 24 h EUE | > 168 h |
+|------|--------|--------------|--------------|------------|--------------|------------|---------|
+| VRE120\_base | 40 | 49,583 MWh | 65.0% | 51.4% | 97.5% | 90.8% | 1 event |
+| VRE120\_wind\_hvy | 17 | 12,965 MWh | 52.9% | 30.5% | 100% | 100% | 0 |
+
+**Not committed:** `results/recharge_window_diagnostic/event_level.csv` and
+`m3_dispatch_wind_hvy.csv` (large files; regenerate with script 51).
+
+---
+
 ## Data availability summary
 
 | Table/Figure | Result folder | Key CSV | Script | N | Status |
