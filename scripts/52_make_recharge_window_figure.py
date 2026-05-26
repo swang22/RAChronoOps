@@ -2,8 +2,12 @@
 """
 52_make_recharge_window_figure.py
 
-Bar chart: share of total event EUE covered by M3 storage charging accumulated
-within lookback windows of 6, 12, 24, 48, 72, and 168 h before each event.
+Recharge-window availability diagnostic (bar chart).
+
+For each lookback window (6–168 h), shows the share of M3 residual shortage
+events and their EUE for which full-year ED accumulated comparable pre-event
+storage charge within that window.  This is a recharge-window availability
+proxy, not a physical feasibility proof.
 
 Two series: balanced VRE (VRE120_base) and wind-heavy VRE (VRE120_wind_hvy).
 
@@ -74,8 +78,8 @@ eue_wind = [row_wind[f"share_eue_covered_{L}h"] * 100 for L in LOOKBACKS]
 ev_base  = [row_base[f"share_events_covered_{L}h"] * 100 for L in LOOKBACKS]
 ev_wind  = [row_wind[f"share_events_covered_{L}h"] * 100 for L in LOOKBACKS]
 
-print("Balanced VRE  — EUE covered (%):   ", [f"{v:.1f}" for v in eue_base])
-print("Wind-heavy VRE — EUE covered (%):  ", [f"{v:.1f}" for v in eue_wind])
+print("Balanced VRE  — share with comparable pre-event charge (%): ", [f"{v:.1f}" for v in eue_base])
+print("Wind-heavy VRE — share with comparable pre-event charge (%): ", [f"{v:.1f}" for v in eue_wind])
 print(f"Balanced VRE  — n_events={int(row_base['n_events'])}, "
       f"total_EUE={row_base['total_eue_mwh']:.0f} MWh (20 scenarios)")
 print(f"Wind-heavy VRE — n_events={int(row_wind['n_events'])}, "
@@ -109,7 +113,7 @@ ax.axhline(100, color="#AAAAAA", lw=0.6, ls=":", zorder=2)
 ax.set_xticks(x)
 ax.set_xticklabels(LABELS)
 ax.set_xlabel("Lookback window before event start")
-ax.set_ylabel("EUE covered (%)")
+ax.set_ylabel("Share with comparable pre-event charge (%)")
 ax.set_ylim(0, 110)
 ax.yaxis.set_major_locator(mticker.MultipleLocator(20))
 ax.grid(axis="y", alpha=0.18, linewidth=0.5)
@@ -124,16 +128,16 @@ legend_handles = [
            markeredgewidth=0.5, markeredgecolor="white"),
 ]
 legend_labels = [
-    "Balanced VRE (EUE)",
-    "Wind-heavy VRE (EUE)",
-    "Event share (diamonds)",
+    "Balanced VRE (event EUE)",
+    "Wind-heavy VRE (event EUE)",
+    "Events (diamonds)",
 ]
 ax.legend(legend_handles, legend_labels,
           loc="lower right", fontsize=7.0,
           framealpha=0.90, edgecolor="#cccccc",
           borderpad=0.4, labelspacing=0.3, handlelength=1.4)
 
-# Annotate the one uncovered balanced-VRE event at 168 h
+# Annotate the one balanced-VRE event with no comparable pre-event charge at 168 h
 ax.annotate("1 event\n> 168 h",
             xy=(x[-1] - offset, eue_base[-1]),
             xytext=(x[-1] - offset - 0.55, eue_base[-1] - 16),

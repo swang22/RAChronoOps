@@ -655,12 +655,12 @@ CI95-LOLH shrinks 3.0× (N=20→200); CI95-EUE shrinks 2.3× (heavy-tailed).
 
 **Placement:** Supporting material / internal diagnostic (not in main paper draft).
 
-**Takeaway:** M3 storage charging accumulated within 24 h before each event is
-sufficient to cover the event EUE for 97.5% of balanced-VRE events (90.8% of
-total EUE) and 100% of wind-heavy events. One balanced-VRE event requires > 168 h
-of pre-event charging. This supports the emergency-only MCS finding: an
-emergency-only rule that charges greedily from system surplus builds up
-sufficient energy within short windows before most events.
+**Takeaway:** For 97.5% of balanced-VRE events and 100% of wind-heavy events, M3
+storage accumulated comparable pre-event charge within 24 h before the event.
+One balanced-VRE event requires > 168 h. This supports the emergency-only MCS
+finding by showing that, in the full-year ED benchmark, comparable storage charge
+is accumulated shortly before most shortage events.  The diagnostic is a
+recharge-window availability proxy, not a physical feasibility proof.
 
 **Source:** `results/paper_tables/recharge_window_diagnostic.csv`
 
@@ -670,8 +670,8 @@ sufficient energy within short windows before most events.
 
 **Key data (N=20, seed=42):**
 
-| Case | Events | EUE (20 scen) | ≤ 12 h events | ≤ 12 h EUE | ≤ 24 h events | ≤ 24 h EUE | > 168 h |
-|------|--------|--------------|--------------|------------|--------------|------------|---------|
+| Case | Events | EUE (20 scen) | Comparable charge ≤ 12 h (events) | ≤ 12 h (EUE) | ≤ 24 h (events) | ≤ 24 h (EUE) | > 168 h |
+|------|--------|--------------|----------------------------------|--------------|----------------|-------------|---------|
 | VRE120\_base | 40 | 49,583 MWh | 65.0% | 51.4% | 97.5% | 90.8% | 1 event |
 | VRE120\_wind\_hvy | 17 | 12,965 MWh | 52.9% | 30.5% | 100% | 100% | 0 |
 

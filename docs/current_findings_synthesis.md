@@ -200,22 +200,25 @@ pre-storage EUE that the storage budget can cover; the 2.8–5.9% uncoverable
 residual corresponds exactly to the M3 EUE.
 
 **Recharge-window diagnostic (script 51/52):**
-An additional diagnostic examines how quickly M3 storage accumulates the charge
-needed to cover each shortage event.  For each M3 residual shortage event, the
+An additional diagnostic examines how quickly M3 storage accumulates charge
+comparable to each shortage event's EUE.  For each M3 residual shortage event, the
 cumulative storage charge in lookback windows of 6, 12, 24, 48, 72, and 168 h
-before event start is compared to the event EUE.
+before event start is compared to the event EUE.  This is a recharge-window
+availability proxy, not a physical feasibility proof.
 
 Key results (N=20, seed=42, `results/paper_tables/recharge_window_diagnostic.csv`):
 
-| Case | Events | EUE (20 scen) | Covered ≤ 12 h | Covered ≤ 24 h | Covered > 168 h |
-|------|--------|--------------|---------------|---------------|-----------------|
+| Case | Events | EUE (20 scen) | With comparable charge ≤ 12 h | With comparable charge ≤ 24 h | Needs > 168 h |
+|------|--------|--------------|------------------------------|------------------------------|--------------|
 | VRE120\_base | 40 | 49,583 MWh | 65% events / 51% EUE | 97.5% events / 90.8% EUE | 1 event |
 | VRE120\_wind\_hvy | 17 | 12,965 MWh | 53% events / 31% EUE | 100% events / 100% EUE | 0 events |
 
-The vast majority of residual shortage events in both portfolios are coverable by
-pre-event charging accumulated within 24 h.  This is consistent with the emergency-only
-MCS result: an emergency-only rule that charges greedily from system surplus builds up
-sufficient energy within short windows before most events.  One balanced-VRE event
+The vast majority of residual shortage events in both portfolios are associated with
+comparable pre-event charge accumulated within 24 h.  This supports the emergency-only
+MCS finding by showing that, in the full-year ED benchmark, comparable storage charge
+is accumulated shortly before most shortage events.  The diagnostic is not a physical
+feasibility proof, but it indicates that the tested cases mostly depend on short
+recharge windows rather than long-horizon energy shifting.  One balanced-VRE event
 requires > 168 h of pre-event charging — it represents a large, deep shortage where
 the entire storage budget must have been charged well in advance; this event is a
 candidate where full-year ED optimization provides more value than a simple

@@ -3,14 +3,16 @@
 #
 # Recharge-window storage-dependence analysis.
 #
-# For each M3 (full-year ED) residual shortage event, computes how much of the
-# event EUE could have been covered by M3 storage charging that occurred within
-# lookback windows of 6, 12, 24, 48, 72, and 168 h prior to event start.
+# For each M3 (full-year ED) residual shortage event, computes the cumulative
+# M3 storage charge accumulated within lookback windows of 6, 12, 24, 48, 72,
+# and 168 h prior to event start, and flags when that charge is comparable to
+# the event EUE.
 #
-# Interpretation: if M3 accumulated enough charge within a short pre-event
-# window to cover the event, an emergency-only rule (M1c) that greedily
-# charges from system surplus can also accumulate enough charge, explaining
-# why M1c matches full-year ED EUE in the tested cases.
+# This is a recharge-window availability diagnostic, not a physical feasibility
+# proof.  The comparison indicates whether full-year ED built up comparable
+# charge shortly before each event (supporting the emergency-only MCS finding),
+# but does not account for power limits, SOC path constraints, or simultaneous
+# scarcity conditions that may still bind.
 #
 # Data:
 #   VRE120_base:     results/storage_operation_comparison/m3_dispatch.csv (cached)

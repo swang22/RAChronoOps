@@ -446,7 +446,7 @@ D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
 | `event_operation_comparison.pdf/.png` | Appendix: representative shortage-event operation (Scenario 15, ED vs UC, h4984-4988) | Appendix B |
 | `storage_operation_comparison.pdf/.png` | Appendix: 3-panel storage operation (load shed, discharge, SOC) for M1c/M2/M3 — Scenario 15, h4959-5048 | Appendix B |
 | `storage_operation_comparison_compact.pdf/.png` | Main text Figure 5: compact 3-panel storage operation, local window rel -8 to +10 around first shedding hour | Main text |
-| `recharge_window_diagnostic.pdf/.png` | Recharge-window diagnostic: share of event EUE covered by M3 pre-event charge within 6/12/24/48/72/168 h | Supporting |
+| `recharge_window_diagnostic.pdf/.png` | Recharge-window availability diagnostic: share of event EUE with comparable M3 pre-event charge within 6/12/24/48/72/168 h (not a physical feasibility proof) | Supporting |
 | `figure_captions.md` | LaTeX-ready captions for all figures | — |
 
 **Key changes (2026-05-25):**
