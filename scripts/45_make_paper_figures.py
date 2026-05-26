@@ -7,19 +7,19 @@ Paper-ready figures for the storage-aware sequential MCS manuscript.
 Reads committed result CSVs only.  Does not re-run experiments.
 
 Outputs (figures/):
-  method_hierarchy.pdf/.png      — Figure 1: method flow diagram
-  eue_by_method.pdf/.png         — Figure 2: EUE by dispatch method
-  runtime_accuracy_frontier.pdf/.png — Figure 3: accuracy-runtime frontier
-  sampling_convergence.pdf/.png  — Figure 4: MC sampling convergence
-  robustness_eue_error.pdf/.png  — Figure 5: robustness sweep EUE
-  figure_captions.md             — LaTeX-ready captions
+  method_hierarchy.pdf/.png           — Figure 1: method flow diagram
+  eue_by_method.pdf/.png              — Figure 2: EUE by dispatch method (two panels)
+  runtime_accuracy_frontier.pdf/.png  — Figure 3: accuracy-runtime frontier
+  event_shape_comparison.pdf/.png     — Figure 4: event-shape comparison (new, main text)
+  sampling_convergence.pdf/.png       — Appendix: MC sampling convergence
+  robustness_eue_error.pdf/.png       — Appendix: robustness sweep EUE
+  figure_captions.md                  — LaTeX-ready captions
 
 Usage:
   python scripts/45_make_paper_figures.py
 """
 
 import os
-import sys
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -64,21 +64,9 @@ plt.rcParams.update({
     "savefig.dpi":        300,
     "savefig.bbox":       "tight",
     "savefig.pad_inches": 0.05,
-    "pdf.fonttype":       42,   # TrueType in PDF (editable in Illustrator)
+    "pdf.fonttype":       42,
     "ps.fonttype":        42,
 })
-
-# Paper-facing names used consistently across figures
-PAPER = {
-    "MC-NoStorage": "Capacity-Balance MCS",
-    "M1":           "Naive Storage MCS",
-    "M1b":          "SOC-Floor Storage MCS",
-    "M1c":          "Emergency-Only Storage MCS",
-    "M2":           "Event-Window Storage MCS",
-    "M3":           "Full-Year ED",
-    "HOPE-ED":      "PCM-ED",
-    "HOPE-UC":      "PCM-UCED",
-}
 
 # Colour palette
 C = {
@@ -95,7 +83,7 @@ C = {
     "lred":    "#FFEBEE",
 }
 
-# Per-method marker/colour used in Figures 3 & 4
+# Per-method marker/colour used in frontier and convergence figures
 METHOD_STYLE = {
     "M1":      dict(color=C["red"],    marker="X",  ms=7),
     "M1b":     dict(color=C["orange"], marker="s",  ms=6),
@@ -114,7 +102,7 @@ def save_fig(fig, stem):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 1 — Method hierarchy diagram
+# Figure 1 — Method hierarchy diagram  (unchanged)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_fig1():
@@ -125,7 +113,6 @@ def make_fig1():
     ax.set_ylim(0, 1)
     ax.axis("off")
 
-    # Rows: (y_center_fraction, label, sub_text, edge_color, fill_hex, badge)
     rows = [
         (0.935, "Capacity-Balance MCS",
                 "Classical hourly capacity check · no storage",
@@ -167,24 +154,18 @@ def make_fig1():
             clip_on=False,
         )
         ax.add_patch(rect)
-
-        # Title
         ax.text(BOX_X0 + 0.018, yc + 0.016, title,
                 transform=ax.transAxes,
                 fontsize=8.2, fontweight="bold", color="#1a1a1a",
                 ha="left", va="center", zorder=3)
-        # Sub-text
         ax.text(BOX_X0 + 0.018, yc - 0.020, sub,
                 transform=ax.transAxes,
                 fontsize=6.8, color="#555555",
                 ha="left", va="center", zorder=3)
-        # Badge (right side)
         ax.text(BOX_X0 + BOX_W - 0.012, yc, badge,
                 transform=ax.transAxes,
                 fontsize=7.0, fontweight="bold", color=ecol,
                 ha="right", va="center", zorder=3)
-
-        # Downward arrow to next row
         if i < len(rows) - 1:
             next_yc = rows[i + 1][0]
             y_top = yc - BOX_H / 2 - 0.005
@@ -197,7 +178,6 @@ def make_fig1():
                 zorder=1,
             )
 
-    # Right-side "increasing cost" arrow
     ax.annotate(
         "", xytext=(0.94, 0.88), xy=(0.94, 0.14),
         xycoords="axes fraction",
@@ -208,116 +188,94 @@ def make_fig1():
             transform=ax.transAxes,
             fontsize=6.2, color="#aaaaaa", rotation=270,
             ha="center", va="center")
-
     ax.set_title("Method hierarchy", fontsize=9.5, fontweight="bold",
                  pad=4, y=1.005, transform=ax.transAxes, ha="center")
     save_fig(fig, "method_hierarchy")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 2 — EUE by method
+# Figure 2 — EUE by method  (revised: two panels, emphasis on accuracy)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_fig2():
-    """Grouped bar chart: EUE by storage dispatch method, two VRE portfolios."""
+    """Two-panel bar chart: EUE by dispatch method, one panel per VRE portfolio."""
     df = pd.read_csv(os.path.join(RES, "paper_tables",
                                    "paper_storage_method_comparison.csv"))
 
-    # Ordered methods (main paper, no M1d)
     order_int = ["M1", "M1b", "M1c", "M2", "M3"]
-    short_labels = {
+    x_labels  = {
         "M1":  "Naive\nStorage MCS",
         "M1b": "SOC-Floor\nStorage MCS",
         "M1c": "Emergency-Only\nStorage MCS",
         "M2":  "Event-Window\nStorage MCS",
         "M3":  "Full-Year ED",
     }
-
-    cases = {
-        "VRE120_base":     "Balanced VRE",
-        "VRE120_wind_hvy": "Wind-Heavy VRE",
+    bar_colors = {
+        "M1":  C["red"],
+        "M1b": C["orange"],
+        "M1c": C["green"],
+        "M2":  C["sky"],
+        "M3":  C["blue"],
     }
-    case_colors  = [C["blue"],   C["orange"]]
-    case_hatches = ["",          "//"]
+
+    panels = [
+        ("VRE120_base",     "(a) Balanced VRE"),
+        ("VRE120_wind_hvy", "(b) Wind-Heavy VRE"),
+    ]
 
     df = df[df["model_internal"].isin(order_int)].copy()
+    x = np.arange(len(order_int))
 
-    x     = np.arange(len(order_int))
-    width = 0.35
-    fig, ax = plt.subplots(figsize=(6.5, 3.4))
+    fig, axes = plt.subplots(1, 2, figsize=(6.8, 3.4))
 
-    for k, (case, clabel) in enumerate(cases.items()):
-        sub = df[df["case"] == case].set_index("model_internal")
-        vals = [sub.loc[m, "eue_mwh"] if m in sub.index else np.nan
-                for m in order_int]
-        off = (k - 0.5) * width
-        ax.bar(x + off, vals, width,
-               label=clabel,
-               color=case_colors[k], alpha=0.80,
-               hatch=case_hatches[k],
-               edgecolor="white", linewidth=0.4)
+    for ax, (case_key, panel_title) in zip(axes, panels):
+        sub = df[df["case"] == case_key].set_index("model_internal")
+        vals   = [sub.loc[m, "eue_mwh"] if m in sub.index else np.nan
+                  for m in order_int]
+        colors = [bar_colors[m] for m in order_int]
 
-    # Reference dashed lines at M3 EUE for each case
-    for k, (case, _) in enumerate(cases.items()):
-        m3_row = df[(df["case"] == case) & (df["model_internal"] == "M3")]
-        if not m3_row.empty:
-            m3_val = m3_row["eue_mwh"].values[0]
-            ax.axhline(m3_val, color=case_colors[k], ls="--", lw=0.8, alpha=0.55)
+        ax.bar(x, vals, 0.60, color=colors, alpha=0.82,
+               edgecolor="white", linewidth=0.5)
 
-    ax.set_xticks(x)
-    ax.set_xticklabels([short_labels[m] for m in order_int], fontsize=7.5)
-    ax.set_ylabel("Expected Unserved Energy (MWh/yr)")
-    ax.set_yscale("log")
-    ax.yaxis.set_major_formatter(ticker.FuncFormatter(
-        lambda v, _: f"{v:,.0f}"))
-    ax.set_title("EUE by storage dispatch method", fontsize=9, fontweight="bold")
-    ax.legend(loc="upper right")
+        # Full-Year ED reference dashed line
+        m3_val = sub.loc["M3", "eue_mwh"] if "M3" in sub.index else None
+        if m3_val is not None:
+            ax.axhline(m3_val, color=C["blue"], ls="--", lw=1.1,
+                       alpha=0.70, zorder=3)
+            # Label at right edge, just above the reference line
+            ax.text(len(order_int) - 0.30, m3_val * 1.35,
+                    "Full-Year ED", fontsize=6.0, color=C["blue"],
+                    ha="right", va="bottom", style="italic")
 
-    # Bracket annotation for zero-error region
-    x_start = 1.65   # between M1b and M1c bars
-    y_ann   = 1200
-    ax.annotate(
-        "EUE matches\nFull-Year ED",
-        xy=(3.0, 2200), xytext=(3.5, 1200),
-        fontsize=7, color="#2E7D32",
-        arrowprops=dict(arrowstyle="->", color="#2E7D32", lw=0.7),
-        ha="center", va="top",
-    )
+        ax.set_xticks(x)
+        ax.set_xticklabels([x_labels[m] for m in order_int], fontsize=6.3)
+        ax.set_ylabel("EUE (MWh/yr)" if ax is axes[0] else "")
+        ax.set_yscale("log")
+        ax.yaxis.set_major_formatter(
+            ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
+        ax.set_title(panel_title, fontsize=8.8, fontweight="bold")
+        ax.grid(axis="y", alpha=0.22)
+        ax.set_axisbelow(True)
 
-    ax.grid(axis="y", alpha=0.25)
-    ax.set_axisbelow(True)
-    fig.tight_layout()
+    fig.suptitle("EUE by storage dispatch method ($N = 20$, common random numbers)",
+                 fontsize=8.8, fontweight="bold", y=1.01)
+    fig.tight_layout(w_pad=2.0)
     save_fig(fig, "eue_by_method")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 3 — Runtime vs EUE error frontier
+# Figure 3 — Runtime vs EUE error frontier  (revised: legend upper-right)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_fig3():
-    """Log–log scatter: per-scenario runtime vs absolute EUE error."""
-    df = pd.read_csv(os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
-
-    # Merge EUE for HOPE models (their error is vs HOPE-UC, but EUE ≈ M3)
-    # Use only the VRE120_base N=20 entries
+    """Log-log scatter: per-scenario runtime vs absolute EUE error."""
+    df   = pd.read_csv(os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
     df_b = df[df["case"] == "VRE120_base"].copy()
 
-    # For HOPE models the error column references HOPE-UC, not M3.
-    # Since HOPE-ED/UC EUE ≈ M3 EUE (both 2479 MWh), treat their
-    # abs_eue_error as ~0 vs Full-Year ED as well.
     include = ["M1", "M1b", "M1c", "M2", "M3", "HOPE-UC"]
     df_b = df_b[df_b["model_internal"].isin(include)].copy()
 
     FLOOR = 0.05   # MWh floor for zero-error methods on log axis
-
-    rows = []
-    for _, row in df_b.iterrows():
-        mid = row["model_internal"]
-        rt  = row["mean_runtime_s"]
-        err = row["abs_eue_error_mwh"]
-        rows.append(dict(mid=mid, rt=rt, err=err, err_plot=max(err, FLOOR)))
-
-    fig, ax = plt.subplots(figsize=(4.5, 3.3))
 
     label_map = {
         "M1":      "Naive Storage MCS",
@@ -328,28 +286,49 @@ def make_fig3():
         "HOPE-UC": "PCM-UCED",
     }
 
-    for r in rows:
-        mid  = r["mid"]
-        st   = METHOD_STYLE.get(mid, dict(color="gray", marker="o", ms=6))
-        lbl  = label_map.get(mid, mid)
-        ax.scatter(r["rt"], r["err_plot"],
-                   color=st["color"], marker=st["marker"], s=st["ms"]**2,
-                   zorder=5, label=lbl, clip_on=False)
+    # Smaller, lighter markers for the cautionary heuristics
+    style_override = {
+        "M1":  dict(color=C["red"],    marker="X",  s=36, alpha=0.55),
+        "M1b": dict(color=C["orange"], marker="s",  s=28, alpha=0.55),
+    }
 
-    # Annotate zero-error group
-    zero_mids = [r for r in rows if r["err"] < 0.5]
-    if zero_mids:
-        # Single annotation box
-        ax.annotate(
-            "Zero EUE error\nvs Full-Year ED",
-            xy=(zero_mids[-1]["rt"], FLOOR),
-            xytext=(0.4, FLOOR * 18),
-            fontsize=7, color=C["green"],
-            ha="left", va="bottom",
-            arrowprops=dict(arrowstyle="-", color="#aaaaaa", lw=0.6),
-            bbox=dict(boxstyle="round,pad=0.25",
-                      facecolor=C["lgreen"], edgecolor=C["green"], lw=0.7),
-        )
+    rows = []
+    for _, row in df_b.iterrows():
+        mid = row["model_internal"]
+        rt  = row["mean_runtime_s"]
+        err = row["abs_eue_error_mwh"]
+        rows.append(dict(mid=mid, rt=rt, err=err, err_plot=max(err, FLOOR)))
+
+    fig, ax = plt.subplots(figsize=(4.5, 3.3))
+
+    for r in rows:
+        mid = r["mid"]
+        if mid in style_override:
+            st  = style_override[mid]
+            ax.scatter(r["rt"], r["err_plot"],
+                       color=st["color"], marker=st["marker"], s=st["s"],
+                       alpha=st["alpha"], zorder=5, label=label_map.get(mid, mid),
+                       clip_on=False)
+        else:
+            st  = METHOD_STYLE.get(mid, dict(color="gray", marker="o", ms=6))
+            ax.scatter(r["rt"], r["err_plot"],
+                       color=st["color"], marker=st["marker"], s=st["ms"]**2,
+                       zorder=5, label=label_map.get(mid, mid), clip_on=False)
+
+    # Zero-error annotation: place above M3 position, away from data
+    zero_rows = [r for r in rows if r["err"] < 0.5]
+    m3_rt = next((r["rt"] for r in rows if r["mid"] == "M3"), 10.0)
+    ax.annotate(
+        "Zero EUE error\nvs Full-Year ED",
+        xy=(m3_rt, FLOOR),
+        xytext=(m3_rt * 6, FLOOR * 25),
+        fontsize=7, color=C["green"],
+        ha="left", va="bottom",
+        arrowprops=dict(arrowstyle="->", color=C["green"], lw=0.7,
+                        connectionstyle="arc3,rad=-0.15"),
+        bbox=dict(boxstyle="round,pad=0.25",
+                  facecolor=C["lgreen"], edgecolor=C["green"], lw=0.7),
+    )
 
     # Floor reference line
     ax.axhline(FLOOR, color="#cccccc", ls=":", lw=0.7, zorder=1)
@@ -361,14 +340,14 @@ def make_fig3():
     ax.set_xlabel("Runtime per scenario (s)")
     ax.set_ylabel("Absolute EUE error vs Full-Year ED (MWh)")
     ax.set_title("Accuracy–runtime trade-off", fontsize=9, fontweight="bold")
-    ax.legend(fontsize=6.8, loc="upper left", framealpha=0.92)
+    ax.legend(fontsize=6.5, loc="upper right", framealpha=0.92)
     ax.grid(True, which="both", alpha=0.22)
     fig.tight_layout()
     save_fig(fig, "runtime_accuracy_frontier")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 4 — Sampling convergence
+# Figure 4 — Sampling convergence  (unchanged)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_fig4():
@@ -384,11 +363,11 @@ def make_fig4():
         return [agg[(agg["model"] == model) & (agg["n_scenarios"] == n)][col].values[0]
                 for n in ns]
 
-    m3_eue    = get_agg("M3",  "eue_mwh")
-    m3_ci95   = get_agg("M3",  "eue_ci95_hw_mwh")
-    m3_lolh_ci = get_agg("M3", "lolh_ci95_hw")
-    m1c_eue   = get_agg("M1c", "eue_mwh")
-    m2_eue    = get_agg("M2",  "eue_mwh")
+    m3_eue     = get_agg("M3",  "eue_mwh")
+    m3_ci95    = get_agg("M3",  "eue_ci95_hw_mwh")
+    m3_lolh_ci = get_agg("M3",  "lolh_ci95_hw")
+    m1c_eue    = get_agg("M1c", "eue_mwh")
+    m2_eue     = get_agg("M2",  "eue_mwh")
 
     m1c_err_abs = [abs(err[(err["model"] == "M1c") & (err["n_scenarios"] == n)]
                        ["eue_error_vs_full_ed"].values[0]) for n in ns]
@@ -397,7 +376,6 @@ def make_fig4():
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.8, 3.0))
 
-    # ── Panel (a): EUE estimates with CI95 ───────────────────────────────────
     ax1.fill_between(
         ns,
         [m3_eue[i] - m3_ci95[i] for i in range(len(ns))],
@@ -405,7 +383,7 @@ def make_fig4():
         alpha=0.18, color=C["blue"], label="_CI95 band",
     )
     ax1.plot(ns, m3_eue, color=C["blue"], marker="^", ms=6, lw=1.5,
-             label="Full-Year ED (M3)")
+             label="Full-Year ED")
     ax1.plot(ns, m1c_eue, color=C["green"], marker="o", ms=5.5, lw=1.4,
              ls="--", label="Emergency-Only Storage MCS")
     ax1.plot(ns, m2_eue,  color=C["sky"],   marker="D", ms=5.5, lw=1.4,
@@ -417,8 +395,6 @@ def make_fig4():
     ax1.legend(fontsize=6.5, loc="lower left")
     ax1.set_xticks(ns)
     ax1.yaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
-
-    # Small note: all three lines are coincident
     ax1.text(0.98, 0.97,
              "All three methods\nproduce the same EUE",
              transform=ax1.transAxes, fontsize=6.5, color="#2E7D32",
@@ -426,26 +402,21 @@ def make_fig4():
              bbox=dict(boxstyle="round,pad=0.2", facecolor=C["lgreen"],
                        edgecolor=C["green"], lw=0.7))
 
-    # ── Panel (b): CI95 shrinkage ─────────────────────────────────────────────
     ax2.plot(ns, m3_ci95, color=C["blue"], marker="^", ms=6, lw=1.5,
              label="Full-Year ED EUE CI95 (MWh)")
     ax2.plot(ns, m3_lolh_ci, color=C["blue"], marker="^", ms=6, lw=1.5,
              ls="--", alpha=0.6, label="Full-Year ED LOLH CI95 (h)")
 
-    # Theoretical 1/√N reference scaled to N=20
-    ns_arr  = np.array(ns, dtype=float)
-    ref_eue = m3_ci95[0] * np.sqrt(ns[0] / ns_arr)
-    ref_lolh = m3_lolh_ci[0] * np.sqrt(ns[0] / ns_arr)
+    ns_arr   = np.array(ns, dtype=float)
+    ref_eue  = m3_ci95[0] * np.sqrt(ns[0] / ns_arr)
     ax2.plot(ns, ref_eue, color=C["blue"], lw=0.7, ls="-.", alpha=0.4,
              label="1/√N reference")
 
-    # Right y-axis for LOLH CI95 (h) — share the scale using twin
     ax2r = ax2.twinx()
     ax2r.set_ylabel("LOLH CI95 (h)", fontsize=8, color="#555555")
     ax2r.tick_params(labelsize=7, colors="#555555")
     ax2r.set_ylim(0, max(m3_lolh_ci) * 1.35)
 
-    # Zero-error annotation box
     ax2.text(0.50, 0.22,
              "Method EUE error:\n0.0 MWh at all N",
              transform=ax2.transAxes, fontsize=7, color="#2E7D32",
@@ -469,20 +440,16 @@ def make_fig4():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Figure 5 — Robustness sweep EUE
+# Figure 5 (appendix) — Robustness sweep EUE  (revised: no internal annotation)
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_fig5():
     """Bar chart: Full-Year ED EUE across storage robustness variants."""
     metrics  = pd.read_csv(os.path.join(RES, "storage_robustness_sweep", "metrics_all.csv"))
-    variants = pd.read_csv(os.path.join(RES, "storage_robustness",
-                                         "case_variant_summary.csv"))
 
-    # Base source case only, M3 reference
     m3_base = metrics[(metrics["model"] == "M3") &
                       (metrics["case"].str.startswith("VRE120_base_"))].copy()
 
-    # Ordered experiment groups
     groups = {
         "A — Storage duration": [
             ("VRE120_base_dur2h",  "2 h"),
@@ -507,7 +474,7 @@ def make_fig5():
     ordered_cases  = []
     ordered_labels = []
     bar_colors     = []
-    boundaries     = []   # (x_start, x_end, group_name, color)
+    boundaries     = []
     x_pos = 0
 
     for gi, (gname, entries) in enumerate(groups.items()):
@@ -530,11 +497,10 @@ def make_fig5():
     ax.bar(xs, ordered_eue, color=bar_colors, alpha=0.80,
            edgecolor="white", linewidth=0.5, width=0.68)
 
-    # Group separator lines and header labels
     y_max = max(ordered_eue)
     for (x0, x1, gname, gcol) in boundaries:
         mid_x = (x0 + x1) / 2
-        ax.text(mid_x, y_max * 1.14, f"Exp {gname}",
+        ax.text(mid_x, y_max * 1.08, f"Exp {gname}",
                 ha="center", va="bottom", fontsize=7.0,
                 fontweight="bold", color=gcol)
         if x0 > 0:
@@ -543,23 +509,76 @@ def make_fig5():
     ax.set_xticks(xs)
     ax.set_xticklabels(ordered_labels, fontsize=7.0)
     ax.set_ylabel("Full-Year ED EUE (MWh/yr)")
-    ax.set_ylim(0, y_max * 1.32)
-    ax.set_title("EUE across storage robustness variants (Balanced VRE, N=20)",
+    ax.set_ylim(0, y_max * 1.28)
+    ax.set_title("Robustness across storage variants (Balanced VRE, $N=20$)",
                  fontsize=9, fontweight="bold")
-
-    # Zero-error annotation banner
-    ax.text(0.50, 1.025,
-            "Emergency-Only and Event-Window Storage MCS match Full-Year ED EUE "
-            "exactly (Δ = 0.0 MWh) across all 11 variants",
-            transform=ax.transAxes, ha="center", va="bottom",
-            fontsize=6.8, color="#2E7D32",
-            bbox=dict(boxstyle="round,pad=0.22", facecolor=C["lgreen"],
-                      edgecolor=C["green"], lw=0.8))
-
     ax.grid(axis="y", alpha=0.22)
     ax.set_axisbelow(True)
     fig.tight_layout()
     save_fig(fig, "robustness_eue_error")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Figure 6 — Event-shape comparison  (new, main text)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def make_fig6():
+    """Four-panel bar chart: event-shape metrics for storage-aware methods (balanced VRE)."""
+    df = pd.read_csv(os.path.join(RES, "paper_tables", "event_shape_summary.csv"))
+
+    # Balanced VRE portfolio, N=20
+    bal = df[df["case"].str.startswith("Balanced")].copy()
+
+    # Key storage-aware methods in display order (matches CSV method names exactly)
+    METHODS = [
+        ("Emergency-only storage MCS", "Emerg.-Only\nStorage MCS", C["green"]),
+        ("Event-window storage MCS",   "Event-Window\nStorage MCS", C["sky"]),
+        ("Full-year ED",               "Full-Year ED",               C["blue"]),
+        ("PCM-UCED",                   "PCM-UCED",                   C["purple"]),
+    ]
+    method_names  = [m[0] for m in METHODS]
+    method_labels = [m[1] for m in METHODS]
+    method_colors = [m[2] for m in METHODS]
+
+    bal = bal[bal["method"].isin(method_names)].copy()
+    # Enforce display order
+    bal["_order"] = bal["method"].map({m: i for i, m in enumerate(method_names)})
+    bal = bal.sort_values("_order").reset_index(drop=True)
+
+    metrics = [
+        ("events_per_yr",           "(a) Events per year",        "Events/yr"),
+        ("mean_event_duration_h",   "(b) Mean event duration",    "Duration (h)"),
+        ("max_event_duration_h",    "(c) Max event duration",     "Duration (h)"),
+        ("max_hourly_shortfall_mw", "(d) Max shortfall",          "Shortfall (MW)"),
+    ]
+
+    fig, axes = plt.subplots(2, 2, figsize=(6.8, 4.0))
+    axes_flat = axes.flatten()
+    x = np.arange(len(METHODS))
+
+    for ax, (col, title, ylabel) in zip(axes_flat, metrics):
+        vals = bal[col].values
+        ax.bar(x, vals, 0.58, color=method_colors, alpha=0.84,
+               edgecolor="white", linewidth=0.5)
+        ax.set_xticks(x)
+        ax.set_xticklabels(method_labels, fontsize=6.1)
+        ax.set_ylabel(ylabel, fontsize=7.5)
+        ax.set_title(title, fontsize=8.2, fontweight="bold")
+        # Value labels on top of each bar
+        for xi, v in zip(x, vals):
+            ax.text(xi, v * 1.03, f"{v:.1f}",
+                    ha="center", va="bottom", fontsize=6.0, color="#333333")
+        ax.grid(axis="y", alpha=0.20)
+        ax.set_axisbelow(True)
+        ymax = max(vals)
+        ax.set_ylim(0, ymax * 1.30)
+
+    fig.suptitle(
+        "Event-shape metrics — Balanced VRE portfolio ($N = 20$)",
+        fontsize=9, fontweight="bold",
+    )
+    fig.tight_layout()
+    save_fig(fig, "event_shape_comparison")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -586,16 +605,15 @@ and ${\sim}22{\times}$ speedups, respectively.
 ---
 
 **Figure 2 — EUE by storage dispatch method.**
-Expected unserved energy (MWh/yr) for five storage dispatch methods applied to
-the balanced VRE portfolio (solid bars) and wind-heavy VRE portfolio (hatched
-bars), $N=20$ Monte Carlo scenarios, seed~42, RTS-GMLC test system.
+Expected unserved energy (MWh/yr) for five storage dispatch methods,
+$N=20$ Monte Carlo scenarios, seed~42, RTS-GMLC test system.
+Panel~(a): balanced VRE portfolio; panel~(b): wind-heavy VRE portfolio.
 All methods use common random numbers (identical outage sequences).
-\textit{Naive Storage MCS} and \textit{SOC-Floor Storage MCS} overestimate
-EUE by $10{\times}$--$50{\times}$ relative to the Full-Year ED reference
-(dashed lines) because proactive discharge depletes storage before shortage
-events.
+Dashed lines mark the Full-Year ED reference EUE in each panel.
+\textit{Naive Storage MCS} and \textit{SOC-Floor Storage MCS} substantially
+overestimate EUE because proactive discharge depletes storage before shortage events.
 \textit{Emergency-Only Storage MCS}, \textit{Event-Window Storage MCS}, and
-Full-Year ED produce identical EUE (bars reach the reference dashed lines;
+Full-Year ED produce identical EUE in both portfolios (bars reach the reference lines;
 log scale).
 
 ---
@@ -609,10 +627,28 @@ ${\sim}0.06$~s/scenario ($150{\times}$ faster than Full-Year ED at
 ${\sim}9.6$~s/scenario); \textit{Event-Window Storage MCS} achieves zero EUE
 error at ${\sim}0.4$~s/scenario ($22{\times}$ faster).
 PCM-UCED validates the EUE benchmark at ${\sim}570$~s/scenario.
+Naive Storage MCS and SOC-Floor Storage MCS (lighter markers) are retained for
+reference but are not part of the recommended frontier.
 
 ---
 
-**Figure 4 — Monte Carlo sampling convergence.**
+**Figure 4 — Event-shape metrics for storage-aware methods.**
+Four event-shape statistics for the balanced VRE portfolio ($N=20$):
+(a)~events per year, (b)~mean event duration, (c)~maximum event duration,
+and (d)~maximum hourly shortfall.
+All four methods produce identical EUE and NEUE (55~ppm); differences in
+event-shape metrics reflect how the same total energy deficit is distributed
+across shortage hours.
+Emergency-Only Storage MCS and Full-Year ED agree on all event-shape statistics.
+Event-Window Storage MCS produces more, shorter events (2.9 vs 2.0 events/yr,
+mean duration 2.0 vs 3.0~h) because windowed LP optimization allocates the same
+deficit differently.
+PCM-UCED further fragments events (4.1 events/yr, 1.8~h mean) due to commitment
+constraints, with a higher maximum shortfall.
+
+---
+
+**Appendix Figure 1 — Monte Carlo sampling convergence.**
 (a) Expected unserved energy estimates with $95\%$ confidence interval
 half-widths (shaded band and error bars on the Full-Year ED line) for $N =
 20, 50, 100, 200$ scenarios.
@@ -626,7 +662,7 @@ that the EUE convergence result is not a small-sample artifact.
 
 ---
 
-**Figure 5 — EUE across storage robustness variants (balanced VRE, $N=20$).**
+**Appendix Figure 2 — Robustness across storage variants (balanced VRE, $N=20$).**
 Full-Year ED expected unserved energy for 11 storage robustness variants
 grouped by stress dimension: Experiment~A (storage duration 2--12~h at fixed
 power), Experiment~B (storage power $0.5{\times}$--$2{\times}$ at fixed 4~h
@@ -649,16 +685,18 @@ def write_captions():
 # ─────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("Generating paper figures …")
+    print("Generating paper figures ...")
     print("  [1] Method hierarchy")
     make_fig1()
-    print("  [2] EUE by method")
+    print("  [2] EUE by method (two panels)")
     make_fig2()
-    print("  [3] Runtime–accuracy frontier")
+    print("  [3] Runtime-accuracy frontier")
     make_fig3()
-    print("  [4] Sampling convergence")
+    print("  [4] Event-shape comparison (new)")
+    make_fig6()
+    print("  [App-1] Sampling convergence")
     make_fig4()
-    print("  [5] Robustness sweep EUE")
+    print("  [App-2] Robustness sweep EUE")
     make_fig5()
     print("  [captions] figure_captions.md")
     write_captions()

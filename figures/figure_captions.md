@@ -18,16 +18,15 @@ and ${\sim}22{\times}$ speedups, respectively.
 ---
 
 **Figure 2 — EUE by storage dispatch method.**
-Expected unserved energy (MWh/yr) for five storage dispatch methods applied to
-the balanced VRE portfolio (solid bars) and wind-heavy VRE portfolio (hatched
-bars), $N=20$ Monte Carlo scenarios, seed~42, RTS-GMLC test system.
+Expected unserved energy (MWh/yr) for five storage dispatch methods,
+$N=20$ Monte Carlo scenarios, seed~42, RTS-GMLC test system.
+Panel~(a): balanced VRE portfolio; panel~(b): wind-heavy VRE portfolio.
 All methods use common random numbers (identical outage sequences).
-\textit{Naive Storage MCS} and \textit{SOC-Floor Storage MCS} overestimate
-EUE by $10{\times}$--$50{\times}$ relative to the Full-Year ED reference
-(dashed lines) because proactive discharge depletes storage before shortage
-events.
+Dashed lines mark the Full-Year ED reference EUE in each panel.
+\textit{Naive Storage MCS} and \textit{SOC-Floor Storage MCS} substantially
+overestimate EUE because proactive discharge depletes storage before shortage events.
 \textit{Emergency-Only Storage MCS}, \textit{Event-Window Storage MCS}, and
-Full-Year ED produce identical EUE (bars reach the reference dashed lines;
+Full-Year ED produce identical EUE in both portfolios (bars reach the reference lines;
 log scale).
 
 ---
@@ -41,10 +40,28 @@ ${\sim}0.06$~s/scenario ($150{\times}$ faster than Full-Year ED at
 ${\sim}9.6$~s/scenario); \textit{Event-Window Storage MCS} achieves zero EUE
 error at ${\sim}0.4$~s/scenario ($22{\times}$ faster).
 PCM-UCED validates the EUE benchmark at ${\sim}570$~s/scenario.
+Naive Storage MCS and SOC-Floor Storage MCS (lighter markers) are retained for
+reference but are not part of the recommended frontier.
 
 ---
 
-**Figure 4 — Monte Carlo sampling convergence.**
+**Figure 4 — Event-shape metrics for storage-aware methods.**
+Four event-shape statistics for the balanced VRE portfolio ($N=20$):
+(a)~events per year, (b)~mean event duration, (c)~maximum event duration,
+and (d)~maximum hourly shortfall.
+All four methods produce identical EUE and NEUE (55~ppm); differences in
+event-shape metrics reflect how the same total energy deficit is distributed
+across shortage hours.
+Emergency-Only Storage MCS and Full-Year ED agree on all event-shape statistics.
+Event-Window Storage MCS produces more, shorter events (2.9 vs 2.0 events/yr,
+mean duration 2.0 vs 3.0~h) because windowed LP optimization allocates the same
+deficit differently.
+PCM-UCED further fragments events (4.1 events/yr, 1.8~h mean) due to commitment
+constraints, with a higher maximum shortfall.
+
+---
+
+**Appendix Figure 1 — Monte Carlo sampling convergence.**
 (a) Expected unserved energy estimates with $95\%$ confidence interval
 half-widths (shaded band and error bars on the Full-Year ED line) for $N =
 20, 50, 100, 200$ scenarios.
@@ -58,7 +75,7 @@ that the EUE convergence result is not a small-sample artifact.
 
 ---
 
-**Figure 5 — EUE across storage robustness variants (balanced VRE, $N=20$).**
+**Appendix Figure 2 — Robustness across storage variants (balanced VRE, $N=20$).**
 Full-Year ED expected unserved energy for 11 storage robustness variants
 grouped by stress dimension: Experiment~A (storage duration 2--12~h at fixed
 power), Experiment~B (storage power $0.5{\times}$--$2{\times}$ at fixed 4~h

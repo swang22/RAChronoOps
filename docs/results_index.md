@@ -425,7 +425,7 @@ M1c, M2, and M3.
 
 **Script:** `scripts/45_make_paper_figures.py` (Python 3.12, matplotlib)
 
-**Status:** Complete (5 figures + LaTeX captions).
+**Status:** Complete (6 figures + LaTeX captions). Updated 2026-05-25.
 
 **Run command:**
 ```
@@ -435,14 +435,25 @@ D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
 
 **Figures generated:**
 
-| File | Content |
-|------|---------|
-| `method_hierarchy.pdf/.png` | Figure 1: method hierarchy flow diagram |
-| `eue_by_method.pdf/.png` | Figure 2: EUE by dispatch method (two VRE portfolios) |
-| `runtime_accuracy_frontier.pdf/.png` | Figure 3: accuracy–runtime log–log scatter |
-| `sampling_convergence.pdf/.png` | Figure 4: EUE estimates + CI95 shrinkage by N |
-| `robustness_eue_error.pdf/.png` | Figure 5: M3 EUE across 11 storage robustness variants |
-| `figure_captions.md` | LaTeX-ready captions for all 5 figures |
+| File | Content | Placement |
+|------|---------|-----------|
+| `method_hierarchy.pdf/.png` | Figure 1: method hierarchy flow diagram | Main text |
+| `eue_by_method.pdf/.png` | Figure 2: EUE by method — two-panel (balanced / wind-heavy VRE) | Main text |
+| `runtime_accuracy_frontier.pdf/.png` | Figure 3: accuracy–runtime log–log scatter (legend upper-right, M1/M1b de-emphasized) | Main text |
+| `event_shape_comparison.pdf/.png` | Figure 4: four-panel event-shape metrics for balanced VRE | Main text (new) |
+| `sampling_convergence.pdf/.png` | Appendix: EUE estimates + CI95 shrinkage by N | Appendix A |
+| `robustness_eue_error.pdf/.png` | Appendix: M3 EUE across 11 storage robustness variants (no internal annotation) | Appendix A |
+| `figure_captions.md` | LaTeX-ready captions for all figures | — |
+
+**Key changes (2026-05-25):**
+- `eue_by_method`: replaced single grouped chart with two panels (one per VRE portfolio);
+  Full-Year ED reference dashed line in each panel; log scale; emphasizes accuracy not severity.
+- `runtime_accuracy_frontier`: legend moved to upper-right (empty region); M1/M1b markers
+  smaller and lighter; zero-error annotation repositioned above M3 point.
+- `robustness_eue_error`: removed internal green annotation banner; shorter title;
+  explanatory text moved to caption only.
+- `event_shape_comparison` (new): 2×2 panel bar chart for balanced VRE — events/yr, mean
+  event duration, max event duration, max shortfall — for M1c/M2/M3/HOPE-UC.
 
 **Committed:** all PDF, PNG, and markdown files listed above; `scripts/45_make_paper_figures.py`.
 
