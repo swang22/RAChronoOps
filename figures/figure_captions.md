@@ -91,7 +91,22 @@ therefore not shown.
 
 ---
 
-**Appendix Figure 3 — Representative storage operation during shortage event.**
+**Figure 5 — Representative storage operation during shortage event.**
+Representative storage operation during a balanced-VRE shortage event
+(Scenario~15, $N=20$).
+(a)~Load shedding (MW); (b)~aggregate storage discharge (MW);
+(c)~aggregate state of charge (MWh).
+The panels compare Emergency-only storage MCS, Event-window storage MCS, and
+Full-year ED over a local event window centered on the first shedding hour
+(relative hour~0).
+All three methods produce the same total event EUE (4{,}572~MWh), but differ
+in discharge timing and SOC trajectories.
+Event-window storage MCS redistributes shortfall across more hours, whereas
+Emergency-only storage MCS closely tracks Full-year ED.
+
+---
+
+**Appendix Figure 3 — Representative storage operation during shortage event (full window).**
 Three-panel time-series for Scenario~15 (balanced VRE portfolio, $N=20$),
 displaying the 90-hour window around the first shedding hour.
 (a)~Load shedding (MW); (b)~aggregate storage discharge (MW);
