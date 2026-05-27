@@ -546,3 +546,43 @@ Two-panel figure: (a) δ = 1 MW primary — normalized marginal capacity credit
 wind-heavy VRE (green).  Dashed reference lines at M3 values.
 
 **Committed:** Yes.
+
+---
+
+## 20. HOPE-PCM-ED marginal CC validation
+
+**Folder:** `results/paper_tables/`
+
+**Scripts:**
+- `scripts/57_hope_marginal_cc_validation.jl` — Julia; runs 75 HOPE-ED marginal-storage scenarios (60 VRE120_base N=20, 15 VRE120_wind_hvy N=5); also re-runs M3 at N=5 for wind-heavy matched comparison
+- `scripts/58_make_hope_marginal_cc_figure.py` — Python (powergenome env); two-panel bar chart
+
+**Status:** Complete (2026-05-27).
+
+### 20a. `hope_pcm_ed_marginal_cc_validation.csv`
+
+Normalized marginal CC for HOPE-PCM-ED and Full-year ED (M3) across both cases and
+δ = 1, 5, 10 MW (12 rows).
+
+Columns: `case`, `model`, `n_scen`, `delta_mw`, `eue_baseline_mwh`,
+`eue_plus_storage_mwh`, `eue_plus_perfect_mwh`, `delta_eue_storage_mwh`,
+`delta_eue_perfect_mwh`, `normalized_marginal_cc`, `cc_error_vs_full_year_ed`,
+`cc_greater_than_one`.
+
+Key results (N=20 base, N=5 wind-heavy, δ = 1 MW):
+- Balanced VRE: M3 CC = 1.116, HOPE-PCM-ED CC = 1.063 (diff = −0.054); both > 1
+- Wind-heavy VRE: M3 CC = 1.171, HOPE-PCM-ED CC = 1.356 (diff = +0.185); both > 1
+
+ΔEUEstor is identical between M3 and HOPE-PCM-ED.  ΔEUEperf differs because LP
+degeneracy (barrier vs vertex solutions) produces different hourly load-shed
+distributions at the same total EUE.
+
+**Committed:** Yes.
+
+### 20b. `figures/hope_pcm_ed_marginal_cc_validation.pdf/.png`
+
+Two-panel figure (a: Balanced VRE N=20, b: Wind-heavy VRE N=5).  Grouped bars for
+Full-year ED (M3) and HOPE-PCM-ED.  Horizontal dashed reference at 1.0.
+Sensitivity markers (δ = 5 and 10 MW) overlaid.
+
+**Committed:** Yes.

@@ -554,3 +554,49 @@ with the multi-hour duration advantage.
 - Script 56: `scripts/56_make_marginal_cc_figure.py`
 - CSV: `results/paper_tables/storage_marginal_capacity_credit.csv`
 - Figure: `figures/storage_marginal_capacity_credit.pdf/.png`
+
+---
+
+## 17. Key finding 10: HOPE-PCM-ED confirms CC > 1 (2026-05-27)
+
+Script 57 validates the normalized marginal CC result from script 55 using HOPE-PCM-ED
+as an independent LP solver, running 75 new HOPE-ED scenarios (60 base N=20, 15 wind-heavy N=5).
+
+**Results (δ = 1 MW, primary):**
+
+| Case | Model | N | EUE_base (MWh) | ΔEUEstor (MWh) | ΔEUEperf (MWh) | CC | CC > 1? |
+|------|-------|---|---------------|----------------|----------------|------|---------|
+| VRE120\_base | M3 (Full-year ED) | 20 | 2,479 | 6.641 | 5.950 | 1.116 | YES |
+| VRE120\_base | HOPE-PCM-ED | 20 | 2,479 | 6.641 | 6.250 | 1.063 | YES |
+| VRE120\_wind\_hvy | M3 (Full-year ED) | 5 | 1,113 | 5.154 | 4.400 | 1.171 | YES |
+| VRE120\_wind\_hvy | HOPE-PCM-ED | 5 | 1,113 | 5.154 | 3.800 | 1.356 | YES |
+
+Finite-difference stability (δ = 5, 10 MW): CC varies by < 0.014 across increments for
+both models and both cases — the result is not finite-difference noise.
+
+**Key finding:** CC > 1 is confirmed by HOPE-PCM-ED in both cases.  The marginal
+reliability contribution of a 1 MW / 4 MWh four-hour storage unit exceeds that of
+a 1 MW perfect-firm resource, consistent with the multi-hour duration effect.
+
+**Discrepancy between HOPE and M3:**
+ΔEUEstor is identical across models (HOPE-ED and M3 agree on EUE for any system
+configuration — the LP objective is the same).  ΔEUEperf differs because it depends
+on the hourly concentration of baseline load-shedding: `Σ_h max(0, shed[h] − δ)`.
+HOPE uses barrier without crossover (interior-point solution), while M3 uses barrier
+with crossover (vertex solution).  These reach different LP optima with the same total
+EUE but different hourly load-shed distributions.  The CC magnitude therefore differs
+across models, but the CC > 1 conclusion is robust.
+
+**Diagnosis checklist:**
+1. Baseline EUE matches: M3 = HOPE = 2,479 MWh (base) / 1,113 MWh (wind-heavy N=5) ✓
+2. ΔEUEperf > 1e-9 (denominator not degenerate): min = 3.800 MWh ✓
+3. ΔEUEstor and ΔEUEperf reported explicitly ✓
+4. Finite-difference stable across δ = 1, 5, 10 MW ✓
+5. CC > 1 in both models: YES ✓
+6. LP degeneracy explanation for HOPE vs M3 discrepancy: documented ✓
+
+**Source:**
+- Script 57: `scripts/57_hope_marginal_cc_validation.jl`
+- Script 58: `scripts/58_make_hope_marginal_cc_figure.py`
+- CSV: `results/paper_tables/hope_pcm_ed_marginal_cc_validation.csv`
+- Figure: `figures/hope_pcm_ed_marginal_cc_validation.pdf/.png`

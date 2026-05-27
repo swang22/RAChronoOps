@@ -721,6 +721,37 @@ Sensitivity (δ = 10 MW) confirms finite-difference approximation is stable (< 0
 
 ---
 
+### Supporting: HOPE-PCM-ED marginal CC validation
+
+**Placement:** Supporting material / internal diagnostic (not in main paper draft).
+
+**Takeaway:** CC > 1 is confirmed by HOPE-PCM-ED in both VRE cases, validating the
+physics result from the custom Full-year ED (M3).  ΔEUEstor is identical between M3
+and HOPE-PCM-ED (both LP solvers agree on the EUE improvement from marginal storage).
+ΔEUEperf differs because HOPE uses barrier without crossover while M3 uses vertex
+solutions, leading to different hourly load-shed distributions at the same total EUE.
+
+**Source:** `results/paper_tables/hope_pcm_ed_marginal_cc_validation.csv`
+
+**Scripts:**
+- `scripts/57_hope_marginal_cc_validation.jl` — Julia; 75 HOPE-ED marginal-storage runs + M3 N=5 re-run for wind-heavy
+- `scripts/58_make_hope_marginal_cc_figure.py` — Python (powergenome env); two-panel comparison chart
+
+**Figure:** `figures/hope_pcm_ed_marginal_cc_validation.pdf/.png`
+Two panels (Balanced VRE N=20, Wind-heavy VRE N=5): grouped bars for Full-year ED (M3)
+and HOPE-PCM-ED, horizontal line at 1.0, sensitivity markers for δ = 5/10 MW.
+
+**Key data (δ = 1 MW):**
+
+| Case | Model | N | ΔEUEstor (MWh) | ΔEUEperf (MWh) | CC | CC > 1? |
+|------|-------|---|----------------|----------------|------|---------|
+| VRE120\_base | Full-year ED (M3) | 20 | 6.641 | 5.950 | 1.116 | YES |
+| VRE120\_base | HOPE-PCM-ED | 20 | 6.641 | 6.250 | 1.063 | YES |
+| VRE120\_wind\_hvy | Full-year ED (M3) | 5 | 5.154 | 4.400 | 1.171 | YES |
+| VRE120\_wind\_hvy | HOPE-PCM-ED | 5 | 5.154 | 3.800 | 1.356 | YES |
+
+---
+
 ## Data availability summary
 
 | Table/Figure | Result folder | Key CSV | Script | N | Status |
