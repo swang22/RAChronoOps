@@ -680,6 +680,41 @@ recharge-window availability proxy, not a physical feasibility proof.
 
 ---
 
+### Supporting: Storage capacity-credit diagnostic
+
+**Placement:** Supporting material / internal diagnostic (not in main paper draft).
+
+**Takeaway:** Methods that recover full-year ED EUE (M1c, M2, M3) also produce
+identical PJM-style storage reliability value and EFC.  M1 has zero capacity
+credit; M1b has partial credit.  EFC for M1c/M2/M3 is 641–762 MW (65–78% of
+the 983 MW storage power rating).
+
+**Source:** `results/paper_tables/storage_capacity_credit_comparison.csv`
+
+**Scripts:**
+- `scripts/53_storage_capacity_credit.jl` — Julia; runs MC-NoStorage, computes PJM ratio and EFC by bisection with analytical CRN
+- `scripts/54_make_capacity_credit_figure.py` — Python (powergenome env); two-panel grouped bar chart
+
+**Figure:** `figures/storage_capacity_credit_comparison.pdf/.png`
+Two panels: (a) PJM-style reliability value ratio (100 MW perfect reference = 1.0 unit),
+(b) EFC in MW.  Grouped bars for balanced VRE (blue) and wind-heavy VRE (green).
+
+**Key data (N=20, seed=42):**
+
+| Case | Method | PJM ratio (100 MW ref) | EFC (MW) |
+|------|--------|----------------------|---------|
+| VRE120\_base | M1 | 0.000 | 0 |
+| VRE120\_base | M1b | 0.323 | 30 |
+| VRE120\_base | M1c / M2 / M3 | 3.358 | 641 |
+| VRE120\_wind\_hvy | M1 | 0.000 | 0 |
+| VRE120\_wind\_hvy | M1b | 1.490 | 162 |
+| VRE120\_wind\_hvy | M1c / M2 / M3 | 3.311 | 762 |
+
+EUE_base = 31,017 MWh (balanced) / 15,801 MWh (wind-heavy);
+EUE_perfect_100MW = 22,520 MWh (balanced) / 11,224 MWh (wind-heavy).
+
+---
+
 ## Data availability summary
 
 | Table/Figure | Result folder | Key CSV | Script | N | Status |

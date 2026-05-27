@@ -423,7 +423,7 @@ M1c, M2, and M3.
 
 **Folder:** `figures/`
 
-**Scripts:** `scripts/45_make_paper_figures.py` (main figures), `scripts/47_make_event_operation_figure.py` (ED vs UC comparison; Python, powergenome conda env), `scripts/48_generate_storage_operation_dispatch.jl` + `scripts/49_make_storage_operation_figure.py` (M1c/M2/M3 storage operation; Julia + Python), `scripts/50_make_storage_operation_compact.py` (compact version for main text; Python, powergenome conda env), `scripts/51_recharge_window_diagnostic.jl` + `scripts/52_make_recharge_window_figure.py` (recharge-window diagnostic; Julia + Python)
+**Scripts:** `scripts/45_make_paper_figures.py` (main figures), `scripts/47_make_event_operation_figure.py` (ED vs UC comparison; Python, powergenome conda env), `scripts/48_generate_storage_operation_dispatch.jl` + `scripts/49_make_storage_operation_figure.py` (M1c/M2/M3 storage operation; Julia + Python), `scripts/50_make_storage_operation_compact.py` (compact version for main text; Python, powergenome conda env), `scripts/51_recharge_window_diagnostic.jl` + `scripts/52_make_recharge_window_figure.py` (recharge-window diagnostic; Julia + Python), `scripts/53_storage_capacity_credit.jl` + `scripts/54_make_capacity_credit_figure.py` (storage capacity-credit diagnostic; Julia + Python)
 
 **Status:** Complete (8 figures + compact variant + LaTeX captions). Updated 2026-05-26.
 
@@ -447,6 +447,7 @@ D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe \
 | `storage_operation_comparison.pdf/.png` | Appendix: 3-panel storage operation (load shed, discharge, SOC) for M1c/M2/M3 — Scenario 15, h4959-5048 | Appendix B |
 | `storage_operation_comparison_compact.pdf/.png` | Main text Figure 5: compact 3-panel storage operation, local window rel -8 to +10 around first shedding hour | Main text |
 | `recharge_window_diagnostic.pdf/.png` | Recharge-window availability diagnostic: share of event EUE with comparable M3 pre-event charge within 6/12/24/48/72/168 h (not a physical feasibility proof) | Supporting |
+| `storage_capacity_credit_comparison.pdf/.png` | Two-panel: (a) PJM-style storage reliability value ratio, (b) EFC in MW; grouped bars for balanced/wind-heavy VRE | Supporting |
 | `figure_captions.md` | LaTeX-ready captions for all figures | — |
 
 **Key changes (2026-05-25):**
@@ -504,3 +505,41 @@ Event-window MCS produces more, shorter events (2.9/yr, 2.0 h mean) with
 the same EUE — LP degeneracy distributes deficit across more hourly slots.
 PCM-UCED produces even more, shorter events (4.1/yr, 1.8 h mean) due to
 unit-commitment constraints.
+
+---
+
+## 19. Storage capacity-credit diagnostic
+
+**Folder:** `results/paper_tables/`
+
+**Scripts:**
+- `scripts/53_storage_capacity_credit.jl` — Julia; runs MC-NoStorage, computes PJM ratio and EFC by bisection
+- `scripts/54_make_capacity_credit_figure.py` — Python (powergenome env); two-panel grouped bar chart
+
+**Status:** Complete (2026-05-26).
+
+### 19a. `storage_capacity_credit_comparison.csv`
+
+PJM-style storage reliability value and EFC for M1, M1b, M1c, M2, M3 in
+both VRE portfolios (10 rows).  Analytical perfect-resource EUE guarantees
+common random numbers; no extra scenario runs needed.
+
+Columns: `case`, `method`, `eue_base_mwh`, `eue_storage_mwh`,
+`eue_perfect_100mw_mwh`, `eue_perfect_500mw_mwh`,
+`eue_improvement_storage_mwh`, `eue_improvement_100mw_mwh`,
+`pjm_ratio_100mw`, `pjm_ratio_500mw`, `ratio_error_vs_full_year_ed`,
+`efc_mw`.
+
+Key results (N=20, seed=42):
+- Balanced VRE: M1c/M2/M3 PJM ratio = 3.358, EFC = 641 MW; M1b ratio = 0.323, EFC = 30 MW; M1 ratio = 0, EFC = 0
+- Wind-heavy VRE: M1c/M2/M3 PJM ratio = 3.311, EFC = 762 MW; M1b ratio = 1.490, EFC = 162 MW; M1 ratio = 0, EFC = 0
+
+**Committed:** Yes.
+
+### 19b. `figures/storage_capacity_credit_comparison.pdf/.png`
+
+Two-panel figure: (a) PJM-style reliability value ratio (100 MW perfect reference = 1.0 unit),
+(b) equivalent firm capacity (MW).  Grouped bars for balanced VRE (blue) and
+wind-heavy VRE (green).  Dashed reference lines at M3 values; EFC annotations on M3 bars.
+
+**Committed:** Yes.

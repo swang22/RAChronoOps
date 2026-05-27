@@ -508,3 +508,48 @@ incorrect mean_event_duration for HOPE-ED (1.4 h, should be 1.58 h) and HOPE-UC
 (1.767 h, should be 2.1 h).  These were fixed by computing event shape from the
 raw hourly load-shedding CSV
 (`results/hope_wind_hvy_n5_pilot/hope_load_shed_hourly.csv`) in script 46.
+
+---
+
+## 16. Key finding 9: storage capacity-credit diagnostic (2026-05-26)
+
+Script 53 computes a PJM-style storage reliability value and equivalent firm
+capacity (EFC) for each storage-aware MCS method using the MC-NoStorage
+base load-shed vectors and analytical CRN:
+
+```
+PJM_ratio_m = (EUE_base − EUE_storage_m) / (EUE_base − EUE_perfect_100MW)
+EUE_perfect_X: shed_perfect[s,h] = max(0, shed_base[s,h] − X)   (analytical CRN)
+EFC: bisection on firm_mw s.t. EUE(no-storage + firm_mw_perfect) = EUE_storage_m
+```
+
+**Key results (N=20, seed=42):**
+
+| Case | Method | EUE_storage (MWh) | PJM ratio (100 MW ref) | EFC (MW) |
+|------|--------|------------------|----------------------|---------|
+| VRE120\_base | M1 | 31,017 | 0.000 | 0 |
+| VRE120\_base | M1b | 28,272 | 0.323 | 30 |
+| VRE120\_base | M1c | 2,479 | 3.358 | 641 |
+| VRE120\_base | M2 | 2,479 | 3.358 | 641 |
+| VRE120\_base | M3 | 2,479 | 3.358 | 641 |
+| VRE120\_wind\_hvy | M1 | 15,801 | 0.000 | 0 |
+| VRE120\_wind\_hvy | M1b | 7,467 | 1.490 | 162 |
+| VRE120\_wind\_hvy | M1c | 648 | 3.311 | 762 |
+| VRE120\_wind\_hvy | M2 | 648 | 3.311 | 762 |
+| VRE120\_wind\_hvy | M3 | 648 | 3.311 | 762 |
+
+Reference: EUE_base = 31,017 MWh (balanced) / 15,801 MWh (wind-heavy);
+EUE_perfect_100MW = 22,520 MWh (balanced) / 11,224 MWh (wind-heavy).
+
+**Key finding:** Methods that recover full-year ED EUE (M1c, M2, M3) produce
+identical PJM ratio and EFC.  M1 has zero capacity credit because it depletes
+storage before events.  M1b has partial credit; its SOC floor preserves some
+energy but the proactive discharge still wastes energy before events.  EFC for
+M1c/M2/M3 is 641–762 MW, representing 65–78% of the 983 MW storage power
+rating.
+
+**Source:**
+- Script 53: `scripts/53_storage_capacity_credit.jl`
+- Script 54: `scripts/54_make_capacity_credit_figure.py`
+- CSV: `results/paper_tables/storage_capacity_credit_comparison.csv`
+- Figure: `figures/storage_capacity_credit_comparison.pdf/.png`
