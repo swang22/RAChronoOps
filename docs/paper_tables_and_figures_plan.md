@@ -680,38 +680,44 @@ recharge-window availability proxy, not a physical feasibility proof.
 
 ---
 
-### Supporting: Storage capacity-credit diagnostic
+### Supporting: Normalized marginal storage capacity-credit diagnostic
 
 **Placement:** Supporting material / internal diagnostic (not in main paper draft).
 
-**Takeaway:** Methods that recover full-year ED EUE (M1c, M2, M3) also produce
-identical PJM-style storage reliability value and EFC.  M1 has zero capacity
-credit; M1b has partial credit.  EFC for M1c/M2/M3 is 641–762 MW (65–78% of
-the 983 MW storage power rating).
+**Deprecated:** The previous 100 MW average reliability-value diagnostic has been deprecated.
+The revised diagnostic computes normalized marginal CC using a 1 MW storage and 1 MW
+perfect-resource increment.
 
-**Source:** `results/paper_tables/storage_capacity_credit_comparison.csv`
+**Takeaway:** M1c and M3 produce identical normalized marginal capacity credit (CC ≈ 1.116
+balanced, 1.101 wind-heavy at δ = 1 MW).  M2 overestimates CC by +0.039 (balanced) and
++0.169 (wind-heavy) relative to M3, because event-window dispatch directs more energy
+to scarcity events for the marginal storage unit.  CC > 1 for all methods reflects the
+multi-hour (4 h) duration advantage over 1 MW perfect firm capacity.
+
+**Source:** `results/paper_tables/storage_marginal_capacity_credit.csv`
 
 **Scripts:**
-- `scripts/53_storage_capacity_credit.jl` — Julia; runs MC-NoStorage, computes PJM ratio and EFC by bisection with analytical CRN
-- `scripts/54_make_capacity_credit_figure.py` — Python (powergenome env); two-panel grouped bar chart
+- `scripts/55_marginal_capacity_credit.jl` — Julia; computes normalized marginal CC at δ=1,5,10 MW with analytical CRN
+- `scripts/56_make_marginal_cc_figure.py` — Python (powergenome env); two-panel grouped bar chart
 
-**Figure:** `figures/storage_capacity_credit_comparison.pdf/.png`
-Two panels: (a) PJM-style reliability value ratio (100 MW perfect reference = 1.0 unit),
-(b) EFC in MW.  Grouped bars for balanced VRE (blue) and wind-heavy VRE (green).
+**Figure:** `figures/storage_marginal_capacity_credit.pdf/.png`
+Two panels: (a) δ = 1 MW primary (normalized marginal capacity credit, marginal reliability
+contribution relative to 1 MW perfect firm capacity); (b) δ = 10 MW finite-difference check.
+Grouped bars for balanced VRE (blue) and wind-heavy VRE (green).
 
-**Key data (N=20, seed=42):**
+**Key data (N=20, seed=42, primary δ = 1 MW):**
 
-| Case | Method | PJM ratio (100 MW ref) | EFC (MW) |
-|------|--------|----------------------|---------|
-| VRE120\_base | M1 | 0.000 | 0 |
-| VRE120\_base | M1b | 0.323 | 30 |
-| VRE120\_base | M1c / M2 / M3 | 3.358 | 641 |
-| VRE120\_wind\_hvy | M1 | 0.000 | 0 |
-| VRE120\_wind\_hvy | M1b | 1.490 | 162 |
-| VRE120\_wind\_hvy | M1c / M2 / M3 | 3.311 | 762 |
+| Case | Method | Norm. marg. CC | Error vs M3 |
+|------|--------|---------------|------------|
+| VRE120\_base | M1c | 1.116 | +0.000 |
+| VRE120\_base | M2  | 1.155 | +0.039 |
+| VRE120\_base | M3  | 1.116 | 0.000 |
+| VRE120\_wind\_hvy | M1c | 1.101 | +0.000 |
+| VRE120\_wind\_hvy | M2  | 1.270 | +0.169 |
+| VRE120\_wind\_hvy | M3  | 1.101 | 0.000 |
 
-EUE_base = 31,017 MWh (balanced) / 15,801 MWh (wind-heavy);
-EUE_perfect_100MW = 22,520 MWh (balanced) / 11,224 MWh (wind-heavy).
+EUE_base = 2,479 MWh (balanced) / 648 MWh (wind-heavy) at existing-storage baseline.
+Sensitivity (δ = 10 MW) confirms finite-difference approximation is stable (< 0.007 deviation).
 
 ---
 

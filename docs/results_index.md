@@ -508,38 +508,41 @@ unit-commitment constraints.
 
 ---
 
-## 19. Storage capacity-credit diagnostic
+## 19. Normalized marginal storage capacity-credit diagnostic
 
 **Folder:** `results/paper_tables/`
 
+**Deprecated:** The previous 100 MW average reliability-value diagnostic (scripts 53/54,
+`storage_capacity_credit_comparison.csv`) has been deprecated.  The revised diagnostic
+computes normalized marginal CC using a 1 MW storage and 1 MW perfect-resource increment.
+
 **Scripts:**
-- `scripts/53_storage_capacity_credit.jl` — Julia; runs MC-NoStorage, computes PJM ratio and EFC by bisection
-- `scripts/54_make_capacity_credit_figure.py` — Python (powergenome env); two-panel grouped bar chart
+- `scripts/55_marginal_capacity_credit.jl` — Julia; runs marginal storage dispatch at δ=1,5,10 MW with analytical perfect-resource CRN
+- `scripts/56_make_marginal_cc_figure.py` — Python (powergenome env); two-panel grouped bar chart
 
 **Status:** Complete (2026-05-26).
 
-### 19a. `storage_capacity_credit_comparison.csv`
+### 19a. `storage_marginal_capacity_credit.csv`
 
-PJM-style storage reliability value and EFC for M1, M1b, M1c, M2, M3 in
-both VRE portfolios (10 rows).  Analytical perfect-resource EUE guarantees
-common random numbers; no extra scenario runs needed.
+Normalized marginal capacity credit for M1c, M2, M3 in both VRE portfolios at
+δ = 1, 5, 10 MW (18 rows).  Analytical perfect-resource EUE guarantees common random
+numbers; one extra dispatch run per (method, case, δ) needed for δ_storage.
 
-Columns: `case`, `method`, `eue_base_mwh`, `eue_storage_mwh`,
-`eue_perfect_100mw_mwh`, `eue_perfect_500mw_mwh`,
-`eue_improvement_storage_mwh`, `eue_improvement_100mw_mwh`,
-`pjm_ratio_100mw`, `pjm_ratio_500mw`, `ratio_error_vs_full_year_ed`,
-`efc_mw`.
+Columns: `case`, `baseline_type`, `delta_mw`, `method`, `eue_baseline_mwh`,
+`eue_plus_storage_mwh`, `eue_plus_perfect_mwh`, `delta_eue_storage_mwh`,
+`delta_eue_perfect_mwh`, `normalized_marginal_cc`, `cc_error_vs_full_year_ed`.
 
-Key results (N=20, seed=42):
-- Balanced VRE: M1c/M2/M3 PJM ratio = 3.358, EFC = 641 MW; M1b ratio = 0.323, EFC = 30 MW; M1 ratio = 0, EFC = 0
-- Wind-heavy VRE: M1c/M2/M3 PJM ratio = 3.311, EFC = 762 MW; M1b ratio = 1.490, EFC = 162 MW; M1 ratio = 0, EFC = 0
+Key results (N=20, seed=42, δ = 1 MW primary):
+- Balanced VRE: M1c CC = 1.116, M2 CC = 1.155 (+0.039 vs M3), M3 CC = 1.116
+- Wind-heavy VRE: M1c CC = 1.101, M2 CC = 1.270 (+0.169 vs M3), M3 CC = 1.101
 
 **Committed:** Yes.
 
-### 19b. `figures/storage_capacity_credit_comparison.pdf/.png`
+### 19b. `figures/storage_marginal_capacity_credit.pdf/.png`
 
-Two-panel figure: (a) PJM-style reliability value ratio (100 MW perfect reference = 1.0 unit),
-(b) equivalent firm capacity (MW).  Grouped bars for balanced VRE (blue) and
-wind-heavy VRE (green).  Dashed reference lines at M3 values; EFC annotations on M3 bars.
+Two-panel figure: (a) δ = 1 MW primary — normalized marginal capacity credit
+(marginal reliability contribution relative to 1 MW perfect firm capacity);
+(b) δ = 10 MW finite-difference check.  Grouped bars for balanced VRE (blue) and
+wind-heavy VRE (green).  Dashed reference lines at M3 values.
 
 **Committed:** Yes.

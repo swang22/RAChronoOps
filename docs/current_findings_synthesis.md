@@ -511,45 +511,46 @@ raw hourly load-shedding CSV
 
 ---
 
-## 16. Key finding 9: storage capacity-credit diagnostic (2026-05-26)
+## 16. Key finding 9: normalized marginal storage capacity-credit diagnostic (2026-05-26)
 
-Script 53 computes a PJM-style storage reliability value and equivalent firm
-capacity (EFC) for each storage-aware MCS method using the MC-NoStorage
-base load-shed vectors and analytical CRN:
+**Deprecated:** The previous 100 MW average reliability-value diagnostic has been deprecated.
+The revised diagnostic computes normalized marginal CC using a 1 MW storage and 1 MW
+perfect-resource increment.
+
+Script 55 computes normalized marginal capacity credit for each storage-aware MCS method,
+case, and increment δ using the existing-storage baseline with analytical CRN:
 
 ```
-PJM_ratio_m = (EUE_base − EUE_storage_m) / (EUE_base − EUE_perfect_100MW)
-EUE_perfect_X: shed_perfect[s,h] = max(0, shed_base[s,h] − X)   (analytical CRN)
-EFC: bisection on firm_mw s.t. EUE(no-storage + firm_mw_perfect) = EUE_storage_m
+CC_m(δ) = [EUE_m(x) − EUE_m(x + δ_storage)] / [EUE_m(x) − EUE_m(x + δ_perfect)]
 ```
 
-**Key results (N=20, seed=42):**
+where x = existing 983 MW / 3932 MWh storage portfolio; δ_storage = δ MW / 4δ MWh;
+δ_perfect = analytical CRN: shed_after_perfect[h] = max(0, shed_base[h] − δ).
 
-| Case | Method | EUE_storage (MWh) | PJM ratio (100 MW ref) | EFC (MW) |
-|------|--------|------------------|----------------------|---------|
-| VRE120\_base | M1 | 31,017 | 0.000 | 0 |
-| VRE120\_base | M1b | 28,272 | 0.323 | 30 |
-| VRE120\_base | M1c | 2,479 | 3.358 | 641 |
-| VRE120\_base | M2 | 2,479 | 3.358 | 641 |
-| VRE120\_base | M3 | 2,479 | 3.358 | 641 |
-| VRE120\_wind\_hvy | M1 | 15,801 | 0.000 | 0 |
-| VRE120\_wind\_hvy | M1b | 7,467 | 1.490 | 162 |
-| VRE120\_wind\_hvy | M1c | 648 | 3.311 | 762 |
-| VRE120\_wind\_hvy | M2 | 648 | 3.311 | 762 |
-| VRE120\_wind\_hvy | M3 | 648 | 3.311 | 762 |
+**Key results — primary metric δ = 1 MW (N=20, seed=42):**
 
-Reference: EUE_base = 31,017 MWh (balanced) / 15,801 MWh (wind-heavy);
-EUE_perfect_100MW = 22,520 MWh (balanced) / 11,224 MWh (wind-heavy).
+| Case | Method | EUE_base (MWh) | Norm. marg. CC | Error vs M3 |
+|------|--------|---------------|---------------|------------|
+| VRE120\_base | M1c | 2,479 | 1.116 | +0.000 |
+| VRE120\_base | M2  | 2,479 | 1.155 | +0.039 |
+| VRE120\_base | M3  | 2,479 | 1.116 | 0.000 |
+| VRE120\_wind\_hvy | M1c | 648 | 1.101 | +0.000 |
+| VRE120\_wind\_hvy | M2  | 648 | 1.270 | +0.169 |
+| VRE120\_wind\_hvy | M3  | 648 | 1.101 | 0.000 |
 
-**Key finding:** Methods that recover full-year ED EUE (M1c, M2, M3) produce
-identical PJM ratio and EFC.  M1 has zero capacity credit because it depletes
-storage before events.  M1b has partial credit; its SOC floor preserves some
-energy but the proactive discharge still wastes energy before events.  EFC for
-M1c/M2/M3 is 641–762 MW, representing 65–78% of the 983 MW storage power
-rating.
+Sensitivity check at δ = 10 MW: CC values differ from δ = 1 MW by < 0.007 (balanced)
+and < 0.006 (wind-heavy), confirming the finite-difference approximation is stable.
+
+**Key finding:** M1c and M3 produce essentially identical normalized marginal capacity
+credit (marginal reliability contribution relative to 1 MW perfect firm capacity).
+M2 overestimates CC by +0.039 (balanced VRE) and +0.169 (wind-heavy VRE), because the
+event-window dispatch conserves more energy for the marginal storage unit during
+identified scarcity events.  CC > 1 for all methods reflects that a 1 MW / 4 MWh
+four-hour storage unit reduces EUE more than a 1 MW perfect-firm resource, consistent
+with the multi-hour duration advantage.
 
 **Source:**
-- Script 53: `scripts/53_storage_capacity_credit.jl`
-- Script 54: `scripts/54_make_capacity_credit_figure.py`
-- CSV: `results/paper_tables/storage_capacity_credit_comparison.csv`
-- Figure: `figures/storage_capacity_credit_comparison.pdf/.png`
+- Script 55: `scripts/55_marginal_capacity_credit.jl`
+- Script 56: `scripts/56_make_marginal_cc_figure.py`
+- CSV: `results/paper_tables/storage_marginal_capacity_credit.csv`
+- Figure: `figures/storage_marginal_capacity_credit.pdf/.png`
