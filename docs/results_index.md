@@ -586,3 +586,45 @@ Full-year ED (M3) and HOPE-PCM-ED.  Horizontal dashed reference at 1.0.
 Sensitivity markers (δ = 5 and 10 MW) overlaid.
 
 **Committed:** Yes.
+
+---
+
+## 21. Model-rerun perfect-resource denominator validation (2026-05-27)
+
+Replaces the analytical `Σ_h max(0, shed[h] − δ)` denominator with a model-rerun
+denominator (explicit CRN-preserving rerun with δ MW perfect-firm generator).
+This is the ED-mode equivalent of HOPE's EREC method.
+
+**Scripts:**
+- `scripts/59_marginal_cc_model_rerun.jl` — Julia; M3 and HOPE-PCM-ED reruns
+- `scripts/60_make_model_rerun_figure.py` — Python (powergenome env); two-panel grouped bar chart
+
+**Status:** Complete (2026-05-27).
+
+### 21a. `marginal_cc_model_rerun_validation.csv`
+
+Model-rerun and analytical CC for M3 and HOPE-PCM-ED, both VRE cases, δ = 1, 5, 10 MW (18 rows).
+
+Columns: `case`, `model`, `n_scen`, `delta_mw`, `eue_baseline_mwh`,
+`eue_plus_storage_mwh`, `eue_plus_perfect_rerun_mwh`, `eue_plus_perfect_analytical_mwh`,
+`delta_eue_storage_mwh`, `delta_eue_perfect_rerun_mwh`, `delta_eue_perfect_analytical_mwh`,
+`normalized_marginal_cc_rerun`, `normalized_marginal_cc_analytical`,
+`cc_error_rerun_vs_m3`, `cc_error_analytical_vs_m3`, `cc_greater_than_one_rerun`.
+
+Key results (δ = 1 MW):
+- Balanced VRE: M3 CC_rerun = 0.4974, HOPE CC_rerun = 0.4974 (diff ≈ 0); M3 CC_anal = 1.116, HOPE CC_anal = 1.063
+- Wind-heavy VRE: M3 CC_rerun = 0.6285, HOPE CC_rerun = 0.6285 (diff ≈ 0); M3 CC_anal = 1.171, HOPE CC_anal = 1.356
+
+M3 and HOPE agree to machine precision under the rerun denominator.  The analytical
+denominator shows model-specific bias up to 0.185 (wind-heavy case) due to LP degeneracy.
+
+**Committed:** Yes.
+
+### 21b. `figures/marginal_cc_model_rerun_validation.pdf/.png`
+
+Two-panel figure (a: Balanced VRE N=20, b: Wind-heavy VRE N=5).  Two grouped bar sets
+per panel: solid bars (model rerun) and hatched bars (analytical legacy).  Both M3 and HOPE
+bars within each group.  Sensitivity markers (δ = 5 and 10 MW) overlaid on rerun group.
+Reference line at CC = 1.0.
+
+**Committed:** Yes.

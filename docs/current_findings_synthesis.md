@@ -600,3 +600,52 @@ across models, but the CC > 1 conclusion is robust.
 - Script 58: `scripts/58_make_hope_marginal_cc_figure.py`
 - CSV: `results/paper_tables/hope_pcm_ed_marginal_cc_validation.csv`
 - Figure: `figures/hope_pcm_ed_marginal_cc_validation.pdf/.png`
+
+---
+
+## 18. Key finding 11: Model-rerun denominator resolves LP-degeneracy spread (2026-05-27)
+
+Script 59 replaces the analytical perfect-resource denominator `Σ_h max(0, shed[h] − δ)`
+with one computed from an explicit model rerun (CRN-preserving insertion of a δ MW
+perfect-firm generator, FOR=0, zero cost).  The corrected formula is:
+
+```
+CC_m(δ) = [EUE_m(x) − EUE_m(x + δ_storage)] / [EUE_m(x) − EUE_m(x + δ_perfect)]
+```
+
+This is the ED-mode equivalent of HOPE's built-in EREC method (which is GTEP-mode only).
+
+**Results (δ = 1 MW):**
+
+| Case | Model | CC_rerun | CC_analytical | HOPE−M3 (rerun) | HOPE−M3 (analytical) |
+|------|-------|----------|--------------|-----------------|----------------------|
+| VRE120_base | M3 | 0.4974 | 1.116 | −0.00000 | −0.054 |
+| VRE120_base | HOPE-PCM-ED | 0.4974 | 1.063 | | |
+| VRE120_wind_hvy | M3 | 0.6285 | 1.171 | −0.00000 | +0.185 |
+| VRE120_wind_hvy | HOPE-PCM-ED | 0.6285 | 1.356 | | |
+
+Key observations:
+1. **CC_rerun < 1 for both models and both cases**: the marginal 1 MW / 4 MWh storage
+   unit contributes *less* reliability than a perfect-firm 1 MW resource, not more.
+   The CC > 1 result from script 57 was an artefact of the analytical denominator
+   underestimating the perfect-firm EUE reduction (by ~2×).
+2. **M3 and HOPE agree to machine precision** (|diff| < 5×10⁻¹⁴) once the same
+   model-rerun denominator is used — the LP-degeneracy spread in the analytical
+   denominator is eliminated entirely.
+3. **Analytical denominator is biased by LP degeneracy**: `Σ_h max(0, shed[h] − δ)`
+   depends on hourly load-shed concentration, which differs between barrier+crossover
+   (M3, vertex solution) and barrier-only (HOPE, interior-point solution) at the same
+   total EUE.  The rerun denominator is immune to this.
+4. **Finite-difference stability**: CC_rerun varies by < 0.005 across δ = 1, 5, 10 MW
+   for both models and cases.
+
+**Why CC < 1 makes physical sense:** The baseline already contains storage.  Adding
+more storage at the margin displaces some perfect-firm capacity value (the storage is
+redundant during events where storage is already fully charged), so the per-MW
+reliability value of additional storage is below that of a perfect-firm resource.
+
+**Source:**
+- Script 59: `scripts/59_marginal_cc_model_rerun.jl`
+- Script 60: `scripts/60_make_model_rerun_figure.py`
+- CSV: `results/paper_tables/marginal_cc_model_rerun_validation.csv`
+- Figure: `figures/marginal_cc_model_rerun_validation.pdf/.png`

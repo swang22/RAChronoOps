@@ -786,6 +786,7 @@ Run with `D:\Users\swang16\AppData\Local\Programs\Python\Python312\python.exe sc
 | `figures/storage_operation_comparison.pdf/.png` | `storage_operation_comparison/event_window.csv` | 48 + 49 | Appendix B | Complete (new) |
 | `figures/storage_operation_comparison_compact.pdf/.png` | `storage_operation_comparison/event_window.csv` | 50 | Main text (Figure 5) | Complete (new) |
 | `figures/figure_captions.md` | — (LaTeX captions) | 45 | — | Complete |
+| `figures/marginal_cc_model_rerun_validation.pdf/.png` | `paper_tables/marginal_cc_model_rerun_validation.csv` | 59, 60 | Supporting diagnostic | Complete (new) |
 | App A | `vre_method_comparison/` | `vre_method_comparison_results.csv` | 16 | 20 | Verify M1c\_VREOnly rows present |
 | App B | `m1d_storage_heuristic_comparison/` | `m1d_metrics_by_scenario.csv` | 38 | 20 | Complete |
 | App C | `full_model_comparison_with_hope/base_n5/` | `all_model_aggregate_metrics.csv` | 25, 30 | 5 | Complete |
