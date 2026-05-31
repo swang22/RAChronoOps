@@ -840,3 +840,23 @@ shorter events with higher maximum hourly shortfall.
   one scenario; events/yr and duration statistics are per-scenario averages.
 - PCM methods show 2–3× higher events/yr and lower mean duration than MCS methods,
   indicating that UC/ED dispatch spreads the same energy deficit into more shorter events.
+
+---
+
+## PCM-UCED marginal CC — supporting result (2026-05-31)
+
+**Source:** `scripts/63_pcm_uced_marginal_cc.jl`
+**CSV:** `results/paper_tables/pcm_uced_marginal_cc.csv`
+**Status:** Complete.
+
+**Key result:** PCM-UCED normalized marginal CC (fixed-UC LP) = 0.497 (balanced,
+N=20) and 0.628 (wind-heavy, N=5), matching M1c/M2/M3/PCM-ED to 3 decimal places.
+
+**Disposition:** The CC value (0.497 / 0.628) can be added to Table II (tab:storage_comparison)
+in the paper as the PCM-UCED Marg. CC entry, replacing the current `†` (not computed)
+placeholder.  Paper update deferred pending review of results.
+
+**Method note:** Fixed-UC LP fixes commitment u[g,h,ω] from HOPE dispatch output and
+re-solves continuous ED + storage SOC.  Full MILP reoptimization is computationally
+infeasible (~19 h for N=20).  The fixed-UC LP exactly reproduces HOPE UCED EUE (0%
+difference across all 25 scenarios), validating the commitment-inference approach.

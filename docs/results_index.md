@@ -628,3 +628,38 @@ bars within each group.  Sensitivity markers (δ = 5 and 10 MW) overlaid on reru
 Reference line at CC = 1.0.
 
 **Committed:** Yes.
+
+---
+
+## 22. PCM-UCED marginal storage CC — fixed-UC redispatch LP
+
+**Folder:** `results/paper_tables/`
+
+**Script:** `scripts/63_pcm_uced_marginal_cc.jl` — Julia; reads HOPE PCM-UCED
+scenario output from `exports/hope_model_cases/`; infers commitment from dispatch
+(threshold 0.01 MW); runs fixed-UC LP for baseline, +storage, and +perfect-firm
+across δ = 1, 5, 10 MW.
+
+**Status:** Complete (2026-05-31).
+
+**Note on full MILP:** ~570 s/scenario × 20 scen × 6 runs × 3 δ ≈ 19 h —
+computationally infeasible.  Fixed-UC LP is the practical diagnostic.
+
+### 22a. `pcm_uced_marginal_cc.csv`
+
+Columns: `case`, `model`, `model_internal`, `n_scen`, `delta_mw`,
+`eue_hope_uced_mean_mwh`, `eue_fixed_uc_baseline_mean_mwh`,
+`eue_fixed_uc_storage_mean_mwh`, `eue_fixed_uc_perfect_mean_mwh`,
+`delta_eue_storage_mwh`, `delta_eue_perfect_mwh`, `normalized_marginal_cc`,
+`fixed_uc_vs_hope_diff_pct`, `milp_reopt_note`.
+
+Key results (δ = 1 MW, model-rerun denominator):
+- Balanced VRE (N=20): CC = 0.497,  fixed-UC EUE = HOPE EUE (0.0% diff)
+- Wind-heavy VRE (N=5): CC = 0.628,  fixed-UC EUE = HOPE EUE (0.0% diff)
+
+PCM-UCED marginal CC matches M1c/M2/M3/PCM-ED to 3 decimal places.
+UC constraints affect LOLH and event timing but not marginal storage CC.
+
+Finite-difference stability: CC varies < 0.004 across δ = 1, 5, 10 MW.
+
+**Committed:** Yes.

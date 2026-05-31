@@ -649,3 +649,54 @@ reliability value of additional storage is below that of a perfect-firm resource
 - Script 60: `scripts/60_make_model_rerun_figure.py`
 - CSV: `results/paper_tables/marginal_cc_model_rerun_validation.csv`
 - Figure: `figures/marginal_cc_model_rerun_validation.pdf/.png`
+
+---
+
+## 19. Key finding 12: PCM-UCED marginal storage CC matches MCS/ED methods (2026-05-31)
+
+Script 63 computes normalized marginal storage CC for PCM-UCED using a fixed-UC
+redispatch LP.  For each baseline HOPE PCM-UCED scenario:
+1. Commitment status u[g,h,ω] is inferred from HOPE dispatch output (threshold 0.01 MW).
+2. A fixed-commitment LP re-solves continuous dispatch + storage SOC with pmin lower
+   bounds for committed generators and zero dispatch for decommitted generators.
+3. CC(δ) = mean(ΔEUE_storage) / mean(ΔEUE_perfect_rerun), using the same model-rerun
+   denominator as scripts 59 and 61.
+
+**Note on full MILP reoptimisation:** A full MILP rerun (~570 s/scenario × 20 scenarios
+× 6 runs per delta × 3 deltas) would require ~19 hours — computationally infeasible for
+routine analysis.  The fixed-UC LP is the practical diagnostic.
+
+**Key results (δ = 1 MW, model-rerun denominator):**
+
+| Case | N | EUE fixed-UC (MWh) | HOPE UCED EUE (MWh) | |diff| | CC_fixed_UC |
+|------|---|-------------------|---------------------|--------|-------------|
+| VRE120_base | 20 | 2,479.17 | 2,479.17 | 0.0% | **0.497** |
+| VRE120_wind_hvy | 5 | 1,113.18 | 1,113.18 | 0.0% | **0.628** |
+
+Finite-difference stability (δ = 1, 5, 10 MW): CC varies by < 0.004 (balanced) and
+< 0.004 (wind-heavy) — stable across increment sizes.
+
+**Interpretation:**
+1. **Fixed-UC LP validates exactly:** The fixed-commitment LP reproduces HOPE UCED EUE
+   to numerical precision in every scenario, confirming that the commitment inference
+   and LP formulation are correct.
+2. **UC constraints do not affect marginal CC:** PCM-UCED CC = 0.497 (balanced) and
+   0.628 (wind-heavy) — matching M1c, M2, M3, and HOPE-PCM-ED to 3 decimal places.
+   Unit commitment constraints change LOLH and event timing but not the marginal
+   reliability value of storage.
+3. **Consistent with prior results:** All methods — emergency-only MCS, event-window
+   MCS, full-year ED, PCM-ED, and PCM-UCED — yield the same marginal CC under the
+   model-rerun denominator.  The marginal reliability value of storage is determined
+   by the energy budget and shortage timing, not by the dispatch model's intertemporal
+   constraints.
+
+**Mean commitment rate:** 26.7% (balanced) / 18.1% (wind-heavy) of generator-hour
+slots are committed (i.e., generator dispatches > 0.01 MW in that scenario-hour).
+
+**Runtime:** ~112 s (N=20 baseline) + ~360 s (N=20 × 3 δ) = ~470 s total for balanced
+VRE; ~25 s + ~90 s = ~115 s for wind-heavy.  Total wall time ≈ 10 minutes (after Julia
+startup).
+
+**Source:**
+- Script 63: `scripts/63_pcm_uced_marginal_cc.jl`
+- CSV: `results/paper_tables/pcm_uced_marginal_cc.csv`
