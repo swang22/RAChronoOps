@@ -1,0 +1,14 @@
+portfolio,method_label,model_internal,n_scenarios,lolh_h,eue_mwh,neue_ppm,cvar_eue_mwh,runtime_s,marginal_cc
+Balanced VRE (N=20),Naive Storage Monte Carlo,M1,20,95.4,31017,688,51937,0.07,0.0
+Balanced VRE (N=20),Reserve-Floor Storage Monte Carlo,M1b,20,83.55,28272,627,49455,0.05,0.029
+Balanced VRE (N=20),Emergency-Only Storage Monte Carlo,M1c,20,5.95,2479,55,9783,0.06,0.497
+Balanced VRE (N=20),Risk-Hour-Earliest Monte Carlo,M1d_earliest,20,5.95,2479,55,9783,0.05,
+Balanced VRE (N=20),Risk-Hour-Largest Monte Carlo,M1d_largest,20,8.45,2479,55,9783,0.06,
+Balanced VRE (N=20),Event-Window LP Monte Carlo,M2,20,5.75,2479,55,9783,0.43,0.497
+Balanced VRE (N=20),Full-Year ED Monte Carlo,M3,20,5.95,2479,55,9783,9.56,0.497
+Balanced VRE (N=20),PCM-UCED,HOPE-UC,20,7.25,2479,55,9783,571.92,
+Wind-heavy VRE (N=5),Emergency-only storage MCS,M1c,5,4.4,1113,25,2793,0.12,0.628
+Wind-heavy VRE (N=5),Event-window storage MCS,M2,5,3.8,1113,25,2793,0.51,0.628
+Wind-heavy VRE (N=5),Full-year ED,M3,5,4.4,1113,25,2793,8.86,0.628
+Wind-heavy VRE (N=5),PCM-ED (cross-check),HOPE-ED,5,3.8,1113,25,2793,117.51,
+Wind-heavy VRE (N=5),PCM-UCED,HOPE-UC,5,4.2,1113,25,2793,542.44,
