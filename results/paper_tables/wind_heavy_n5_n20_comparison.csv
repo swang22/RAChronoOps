@@ -1,0 +1,26 @@
+method_internal,method_label,metric,value_n5,value_n20,abs_diff_n20_minus_n5,rel_diff_pct,interpretation
+M1,Naive storage MCS,lolh_h,67.2,52.4,-14.80,-22.02,Large decrease: N=5 scenarios 1-5 skew toward high-outage draws
+M1,Naive storage MCS,eue_mwh,21202.40,15801.11,-5401.29,-25.47,Same direction: fewer high-EUE scenarios in full N=20 set
+M1,Naive storage MCS,neue_ppm,470.40,350.56,-119.84,-25.48,Derived from EUE; identical relative change
+M1,Naive storage MCS,cvar_eue_mwh,28366.46,26871.07,-1495.39,-5.27,Tail metric less sensitive to mean shift; still ~5% lower at N=20
+M1,Naive storage MCS,runtime_s_per_scen,0.06,0.06,0.00,0.00,No meaningful difference
+M1b,SOC-floor storage MCS,lolh_h,36.4,25.0,-11.40,-31.32,Substantial reduction; same sampling cause as M1
+M1b,SOC-floor storage MCS,eue_mwh,13798.61,8982.38,-4816.23,-34.90,35% lower at N=20; largest relative gap among all methods
+M1b,SOC-floor storage MCS,neue_ppm,306.13,199.28,-106.85,-34.90,Same as EUE
+M1b,SOC-floor storage MCS,cvar_eue_mwh,20642.74,20155.20,-487.54,-2.36,Tail relatively stable vs mean
+M1b,SOC-floor storage MCS,runtime_s_per_scen,0.06,0.05,-0.01,-16.67,Negligible
+M1c,Emergency-only storage MCS,lolh_h,4.4,2.25,-2.15,-48.86,N=5 scenarios are 2x more severe; pure small-sample variance
+M1c,Emergency-only storage MCS,eue_mwh,1113.18,648.24,-464.94,-41.77,KEY INCONSISTENCY: same seed same system; 42% gap from N=5 vs N=20
+M1c,Emergency-only storage MCS,neue_ppm,24.70,14.38,-10.32,-41.78,24.7 ppm (N=5) vs 14.4 ppm (N=20); cannot use same number in paper
+M1c,Emergency-only storage MCS,cvar_eue_mwh,2792.63,3528.39,735.76,26.33,N=20 CVaR HIGHER: better tail sampling reveals larger worst cases
+M1c,Emergency-only storage MCS,runtime_s_per_scen,0.12,0.07,-0.05,-41.67,Slightly faster at N=20 (run-to-run variation)
+M2,Event-window storage MCS,lolh_h,3.8,1.95,-1.85,-48.68,Same direction as M1c; consistent sampling effect
+M2,Event-window storage MCS,eue_mwh,1113.18,648.24,-464.94,-41.77,Identical to M1c (same scenarios same CRN)
+M2,Event-window storage MCS,neue_ppm,24.70,14.38,-10.32,-41.78,Same as M1c
+M2,Event-window storage MCS,cvar_eue_mwh,2792.63,3528.39,735.76,26.33,Same as M1c
+M2,Event-window storage MCS,runtime_s_per_scen,0.51,0.38,-0.13,-25.49,Slightly faster at N=20
+M3,Full-year ED,lolh_h,4.4,2.25,-2.15,-48.86,Same as M1c (same scenarios exact same LP)
+M3,Full-year ED,eue_mwh,1113.18,648.24,-464.94,-41.77,Same as M1c
+M3,Full-year ED,neue_ppm,24.70,14.38,-10.32,-41.78,Same as M1c
+M3,Full-year ED,cvar_eue_mwh,2792.63,3528.39,735.76,26.33,Same as M1c
+M3,Full-year ED,runtime_s_per_scen,8.86,9.22,0.36,4.06,Negligible; LP solve time weakly varies with problem content
