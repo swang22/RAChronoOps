@@ -67,11 +67,13 @@ def load(fname):
         return None
     return pd.read_csv(p)
 
-df_mcs  = load("paper_storage_method_comparison.csv")    # N=20 all methods
-df_hope = load("paper_hope_validation.csv")              # N=20 wind-heavy + N=20 balanced
-df_cc61 = load("marginal_cc_all_methods_rerun.csv")      # script 61 (M1/M1b/M1c/M2)
-df_cc59 = load("marginal_cc_model_rerun_validation.csv") # script 59 (M3/HOPE)
-df_es   = load("event_shape_summary.csv")                # event shape
+df_mcs       = load("paper_storage_method_comparison.csv")    # N=20 all methods
+df_hope      = load("paper_hope_validation.csv")              # N=20 wind-heavy + N=20 balanced
+df_cc61      = load("marginal_cc_all_methods_rerun.csv")      # script 61 (M1/M1b/M1c/M2, wind-heavy N=5)
+df_cc59      = load("marginal_cc_model_rerun_validation.csv") # script 59 (M3/HOPE, wind-heavy N=5)
+df_cc64      = load("marginal_cc_all_methods_n20.csv")        # script 64 (all methods, wind-heavy N=20)
+df_pcm_uced  = load("pcm_uced_marginal_cc.csv")               # scripts 63/64 (PCM-UCED fixed-UC)
+df_es        = load("event_shape_summary.csv")                # event shape
 
 # NEUE: Balanced VRE peak=9830 MW, annual_load=2479/0.0000549≈45.16e6 MWh
 # Easier: compute from known M1c EUE and NEUE ppm: NEUE=EUE/annual_load*1e6
@@ -87,7 +89,7 @@ print("=" * 70)
 print("Part 1: Building main_method_comparison_with_runtime_cc.csv")
 print("=" * 70)
 
-# --- CC lookup from scripts 59 + 61 ---
+# --- CC lookup from scripts 59 + 61 (N=5 wind-heavy baseline) ---
 cc_lookup = {}   # (case_key, model_internal) -> cc_rerun
 
 if df_cc61 is not None:
@@ -100,6 +102,21 @@ if df_cc59 is not None:
         key_m3 = (r["case"], "M3") if r["model"] == "Full-year ED (M3)" else None
         if key_m3:
             cc_lookup[key_m3] = r["normalized_marginal_cc_rerun"]
+
+# Override wind-heavy entries with N=20 values from script 64 (if available)
+if df_cc64 is not None:
+    for _, r in df_cc64[df_cc64["delta_mw"] == 1.0].iterrows():
+        key = (r["case"], r["model_internal"])
+        cc_lookup[key] = r["normalized_marginal_cc_rerun"]
+
+# --- PCM-UCED CC from fixed-UC LP (scripts 63/64) ---
+# For each case, prefer the highest-N row (N=20 over N=5).
+pcm_uced_cc = {}   # case_key -> normalized_marginal_cc
+if df_pcm_uced is not None:
+    df1mw = df_pcm_uced[df_pcm_uced["delta_mw"] == 1.0].copy()
+    for case_k, grp in df1mw.groupby("case"):
+        best = grp.sort_values("n_scen", ascending=False).iloc[0]
+        pcm_uced_cc[case_k] = best["normalized_marginal_cc"]
 
 def get_cc(case, model_int):
     return cc_lookup.get((case, model_int), float("nan"))
@@ -153,7 +170,7 @@ if df_hope is not None:
             "neue_ppm":        fmt_neue(neue),
             "cvar_eue_mwh":    fmt_eue(r["cvar_eue_mwh"]),
             "runtime_s":       fmt_rt(r["mean_runtime_s"]),
-            "marginal_cc":     float("nan"),   # not computed
+            "marginal_cc":     fmt_cc(pcm_uced_cc.get(case_b, float("nan"))),
         })
 
 # ------ Wind-heavy VRE (N=20) — methods from paper_hope_validation.csv ------
@@ -177,11 +194,12 @@ if df_hope is not None:
         }
         paper_label = label_map.get(mint, mint)
 
-        # Get CC from script 61 (N=5 wind-heavy) or script 59 (M3)
-        cc_key = (case_w, mint)
+        # Get CC from cc_lookup (N=20 wind-heavy from script 64, or N=5 fallback)
         cc = get_cc(case_w, "M3") if mint == "M3" else get_cc(case_w, mint)
-        if mint in ("HOPE-ED", "HOPE-UC"):
-            cc = float("nan")
+        if mint == "HOPE-ED":
+            cc = float("nan")   # not computed
+        elif mint == "HOPE-UC":
+            cc = pcm_uced_cc.get(case_w, float("nan"))
 
         rows.append({
             "portfolio":       label_w,

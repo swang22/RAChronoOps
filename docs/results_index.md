@@ -695,3 +695,46 @@ Key results:
 - `main_method_comparison_with_runtime_cc.csv` — rebuilt with N=20 wind-heavy; label changed to "Wind-heavy VRE (N=20)"
 
 **Committed:** Yes.
+
+---
+
+## 24. Wind-heavy marginal CC recomputed at N=20 (script 64)
+
+**Script:** `scripts/64_wind_hvy_marginal_cc_n20.jl`
+
+**Status:** Complete (2026-06-01).
+
+**Method:** Part 1 — M1/M1b/M1c/M2/M3 via Julia dispatch with CRN seed=42 N=20 scenarios.
+Part 2 — PCM-UCED fixed-UC redispatch LP reading existing s001–s020 UC HOPE outputs; no new HOPE runs.
+
+### 24a. `results/paper_tables/marginal_cc_all_methods_n20.csv`
+
+Wind-heavy N=20 CC for M1, M1b, M1c, M2, M3.  Same schema as `marginal_cc_all_methods_rerun.csv`.
+15 rows (5 methods × 3 δ).
+
+Key CC values (δ = 1 MW):
+- M1: 0.000 (unchanged from N=5; naive storage never dispatches optimally)
+- M1b: 0.113 (vs 0.102 at N=5; similar across N=5 and N=20)
+- M1c: 0.604 (vs 0.628 at N=5; modest change −0.024)
+- M2: 0.604 (vs 0.628 at N=5; same as M1c)
+- M3: 0.604 (vs 0.628 at N=5; same as M1c)
+
+### 24b. `results/paper_tables/pcm_uced_marginal_cc.csv` (updated)
+
+Now contains 9 rows: balanced N=20 (3 δ) + wind-heavy N=5 (3 δ) + wind-heavy N=20 (3 δ).
+
+Wind-heavy N=20 PCM-UCED CC (δ = 1 MW) = **0.612** (vs 0.628 at N=5; similar across N=5 and N=20).
+Fixed-UC baseline EUE = 648.43 MWh (vs HOPE-UC MILP = 660.30 MWh; 1.8% lower — LP relaxes
+MILP constraints; 3 of 20 scenarios had 4–9% EUE discrepancy: s011, s013, s015).
+
+### 24c. Updated paper tables and script 62
+
+- `main_method_comparison_with_runtime_cc.csv` — rebuilt with N=20 wind-heavy CC for all methods,
+  and PCM-UCED CC now filled in for both balanced (0.497) and wind-heavy (0.612).
+
+`scripts/62_build_main_comparison_and_dashboard.py` updated:
+1. Load `marginal_cc_all_methods_n20.csv` and override N=5 wind-heavy CC with N=20 values.
+2. Load `pcm_uced_marginal_cc.csv` and use highest-N row for each case.
+3. Fill PCM-UCED CC for balanced (0.497) and wind-heavy (0.612) in main table.
+
+**Committed:** No (pending this commit).

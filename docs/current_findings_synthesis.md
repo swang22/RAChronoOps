@@ -749,8 +749,7 @@ Key observations:
 
 All methods show the same convergence direction: the N=5 scenarios were unrepresentatively severe.
 
-**Marginal CC for wind-heavy N=20:** Not re-computed (CC is computed at N=5 for wind-heavy
-in scripts 61/59/63 and the CC value of 0.628 is a model property, not sensitive to N).
+**Marginal CC for wind-heavy N=20:** Re-computed; see Section 21 below.
 
 **Sources:**
 - Script 25: export of s006–s020 UC+ED cases
@@ -763,3 +762,59 @@ in scripts 61/59/63 and the CC value of 0.628 is a model property, not sensitive
 - Diagnostics: `results/paper_tables/wind_heavy_result_inventory.csv`
          `results/paper_tables/wind_heavy_n5_n20_comparison.csv`
          `docs/wind_heavy_strategy_recommendation.md`
+
+---
+
+## 21. Key finding 14: Wind-heavy marginal CC recomputed at N=20 (2026-06-01)
+
+**Context:** After resolving the N=5/N=20 scenario-count inconsistency (Section 20), the
+wind-heavy marginal CC values in the main comparison table still came from N=5 runs (scripts
+59/61/63).  This section documents the N=20 recomputation (script 64) and the N=5 vs N=20
+comparison.
+
+**Methods:** M1, M1b, M1c, M2, M3 (Julia dispatch), PCM-UCED (fixed-UC redispatch LP from
+N=20 HOPE-UC outputs, s001–s020).  No new HOPE runs required.
+
+**N=5 vs N=20 CC comparison (δ = 1 MW, wind-heavy, model-rerun denominator):**
+
+| Method | CC (N=5) | CC (N=20) | ΔCC | Assessment |
+|--------|----------|----------|-----|------------|
+| M1 (naive) | 0.000 | 0.000 | 0.000 | similar across N=5 and N=20 |
+| M1b (SOC-floor) | 0.102 | 0.113 | +0.011 | similar across N=5 and N=20 |
+| M1c (emergency-only) | 0.628 | 0.604 | −0.024 | modest change; see note |
+| M2 (event-window) | 0.628 | 0.604 | −0.024 | modest change; same as M1c |
+| M3 (full-year ED) | 0.628 | 0.604 | −0.024 | modest change; same as M1c |
+| PCM-UCED (fixed-UC) | 0.628 | 0.612 | −0.016 | similar across N=5 and N=20 |
+
+**Notes:**
+- M1c/M2/M3: CC dropped from 0.628 to 0.604 (−3.9% relative).  The N=5 scenarios (1–5) were
+  high-outage draws where the 1 MW storage provided proportionally more relief; at N=20, the
+  average scenario is milder, reducing the marginal storage benefit relative to the perfect-firm
+  denominator.  The change is modest and not a sign of instability — it reflects sampling
+  variation in the marginal storage benefit across scenario sets.
+- PCM-UCED: CC = 0.612 (vs M1c/M3 = 0.604, difference = +0.008).  The fixed-UC baseline EUE
+  is 648.43 MWh (vs HOPE-UC MILP = 660.30 MWh, |diff| = 1.8%).  For 3 of 20 scenarios (s011,
+  s013, s015), the fixed-UC LP gives 4–9% lower EUE than the MILP, because the LP relaxes
+  MILP commitment constraints.  The mean fixed-UC EUE (648.43 MWh) is very close to M1c/M3
+  (648.24 MWh).  The +0.008 CC difference vs M3 reflects the slightly different baseline EUE.
+- M1 CC = 0 at N=20 (as at N=5): naive storage never discharges optimally, so adding 1 MW
+  marginal storage provides zero EUE reduction.
+
+**Updated main comparison table (wind-heavy N=20):**
+
+| Method | CC (N=20) |
+|--------|----------|
+| M1c | 0.604 |
+| M2 | 0.604 |
+| M3 | 0.604 |
+| PCM-UCED | 0.612 |
+
+Balanced VRE CC values are unchanged (all N=20 from scripts 61/59/63): M1c/M2/M3 = 0.497,
+PCM-UCED = 0.497 (now filled in, was NaN previously).
+
+**Script:** `scripts/64_wind_hvy_marginal_cc_n20.jl`
+
+**Output CSVs:**
+- `results/paper_tables/marginal_cc_all_methods_n20.csv` — wind-heavy N=20, M1/M1b/M1c/M2/M3 (15 rows)
+- `results/paper_tables/pcm_uced_marginal_cc.csv` — updated with wind-heavy N=20 row (9 rows total)
+- `results/paper_tables/main_method_comparison_with_runtime_cc.csv` — rebuilt with N=20 CC
