@@ -68,7 +68,7 @@ def load(fname):
     return pd.read_csv(p)
 
 df_mcs  = load("paper_storage_method_comparison.csv")    # N=20 all methods
-df_hope = load("paper_hope_validation.csv")              # N=5 wind-heavy + N=20 balanced
+df_hope = load("paper_hope_validation.csv")              # N=20 wind-heavy + N=20 balanced
 df_cc61 = load("marginal_cc_all_methods_rerun.csv")      # script 61 (M1/M1b/M1c/M2)
 df_cc59 = load("marginal_cc_model_rerun_validation.csv") # script 59 (M3/HOPE)
 df_es   = load("event_shape_summary.csv")                # event shape
@@ -77,7 +77,7 @@ df_es   = load("event_shape_summary.csv")                # event shape
 # Easier: compute from known M1c EUE and NEUE ppm: NEUE=EUE/annual_load*1e6
 # From main CSV: M1c balanced EUE=2479.17, NEUE=55 ppm → annual_load=2479.17/55*1e6=45,076,727 MWh
 ANNUAL_LOAD_BASE   = 2479.17 / 55.0 * 1e6    # ~45.1 million MWh (balanced VRE, scaled load)
-ANNUAL_LOAD_WIND   = 1113.18 / 25.0 * 1e6    # from wind-heavy N=5 results
+ANNUAL_LOAD_WIND   = ANNUAL_LOAD_BASE             # same load profile; N=20 M1c: 648.24/14.38=45.08e6
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Part 1: Build comprehensive CSV
@@ -156,9 +156,9 @@ if df_hope is not None:
             "marginal_cc":     float("nan"),   # not computed
         })
 
-# ------ Wind-heavy VRE (N=5) — methods from paper_hope_validation.csv ------
+# ------ Wind-heavy VRE (N=20) — methods from paper_hope_validation.csv ------
 case_w = "VRE120_wind_hvy"
-label_w = "Wind-heavy VRE (N=5)"
+label_w = "Wind-heavy VRE (N=20)"
 
 if df_hope is not None:
     hope_w = df_hope[df_hope["case"] == case_w].copy()

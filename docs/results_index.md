@@ -663,3 +663,35 @@ UC constraints affect LOLH and event timing but not marginal storage CC.
 Finite-difference stability: CC varies < 0.004 across δ = 1, 5, 10 MW.
 
 **Committed:** Yes.
+
+---
+
+## 23. Wind-heavy N=20 HOPE-UC/ED run and sampling inconsistency resolution
+
+**Folder:** `results/wind_hvy_hope_uc_comparison/n20/`
+
+**Scripts:** 25 (export s006–s020), 29_run_hope_n5_pilot.jl (HOPE run), 27 (collect), 37 (aggregate)
+
+**Status:** Complete (2026-06-01).
+
+### 23a. `results/wind_hvy_hope_uc_comparison/n20/all_model_aggregate_metrics.csv`
+
+N=20 aggregate metrics for all five methods on wind-heavy portfolio.
+
+Key results:
+- M1c/M2/M3/HOPE-ED: EUE=648.24 MWh, NEUE=14.38 ppm, LOLH=2.25/1.95/2.25/1.95 h
+- HOPE-UC: EUE=660.30 MWh (+1.85%), NEUE=14.65 ppm, LOLH=2.65 h (+18%), CVaR=3624.39 MWh
+- HOPE-UC runtime: 2819.95 s/scen (vs 542 s at N=5 — harder MILP instances)
+- All methods converged: N=5 EUE was 1113 MWh (42% above N=20) due to unrepresentative sample
+
+### 23b. Diagnostics (paper_tables/)
+
+- `wind_heavy_result_inventory.csv` — all wind-heavy results N=5 and N=20
+- `wind_heavy_n5_n20_comparison.csv` — metric-by-metric N=5 vs N=20 comparison
+
+### 23c. Updated paper tables
+
+- `paper_hope_validation.csv` — wind-heavy rows updated from N=5 to N=20
+- `main_method_comparison_with_runtime_cc.csv` — rebuilt with N=20 wind-heavy; label changed to "Wind-heavy VRE (N=20)"
+
+**Committed:** Yes.

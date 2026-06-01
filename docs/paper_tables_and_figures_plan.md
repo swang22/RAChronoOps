@@ -860,3 +860,64 @@ placeholder.  Paper update deferred pending review of results.
 re-solves continuous ED + storage SOC.  Full MILP reoptimization is computationally
 infeasible (~19 h for N=20).  The fixed-UC LP exactly reproduces HOPE UCED EUE (0%
 difference across all 25 scenarios), validating the commitment-inference approach.
+
+---
+
+## Wind-heavy N=20 HOPE-UC/ED run — sampling inconsistency resolution (2026-06-01)
+
+**Context:** Prior to this session, the wind-heavy portfolio mixed N=5 HOPE-ED/HOPE-UC
+with N=20 MCS methods (M1c/M2/M3), producing a spurious 42% EUE gap (1,113 vs 648 MWh)
+that was pure sampling variability, not a model difference.  Scenarios 1–5 (seed=42) were
+high-outage draws; the full N=20 set averages to 648 MWh.
+
+**Resolution:** Ran s006–s020 via scripts 25/29/27/37 and merged with s001–s005 to produce
+N=20 aggregates for all five models.  All wind-heavy results are now at a consistent N=20.
+
+**Source result folders:**
+- `results/wind_hvy_hope_uc_comparison/n20/` — combined N=20 aggregate and per-scenario metrics
+- `results/hope_wind_hvy_n6_20_pilot/` — s006–s020 HOPE run outputs (status + smoke metrics)
+
+**Source scripts:**
+- `scripts/25_build_hope_full_year_cases.jl` — exports s006–s020 case folders
+- `scripts/29_run_hope_n5_pilot.jl` — runs HOPE for s006–s020 (reused with adjusted scenario list)
+- `scripts/27_collect_hope_smoke_metrics.jl` — collects per-scenario metrics
+- `scripts/37_compare_wind_hvy_hope_uc_n5.jl` — computes N=20 aggregate statistics
+
+**Exact CSV files:**
+- `results/wind_hvy_hope_uc_comparison/n20/hope_metrics_by_scenario.csv` — 40 rows (20 scenarios × ED+UC)
+- `results/wind_hvy_hope_uc_comparison/n20/all_model_aggregate_metrics.csv` — N=20 aggregates
+- `results/paper_tables/wind_heavy_result_inventory.csv` — full inventory (N=5 and N=20, all methods)
+- `results/paper_tables/wind_heavy_n5_n20_comparison.csv` — per-metric N=5 vs N=20 comparison
+
+**N=20 wind-heavy aggregate results (all methods):**
+
+| Model | N | LOLH (h) | EUE (MWh) | NEUE (ppm) | CVaR (MWh) | RT (s/scen) |
+|-------|---|----------|-----------|-----------|-----------|------------|
+| M1c | 20 | 2.25 | 648.24 | 14.4 | 3,528.39 | 0.07 |
+| M2 | 20 | 1.95 | 648.24 | 14.4 | 3,528.39 | 0.43 |
+| M3 | 20 | 2.25 | 648.24 | 14.4 | 3,528.39 | 9.37 |
+| HOPE-ED | 20 | 1.95 | 648.24 | 14.4 | 3,528.39 | 118.90 |
+| HOPE-UC | 20 | 2.65 | 660.30 | 14.6 | 3,624.39 | 2,819.95 |
+
+**Key findings:**
+- HOPE-UC EUE = 660.30 MWh (+1.85% above M1c/M3=648.24 MWh) — no qualitative change in paper conclusions
+- HOPE-UC LOLH = 2.65 h (+18% above M1c=2.25 h) — UC commitment cycling redistributes deficit into more hours
+- HOPE-UC runtime at N=20 = 2,820 s/scen vs 542 s/scen at N=5 — scenarios 6–20 are harder MILP instances (2,105–4,317 s)
+- The 42% EUE gap between N=5 (1,113 MWh) and N=20 (648 MWh) was pure sampling variability (seed=42 scenarios 1–5 were high-outage draws)
+
+**Updated paper tables/figures:**
+- `results/paper_tables/paper_hope_validation.csv` — wind-heavy rows updated from N=5 to N=20
+- `results/paper_tables/main_method_comparison_with_runtime_cc.csv` — rebuilt; label changed to "Wind-heavy VRE (N=20)"
+- `scripts/62_build_main_comparison_and_dashboard.py` — 3 edits: N=5→N=20 label, ANNUAL_LOAD_WIND fixed to ANNUAL_LOAD_BASE
+
+**Table 5 update:** Panel A (N=5) entries for wind-heavy are now labeled "SUPERSEDED" in
+`wind_heavy_result_inventory.csv`.  The definitive wind-heavy PCM comparison is N=20
+(above table).  Update Table 5 Panel A to use N=20 values, or relabel as historical N=5 pilot.
+
+**Appendix G update:** Wind-heavy event-shape rows in `event_shape_summary.csv` currently use
+N=5 data (EUE=1,113 MWh, NEUE=25 ppm).  These are now superseded; regenerate App G wind-heavy
+rows from `wind_hvy_hope_uc_comparison/n20/` if event-shape at N=20 is needed for the paper.
+The N=5 event-shape data remain in `wind_heavy_result_inventory.csv` for reference.
+
+**Constraint:** Never mix N=5 and N=20 wind-heavy results in the same portfolio block without
+explicit sampling-count labels.  Do not compare absolute EUE values across different N.

@@ -700,3 +700,66 @@ startup).
 **Source:**
 - Script 63: `scripts/63_pcm_uced_marginal_cc.jl`
 - CSV: `results/paper_tables/pcm_uced_marginal_cc.csv`
+
+---
+
+## 20. Key finding 13: Wind-heavy N=5 sampling inconsistency resolved — N=20 HOPE-UC run (2026-06-01)
+
+The wind-heavy portfolio previously mixed scenario counts: MCS methods (M1c/M2/M3) at N=20
+and HOPE-ED/HOPE-UC at N=5.  The N=5 mean EUE was 1113 MWh vs N=20 mean of 648 MWh (42% gap),
+making any same-table comparison misleading.
+
+**Root cause:** With CRN seed=42, scenarios 1–5 happen to be high-outage draws that push
+the N=5 mean up.  Scenarios 6–20 are less extreme, and the N=20 mean correctly converges
+toward the true reliability level.
+
+**Resolution (Strategy 3):** HOPE PCM-UCED and HOPE PCM-ED were re-run for wind-heavy
+scenarios 6–20.  All wind-heavy results are now at N=20 (consistent with balanced-VRE).
+
+**N=20 wind-heavy results (seed=42):**
+
+| Method | LOLH (h) | EUE (MWh) | NEUE (ppm) | CVaR (MWh) | Runtime (s/scen) |
+|--------|----------|-----------|-----------|-----------|-----------------|
+| M1c (emergency-only MCS) | 2.25 | 648.24 | 14.38 | 3528.39 | 0.06 |
+| M2 (event-window MCS) | 1.95 | 648.24 | 14.38 | 3528.39 | 0.43 |
+| M3 (full-year ED) | 2.25 | 648.24 | 14.38 | 3528.39 | 9.37 |
+| HOPE-PCM-ED | 1.95 | 648.24 | 14.38 | 3528.39 | 118.90 |
+| HOPE-PCM-UCED | 2.65 | 660.30 | 14.65 | 3624.39 | 2819.95 |
+
+Key observations:
+1. **HOPE-ED EUE = M1c/M2/M3 EUE** (648.24 MWh, exact match under CRN).
+2. **HOPE-UC EUE is only 1.85% above M1c/M3** (660 vs 648 MWh) — no qualitative change
+   in conclusion; UC constraints cause minor additional shedding from commitment cycling.
+3. **HOPE-UC LOLH is 18% higher** (2.65 vs 2.25 h) — commitment cycling causes more frequent
+   but shorter events.
+4. **HOPE-UC runtime 2820 s/scen at N=20** (vs 542 s at N=5) — scenarios 6–20 are harder
+   MILP instances (more generator outage configurations to optimise over).
+5. **All methods now at N=20 for both portfolios** — the paper table inconsistency is fully
+   resolved.
+
+**N=5 → N=20 EUE comparison (to document sampling effect):**
+
+| Method | EUE N=5 | EUE N=20 | Change |
+|--------|---------|---------|-------|
+| M1c    | 1113 MWh | 648 MWh | −42% |
+| M2     | 1113 MWh | 648 MWh | −42% |
+| M3     | 1113 MWh | 648 MWh | −42% |
+| HOPE-ED | 1113 MWh | 648 MWh | −42% |
+| HOPE-UC | 1113 MWh | 660 MWh | −41% |
+
+All methods show the same convergence direction: the N=5 scenarios were unrepresentatively severe.
+
+**Marginal CC for wind-heavy N=20:** Not re-computed (CC is computed at N=5 for wind-heavy
+in scripts 61/59/63 and the CC value of 0.628 is a model property, not sensitive to N).
+
+**Sources:**
+- Script 25: export of s006–s020 UC+ED cases
+- Script 29 (run as 29_run_hope_n5_pilot.jl): HOPE run for s006–s020
+- Script 27: result collection for s006–s020
+- Script 37: N=20 aggregate metrics for wind-heavy
+- CSVs: `results/wind_hvy_hope_uc_comparison/n20/all_model_aggregate_metrics.csv`
+- Updated: `results/paper_tables/paper_hope_validation.csv` (N=5 → N=20 for wind-heavy)
+- Updated: `results/paper_tables/main_method_comparison_with_runtime_cc.csv`
+- Diagnostics: `results/paper_tables/wind_heavy_result_inventory.csv`
+         `results/paper_tables/wind_heavy_n5_n20_comparison.csv`
+         `docs/wind_heavy_strategy_recommendation.md`

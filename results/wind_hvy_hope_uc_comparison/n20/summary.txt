@@ -1,0 +1,84 @@
+Wind-Heavy HOPE-UC Comparison: M1c / M2 / M3 / HOPE-ED / HOPE-UC
+Generated: 2026-06-01T12:36:04.928
+Case: VRE120_wind_hvy  |  Scenarios: 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20  |  seed=42
+M2 config: risk_margin_mw=1000.0, window_buffer_hours=48
+
+──────────────────────────────────────────────────────────────────────
+Aggregate metrics (mean over 20 scenarios)
+──────────────────────────────────────────────────────────────────────
+Model       LOLH (h)    EUE (MWh)   CVaR (MWh)    p95 (MWh)    RT (s)
+----------------------------------------------------------------------
+M1c              2.2       648.24      3528.39      2866.21       1.2
+M2               1.9       648.24      3528.39      2866.21       8.6
+M3               2.2       648.24      3528.39      2866.21     187.5
+HOPE-ED          1.9       648.24      3528.39      2866.21    2378.1
+HOPE-UC          2.6       660.30      3624.39      2875.81   56398.9
+
+──────────────────────────────────────────────────────────────────────
+Per-scenario EUE (MWh)
+──────────────────────────────────────────────────────────────────────
+s_id  M1c                   M2                    M3                    HOPE-ED               HOPE-UC             
+--------------------------------------------------------------------------------------------------------------------
+s001                514.14                514.14                514.14                514.14                514.14
+s002                537.14                537.14                537.14                537.14                537.14
+s003                  0.00                  0.00                  0.00                  0.00                  0.00
+s004               1722.01               1722.01               1722.01               1722.01               1722.01
+s005               2792.63               2792.63               2792.63               2792.63               2792.63
+s006               1513.24               1513.24               1513.24               1513.24               1516.42
+s007                  0.00                  0.00                  0.00                  0.00                  0.07
+s008                  0.00                  0.00                  0.00                  0.00                  0.00
+s009                  0.00                  0.00                  0.00                  0.00                  0.00
+s010                  0.00                  0.00                  0.00                  0.00                  0.00
+s011                814.80                814.80                814.80                814.80                860.14
+s012                  0.00                  0.00                  0.00                  0.00                  0.00
+s013                  0.00                  0.00                  0.00                  0.00                  0.58
+s014                  0.00                  0.00                  0.00                  0.00                  0.00
+s015               4264.14               4264.14               4264.14               4264.14               4456.14
+s016                  0.00                  0.00                  0.00                  0.00                  0.07
+s017                  0.00                  0.00                  0.00                  0.00                  0.00
+s018                806.63                806.63                806.63                806.63                806.63
+s019                  0.00                  0.00                  0.00                  0.00                  0.00
+s020                  0.00                  0.00                  0.00                  0.00                  0.07
+
+──────────────────────────────────────────────────────────────────────
+Q&A
+──────────────────────────────────────────────────────────────────────
+
+Q1. Does HOPE-ED match M3 (ED LP with storage)?
+  HOPE-ED vs M3:  ΔEUE = 0.00 MWh,  ΔLOLH = -0.3 h
+  YES — HOPE-ED and M3 agree within 5 MWh / 0.5 h.
+  Both solve the same ED LP; small differences trace to solver tolerance or horizon effects.
+
+Q2. Does HOPE-UC increase EUE vs HOPE-ED (commitment cycling penalty)?
+  HOPE-UC vs HOPE-ED:  ΔEUE = 12.06 MWh,  ΔCVaR = 96.00 MWh
+  YES — UC commitment constraints increase EUE by 12.1 MWh.
+  With storage, UC min-up/down constraints bind intertemporal storage dispatch.
+
+Q3. Does HOPE-UC change LOLH or shortage event count vs HOPE-ED?
+  HOPE-UC vs HOPE-ED:  ΔLOLH = 0.7 h,  Δevents = 0.3
+  UC increases LOLH: commitment constraints fragment load shed into more hours.
+  Storage pre-positioning is constrained by thermal min-up/down times.
+
+Q4. How do M1c and M2 compare to HOPE-UC (most detailed model)?
+  M1c  vs HOPE-UC: ΔEUE = -12.06 MWh  (underestimates)
+  M2   vs HOPE-UC: ΔEUE = -12.06 MWh  (underestimates)
+  Closest to HOPE-UC: M1c
+
+Q5. Is the UC reliability effect larger with storage than without (Phase H)?
+  VRE120_wind_hvy (with storage):     |ΔEUE| = 12.06 MWh,  |ΔLOLH| = 0.7 h
+  VRE120_base_nostorage (Phase H):    |ΔEUE| = 0.00 MWh,  |ΔLOLH| = 0.0 h
+  YES — storage amplifies the UC effect.
+  UC min-up/down constraints bind intertemporal SOC dispatch, raising EUE.
+
+Q6. Does UC cause additional VRE curtailment in surplus hours?
+  Requires dispatch-level output from HOPE (power_hourly.csv); not computed here.
+  In Phase H (no storage), UC curtailed up to 260 MW more VRE in surplus hours
+  due to thermal Pmin locking — a zero-cost, zero-reliability effect.
+  With storage, UC may additionally constrain battery charging in low-net-load hours,
+  potentially reducing SOC available for shortage pre-positioning.
+  → Check exports/hope_model_cases/<folder>/power_hourly.csv for verification.
+
+Q7. Should we scale to N=20?
+  HOPE-UC N=20 total runtime: 56399 s.  Projected N=20: 56399 s (15.7 h).
+  |ΔEUE| at N=20 is significant — N=20 would confirm whether UC effect persists.
+  Scaling requires a compute node.
