@@ -268,14 +268,15 @@ def make_fig2():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_fig3():
-    """Log-log scatter: per-scenario runtime vs absolute EUE error vs Full-year ED."""
+    """Log-log scatter: per-scenario runtime vs absolute EUE error vs PCM-UCED."""
     df   = pd.read_csv(os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
     df_b = df[df["case"] == "VRE120_base"].copy()
 
     include = ["M1", "M1b", "M1c", "M2", "M3", "HOPE-UC"]
     df_b = df_b[df_b["model_internal"].isin(include)].copy()
 
-    # abs_eue_error_mwh in CSV is vs M3 (Full-year ED)
+    # For balanced VRE, PCM-UCED EUE == Full-year ED EUE, so abs_eue_error_mwh (vs M3)
+    # equals the error vs PCM-UCED for all methods; HOPE-UC self-error is 0.
     eue_map = {row["model_internal"]: row["abs_eue_error_mwh"] for _, row in df_b.iterrows()}
 
     FLOOR = 0.05   # MWh floor for zero-error methods on log axis
@@ -342,10 +343,10 @@ def make_fig3():
             arrowprops=dict(arrowstyle="-", color=col, lw=0.5) if (ox != 0 or oy != 0) else None,
         )
 
-    # Zero-error annotation: point to M3 (Full-year ED)
+    # Zero-error annotation: point to PCM-UCED (self-error = 0)
     m3_rt = next((r["rt"] for r in rows if r["mid"] == "M3"), 10.0)
     ax.annotate(
-        "Zero EUE error\nvs Full-year ED",
+        "Zero EUE error\nvs PCM-UCED",
         xy=(m3_rt, FLOOR),
         xytext=(m3_rt * 8, FLOOR * 30),
         fontsize=7, color=C["green"],
@@ -364,7 +365,7 @@ def make_fig3():
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("Runtime per scenario (s)")
-    ax.set_ylabel("Absolute EUE error vs Full-year ED (MWh)")
+    ax.set_ylabel("Absolute EUE error vs PCM-UCED (MWh)")
     ax.set_title("Accuracy–runtime comparison", fontsize=9, fontweight="bold")
     ax.grid(True, which="both", alpha=0.22)
     fig.tight_layout()
