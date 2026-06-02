@@ -268,61 +268,59 @@ else:
                 vals.append(v / ref_val if ref_val > 0 else float("nan"))
         data[mk] = np.array(vals)
 
-    # Colours per method
+    # Colours and markers per method
     C_M1c  = "#2E7D32"   # green
     C_M2   = "#1565C0"   # blue
     C_M3   = "#555555"   # grey (reference)
     C_PCM  = "#C62828"   # red
 
-    METHOD_COLORS = [C_M1c, C_M2, C_M3, C_PCM]
-    N_METHODS = len(METHOD_ORDER)
-    N_METRICS = len(METRICS)
-
-    # Layout: one panel per metric, methods on x-axis
-    fig, axes = plt.subplots(1, N_METRICS, figsize=(7.5, 2.6), sharey=False)
-
-    BAR_W = 0.55
-    x     = np.array([0])   # single group per panel
-
-    for ax, (mk, mlabel) in zip(axes, METRICS):
-        vals = data[mk]
-        for i, (color, val) in enumerate(zip(METHOD_COLORS, vals)):
-            if np.isnan(val):
-                continue
-            xpos = i * 0.8
-            bar = ax.bar(xpos, val, BAR_W, color=color, alpha=0.85,
-                         edgecolor="#333333", linewidth=0.5, zorder=3)
-            ax.text(xpos, val + 0.02, f"{val:.2f}", ha="center", va="bottom",
-                    fontsize=5.8, color="#222222")
-
-        ax.axhline(1.0, color="#888888", lw=0.9, ls="--", zorder=2, alpha=0.8)
-        ax.set_xticks([i * 0.8 for i in range(N_METHODS)])
-        ax.set_xticklabels(method_labels, fontsize=6.0)
-        ax.set_ylabel("Ratio relative to Full-year ED", fontsize=7.0)
-        ax.set_title(mlabel, fontsize=7.5, pad=3)
-        ax.set_ylim(bottom=0)
-        ax.grid(axis="y", alpha=0.18, linewidth=0.5)
-        ax.set_axisbelow(True)
-        ax.tick_params(axis="x", length=0, pad=2)
-        ax.yaxis.set_major_locator(mticker.MaxNLocator(nbins=4))
-
-    # Legend
-    handles = [
-        Patch(facecolor=C_M1c, alpha=0.85, edgecolor="#333333", lw=0.5,
-              label="Emergency-only storage MCS"),
-        Patch(facecolor=C_M2,  alpha=0.85, edgecolor="#333333", lw=0.5,
-              label="Event-window storage MCS"),
-        Patch(facecolor=C_M3,  alpha=0.85, edgecolor="#333333", lw=0.5,
-              label="Full-year ED (reference)"),
-        Patch(facecolor=C_PCM, alpha=0.85, edgecolor="#333333", lw=0.5,
-              label="PCM-UCED"),
+    METRIC_LABELS = ["Events/yr", "Mean dur.", "Max shortfall", "Max dur."]
+    METRIC_KEYS   = [
+        "events_per_yr",
+        "mean_event_duration_h",
+        "max_hourly_shortfall_mw",
+        "max_event_duration_h",
     ]
-    fig.legend(handles=handles, loc="lower center", ncol=4, fontsize=6.5,
-               borderpad=0.4, labelspacing=0.3, handlelength=1.2,
-               handletextpad=0.3, framealpha=0.92,
-               bbox_to_anchor=(0.5, -0.04))
+    # (method_csv_name, legend_label, color, marker, markersize, y_jitter)
+    METHOD_PLOT = [
+        ("Emergency-only storage MCS", "Emergency",    C_M1c, "o",  42, +0.15),
+        ("Event-window storage MCS",   "Event-window", C_M2,  "D",  42, +0.05),
+        ("Full-year ED",               "Full-year ED", C_M3,  "^",  46, -0.05),
+        ("PCM-UCED",                   "PCM-UCED",     C_PCM, "P",  50, -0.15),
+    ]
 
-    plt.tight_layout(rect=[0, 0.09, 1, 1], w_pad=1.4)
+    n_metrics = len(METRIC_KEYS)
+    y_base    = np.arange(n_metrics)   # 0=Events/yr, 1=Mean dur., etc.
+
+    fig, ax = plt.subplots(figsize=(4.2, 2.6))
+
+    # Vertical dashed reference at ratio=1
+    ax.axvline(1.0, color="#888888", lw=0.9, ls="--", zorder=1, alpha=0.7)
+
+    for method_name, label, color, marker, ms, y_jitter in METHOD_PLOT:
+        row_m = es_b[es_b["method"] == method_name]
+        if row_m.empty:
+            continue
+        row_data = row_m.iloc[0]
+        xs, ys = [], []
+        for yi, mk in enumerate(METRIC_KEYS):
+            ref_val = float(ref[mk])
+            v = float(row_data[mk])
+            xs.append(v / ref_val if ref_val > 0 else float("nan"))
+            ys.append(yi + y_jitter)
+        ax.scatter(xs, ys, color=color, marker=marker, s=ms, zorder=5,
+                   label=label, edgecolors="white", linewidths=0.5)
+
+    ax.set_yticks(y_base)
+    ax.set_yticklabels(METRIC_LABELS, fontsize=7.5)
+    ax.set_xlabel("Ratio relative to Full-year ED", fontsize=8)
+    ax.set_xlim(0, 2.4)
+    ax.set_ylim(-0.5, n_metrics - 0.5)
+    ax.legend(loc="lower right", fontsize=6.5, markerscale=0.85,
+              handlelength=0.9, handletextpad=0.4, framealpha=0.9, borderpad=0.4)
+    ax.grid(axis="x", alpha=0.20, linewidth=0.5)
+    ax.set_axisbelow(True)
+    fig.tight_layout()
 
     for ext in ("pdf", "png"):
         out = os.path.join(FIG_DIR, f"event_shape_dashboard.{ext}")
