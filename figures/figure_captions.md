@@ -75,57 +75,7 @@ that the EUE convergence result is not a small-sample artifact.
 
 ---
 
-**Appendix Figure 2 — Representative shortage-event operation.**
-Hourly load shedding during and around a representative five-hour shortage
-event (hours 4984--4988, Scenario~15, balanced VRE portfolio, $N=20$).
-Blue bars (Full-Year ED / Emergency-Only Storage MCS) and purple bars
-(PCM-UCED) are grouped by hour; the shaded region marks the main event
-window.
-Both methods produce identical total EUE in the displayed window
-(4\,572~MWh); differences reflect how PCM-UCED redistributes the same
-deficit across hours under unit-commitment constraints.
-PCM-UCED introduces one additional shedding hour (h4983) not present in
-Full-Year ED, while reducing intensity at the end of the event.
-Storage SOC and discharge are not output by the PCM model and are
-therefore not shown.
-
----
-
-**Figure 5 — Representative storage operation during shortage event.**
-Representative storage operation during a balanced-VRE shortage event
-(Scenario~15, $N=20$).
-(a)~Load shedding (MW); (b)~aggregate storage discharge (MW);
-(c)~aggregate state of charge (MWh).
-The panels compare Emergency-only storage MCS, Event-window storage MCS, and
-Full-year ED over a local event window centered on the first shedding hour
-(relative hour~0).
-All three methods produce the same total event EUE (4{,}572~MWh), but differ
-in discharge timing and SOC trajectories.
-Event-window storage MCS redistributes shortfall across more hours, whereas
-Emergency-only storage MCS closely tracks Full-year ED.
-
----
-
-**Appendix Figure 3 — Representative storage operation during shortage event (full window).**
-Three-panel time-series for Scenario~15 (balanced VRE portfolio, $N=20$),
-displaying the 90-hour window around the first shedding hour.
-(a)~Load shedding (MW); (b)~aggregate storage discharge (MW);
-(c)~aggregate state of charge (MWh).
-Emergency-only storage MCS and Full-year ED produce identical load shedding
-per scenario (overlapping lines in panel~a); their storage discharge and SOC
-trajectories differ because Full-year ED optimizes dispatch over the full year
-while Emergency-only MCS charges from system surplus and discharges only during
-shortage.
-Event-window storage MCS produces different load-shedding timing in this event:
-it adds one shedding hour not present under the other methods and reaches a
-higher maximum shortfall (1{,}440 vs 1{,}348~MW), illustrating that
-LP-based event-window optimization can redistribute the same total EUE
-across hours differently from the emergency-only heuristic.
-Total EUE in the window is identical across all three methods (8{,}060~MWh).
-
----
-
-**Appendix Figure 4 — Robustness across storage variants (balanced VRE, $N=20$).**
+**Appendix Figure 2 — Robustness across storage variants (balanced VRE, $N=20$).**
 Full-Year ED expected unserved energy for 11 storage robustness variants
 grouped by stress dimension: Experiment~A (storage duration 2--12~h at fixed
 power), Experiment~B (storage power $0.5{\times}$--$2{\times}$ at fixed 4~h

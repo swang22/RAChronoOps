@@ -268,60 +268,89 @@ def make_fig2():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def make_fig3():
-    """Log-log scatter: per-scenario runtime vs absolute EUE error."""
+    """Log-log scatter: per-scenario runtime vs absolute EUE error vs PCM-UCED."""
     df   = pd.read_csv(os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
     df_b = df[df["case"] == "VRE120_base"].copy()
 
     include = ["M1", "M1b", "M1c", "M2", "M3", "HOPE-UC"]
     df_b = df_b[df_b["model_internal"].isin(include)].copy()
 
+    # EUE error relative to PCM-UCED (same as vs M3 for balanced since HOPE-UC EUE = M3 EUE)
+    hope_uc_eue = df_b[df_b["model_internal"] == "HOPE-UC"]["abs_eue_error_mwh"].values
+    # abs_eue_error_mwh in CSV is already vs M3; since HOPE-UC EUE == M3 EUE for balanced,
+    # error vs PCM-UCED is the same. For HOPE-UC itself, error = 0.
+    eue_map = {row["model_internal"]: row["abs_eue_error_mwh"] for _, row in df_b.iterrows()}
+
     FLOOR = 0.05   # MWh floor for zero-error methods on log axis
 
     label_map = {
-        "M1":      "Naive Storage MCS",
-        "M1b":     "SOC-Floor Storage MCS",
-        "M1c":     "Emergency-Only Storage MCS",
-        "M2":      "Event-Window Storage MCS",
-        "M3":      "Full-Year ED",
+        "M1":      "Naive",
+        "M1b":     "SOC-floor",
+        "M1c":     "Emergency-only",
+        "M2":      "Event-window",
+        "M3":      "Full-year ED",
         "HOPE-UC": "PCM-UCED",
     }
 
     # Smaller, lighter markers for the cautionary heuristics
     style_override = {
-        "M1":  dict(color=C["red"],    marker="X",  s=36, alpha=0.55),
-        "M1b": dict(color=C["orange"], marker="s",  s=28, alpha=0.55),
+        "M1":  dict(color=C["red"],    marker="X",  s=36, alpha=0.60),
+        "M1b": dict(color=C["orange"], marker="s",  s=28, alpha=0.60),
     }
 
     rows = []
     for _, row in df_b.iterrows():
         mid = row["model_internal"]
         rt  = row["mean_runtime_s"]
-        err = row["abs_eue_error_mwh"]
+        err = eue_map[mid]
         rows.append(dict(mid=mid, rt=rt, err=err, err_plot=max(err, FLOOR)))
 
     fig, ax = plt.subplots(figsize=(4.5, 3.3))
 
     for r in rows:
         mid = r["mid"]
+        lbl = label_map.get(mid, mid)
         if mid in style_override:
-            st  = style_override[mid]
+            st = style_override[mid]
             ax.scatter(r["rt"], r["err_plot"],
                        color=st["color"], marker=st["marker"], s=st["s"],
-                       alpha=st["alpha"], zorder=5, label=label_map.get(mid, mid),
-                       clip_on=False)
+                       alpha=st["alpha"], zorder=5, label=lbl, clip_on=False)
         else:
-            st  = METHOD_STYLE.get(mid, dict(color="gray", marker="o", ms=6))
+            st = METHOD_STYLE.get(mid, dict(color="gray", marker="o", ms=6))
             ax.scatter(r["rt"], r["err_plot"],
                        color=st["color"], marker=st["marker"], s=st["ms"]**2,
-                       zorder=5, label=label_map.get(mid, mid), clip_on=False)
+                       zorder=5, label=lbl, clip_on=False)
 
-    # Zero-error annotation: place above M3 position, away from data
-    zero_rows = [r for r in rows if r["err"] < 0.5]
+    # Direct text labels offset from points to avoid legend crowding
+    offsets = {
+        "M1":      (+0.0, +4.0),
+        "M1b":     (+0.0, -5.5),
+        "M1c":     (+1.5, +0.0),
+        "M2":      (+1.5, +0.0),
+        "M3":      (+1.5, +0.0),
+        "HOPE-UC": (+1.5, +0.0),
+    }
+    for r in rows:
+        mid = r["mid"]
+        lbl = label_map.get(mid, mid)
+        ox, oy = offsets.get(mid, (1.5, 0.0))
+        st = style_override.get(mid, METHOD_STYLE.get(mid, dict(color="gray")))
+        col = st["color"] if "color" in st else "gray"
+        ax.annotate(
+            lbl,
+            xy=(r["rt"], r["err_plot"]),
+            xytext=(r["rt"] * (10**ox) if ox != 0 else r["rt"],
+                    r["err_plot"] * (10**oy) if oy != 0 else r["err_plot"]),
+            fontsize=6.5, color=col, va="center",
+            arrowprops=dict(arrowstyle="-", color=col, lw=0.5) if ox != 0 or oy != 0 else None,
+        )
+
+    # Zero-error annotation: point to M3 (Full-year ED)
     m3_rt = next((r["rt"] for r in rows if r["mid"] == "M3"), 10.0)
     ax.annotate(
-        "Zero EUE error\nvs Full-Year ED",
+        "Zero error\nvs PCM-UCED",
         xy=(m3_rt, FLOOR),
-        xytext=(m3_rt * 6, FLOOR * 25),
+        xytext=(m3_rt * 8, FLOOR * 30),
         fontsize=7, color=C["green"],
         ha="left", va="bottom",
         arrowprops=dict(arrowstyle="->", color=C["green"], lw=0.7,
@@ -338,9 +367,8 @@ def make_fig3():
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("Runtime per scenario (s)")
-    ax.set_ylabel("Absolute EUE error vs Full-Year ED (MWh)")
-    ax.set_title("Accuracy–runtime trade-off", fontsize=9, fontweight="bold")
-    ax.legend(fontsize=6.5, loc="upper right", framealpha=0.92)
+    ax.set_ylabel("Absolute EUE error vs PCM-UCED (MWh)")
+    ax.set_title("Accuracy–runtime comparison", fontsize=9, fontweight="bold")
     ax.grid(True, which="both", alpha=0.22)
     fig.tight_layout()
     save_fig(fig, "runtime_accuracy_frontier")
