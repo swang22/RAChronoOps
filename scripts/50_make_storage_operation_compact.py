@@ -44,20 +44,20 @@ plt.rcParams.update({
     "figure.facecolor":   "white",
     "axes.facecolor":     "white",
     "axes.edgecolor":     "#333333",
-    "axes.linewidth":     0.8,
+    "axes.linewidth":     0.7,
     "font.family":        "sans-serif",
     "font.sans-serif":    ["Arial", "Helvetica", "DejaVu Sans"],
-    "font.size":          8.5,
-    "axes.labelsize":     8.5,
-    "xtick.labelsize":    7.5,
-    "ytick.labelsize":    7.5,
-    "legend.fontsize":    7.2,
+    "font.size":          7.5,
+    "axes.labelsize":     7.5,
+    "xtick.labelsize":    7.0,
+    "ytick.labelsize":    7.0,
+    "legend.fontsize":    6.5,
     "legend.framealpha":  0.90,
     "legend.edgecolor":   "#cccccc",
     "legend.handlelength": 2.0,
     "savefig.dpi":        300,
     "savefig.bbox":       "tight",
-    "savefig.pad_inches": 0.05,
+    "savefig.pad_inches": 0.04,
     "pdf.fonttype":       42,
     "ps.fonttype":        42,
 })
@@ -109,10 +109,10 @@ print(f"Local-window EUE — Emergency-only MCS: {eue_m1c:.1f}  "
 
 fig, axes = plt.subplots(
     3, 1,
-    figsize=(5.5, 5.8),
+    figsize=(3.5, 5.0),
     sharex=True,
-    gridspec_kw={"hspace": 0.08, "top": 0.97, "bottom": 0.09,
-                 "left": 0.13, "right": 0.97},
+    gridspec_kw={"hspace": 0.08, "top": 0.97, "bottom": 0.10,
+                 "left": 0.17, "right": 0.97},
 )
 ax_ls, ax_dc, ax_soc = axes
 
@@ -154,17 +154,17 @@ legend_handles = [
            label="Full-year ED"),
 ]
 ax_ls.legend(handles=legend_handles, loc="upper right",
-             fontsize=7.0, framealpha=0.90, edgecolor="#cccccc",
-             handlelength=2.2, handleheight=0.9,
+             fontsize=6.2, framealpha=0.90, edgecolor="#cccccc",
+             handlelength=2.0, handleheight=0.9,
              borderpad=0.4, labelspacing=0.3)
 
 ax_ls.text(0.014, 0.96, "(a)", transform=ax_ls.transAxes,
-           fontsize=8.5, fontweight="bold", va="top")
+           fontsize=7.5, fontweight="bold", va="top")
 
 # Annotate "first shedding hour" on the x-axis reference line
 ax_ls.annotate("first\nshedding\nhour",
                xy=(0, -20), xytext=(-3.5, ymax_ls * 0.72),
-               fontsize=6.0, color="#777777", ha="center",
+               fontsize=5.5, color="#777777", ha="center",
                arrowprops=dict(arrowstyle="-", color="#AAAAAA",
                                lw=0.6, shrinkA=0, shrinkB=2))
 
@@ -179,14 +179,14 @@ ax_dc.step(rel, dc_m2,  where="post", color=C_M2,  lw=LW,    zorder=5)
 # Max-power reference line
 ax_dc.axhline(983.0, color="#BBBBBB", lw=0.6, ls=":", zorder=2)
 ax_dc.text(x_hi - 0.2, 983.0 + 30, "983 MW",
-           fontsize=6.2, color="#888888", ha="right", va="bottom")
+           fontsize=5.8, color="#888888", ha="right", va="bottom")
 
 ax_dc.set_ylabel("Storage discharge (MW)")
 ymax_dc = max(dc_m1c.max(), dc_m2.max(), dc_m3.max())
 ax_dc.set_ylim(-20, ymax_dc * 1.18)
 
 ax_dc.text(0.014, 0.96, "(b)", transform=ax_dc.transAxes,
-           fontsize=8.5, fontweight="bold", va="top")
+           fontsize=7.5, fontweight="bold", va="top")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # (c) State of charge
@@ -200,14 +200,14 @@ ax_soc.plot(rel, soc_m2,  color=C_M2,  lw=LW,    zorder=5)
 ax_soc.axhline(STORAGE_CAPACITY_MWH, color="#BBBBBB", lw=0.6, ls=":", zorder=2)
 ax_soc.text(x_hi - 0.2, STORAGE_CAPACITY_MWH + 90,
             f"{STORAGE_CAPACITY_MWH/1000:.1f} GWh",
-            fontsize=6.2, color="#888888", ha="right", va="bottom")
+            fontsize=5.8, color="#888888", ha="right", va="bottom")
 
 ax_soc.set_ylabel("State of charge (MWh)")
 ax_soc.set_ylim(-100, STORAGE_CAPACITY_MWH * 1.13)
 ax_soc.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(1000))
 
 ax_soc.text(0.014, 0.96, "(c)", transform=ax_soc.transAxes,
-            fontsize=8.5, fontweight="bold", va="top")
+            fontsize=7.5, fontweight="bold", va="top")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Shared x-axis

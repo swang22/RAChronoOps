@@ -231,19 +231,19 @@ print("=" * 70)
 if df_es is None:
     print("event_shape_summary.csv not found — skipping figure")
 else:
-    # Balanced VRE (N=20), normalize to Full-year ED
+    # Balanced VRE (N=20), normalize to PCM-UCED
     es_b = df_es[df_es["case"].str.contains("Balanced")].copy()
     print(es_b.to_string(index=False))
 
-    # Reference: Full-year ED row
-    ref = es_b[es_b["method"] == "Full-year ED"].iloc[0]
+    # Reference: PCM-UCED (operational benchmark)
+    ref = es_b[es_b["method"] == "PCM-UCED"].iloc[0]
 
     # Methods and their display order
     METHOD_ORDER = [
         ("Emergency-only storage MCS", "Emergency-only\nMCS"),
         ("Event-window storage MCS",   "Event-window\nMCS"),
-        ("Full-year ED",               "Full-year ED\n(reference)"),
-        ("PCM-UCED",                   "PCM-UCED"),
+        ("Full-year ED",               "Full-year ED"),
+        ("PCM-UCED",                   "PCM-UCED\n(benchmark)"),
     ]
 
     METRICS = [
@@ -313,8 +313,8 @@ else:
 
     ax.set_yticks(y_base)
     ax.set_yticklabels(METRIC_LABELS, fontsize=7.5)
-    ax.set_xlabel("Ratio relative to Full-year ED", fontsize=8)
-    ax.set_xlim(0, 2.4)
+    ax.set_xlabel("Ratio relative to PCM-UCED", fontsize=8)
+    ax.set_xlim(0, 2.0)
     ax.set_ylim(-0.5, n_metrics - 0.5)
     ax.legend(loc="lower right", fontsize=6.5, markerscale=0.85,
               handlelength=0.9, handletextpad=0.4, framealpha=0.9, borderpad=0.4)

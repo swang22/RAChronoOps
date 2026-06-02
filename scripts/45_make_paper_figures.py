@@ -269,6 +269,7 @@ def make_fig2():
 
 def make_fig3():
     """Log-log scatter: per-scenario runtime vs absolute EUE error vs PCM-UCED."""
+    import matplotlib.transforms as mtransforms
     df   = pd.read_csv(os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
     df_b = df[df["case"] == "VRE120_base"].copy()
 
@@ -290,10 +291,10 @@ def make_fig3():
         "HOPE-UC": "PCM-UCED",
     }
 
-    # Smaller, lighter markers for the cautionary heuristics
+    # Smaller, lighter markers for cautionary heuristics
     style_override = {
-        "M1":  dict(color=C["red"],    marker="X",  s=36, alpha=0.60),
-        "M1b": dict(color=C["orange"], marker="s",  s=28, alpha=0.60),
+        "M1":  dict(color=C["red"],    marker="X",  s=38, alpha=0.65),
+        "M1b": dict(color=C["orange"], marker="s",  s=30, alpha=0.65),
     }
 
     rows = []
@@ -319,19 +320,20 @@ def make_fig3():
                        color=st["color"], marker=st["marker"], s=st["ms"]**2,
                        zorder=5, label=lbl, clip_on=False)
 
-    # Direct text labels using pixel-based offsets (avoids log-scale arithmetic bugs)
+    # Direct text labels using pixel-based offsets
     offsets = {
-        "M1":      (0,  +14),
-        "M1b":     (0,  -14),
-        "M1c":     (7,    0),
-        "M2":      (7,    0),
-        "M3":      (7,    0),
-        "HOPE-UC": (7,    0),
+        # (dx_pts, dy_pts, va, ha)
+        "M1":      (0,  +14, "bottom", "center"),
+        "M1b":     (0,  -14, "top",    "center"),
+        "M1c":     (+6, +10, "bottom", "left"),
+        "M2":      (+6,  +9, "bottom", "left"),
+        "M3":      (+6,  +9, "bottom", "left"),
+        "HOPE-UC": (0,  +12, "bottom", "center"),
     }
     for r in rows:
         mid = r["mid"]
         lbl = label_map.get(mid, mid)
-        ox, oy = offsets.get(mid, (7, 0))
+        ox, oy, va, ha = offsets.get(mid, (6, 0, "center", "left"))
         st = style_override.get(mid, METHOD_STYLE.get(mid, dict(color="gray")))
         col = st["color"] if "color" in st else "gray"
         ax.annotate(
@@ -339,28 +341,19 @@ def make_fig3():
             xy=(r["rt"], r["err_plot"]),
             xytext=(ox, oy),
             textcoords="offset points",
-            fontsize=6.5, color=col, va="center",
-            arrowprops=dict(arrowstyle="-", color=col, lw=0.5) if (ox != 0 or oy != 0) else None,
+            fontsize=6.5, color=col, va=va, ha=ha,
+            arrowprops=dict(arrowstyle="-", color=col, lw=0.4,
+                            shrinkA=2, shrinkB=0)
+                    if (ox != 0 or oy != 0) else None,
         )
 
-    # Zero-error annotation: point to PCM-UCED (self-error = 0)
-    m3_rt = next((r["rt"] for r in rows if r["mid"] == "M3"), 10.0)
-    ax.annotate(
-        "Zero EUE error\nvs PCM-UCED",
-        xy=(m3_rt, FLOOR),
-        xytext=(m3_rt * 8, FLOOR * 30),
-        fontsize=7, color=C["green"],
-        ha="left", va="bottom",
-        arrowprops=dict(arrowstyle="->", color=C["green"], lw=0.7,
-                        connectionstyle="arc3,rad=-0.15"),
-        bbox=dict(boxstyle="round,pad=0.25",
-                  facecolor=C["lgreen"], edgecolor=C["green"], lw=0.7),
-    )
-
-    # Floor reference line
-    ax.axhline(FLOOR, color="#cccccc", ls=":", lw=0.7, zorder=1)
-    ax.text(0.012, FLOOR * 0.55, f"Floor = {FLOOR} MWh",
-            fontsize=6, color="#aaaaaa", va="top")
+    # Zero-error floor line: green with label on the right using a blended transform
+    ax.axhline(FLOOR, color=C["green"], ls=":", lw=0.9, zorder=1, alpha=0.7)
+    trans = mtransforms.blended_transform_factory(ax.transAxes, ax.transData)
+    ax.text(0.985, FLOOR * 2.5,
+            "zero EUE error\nvs PCM-UCED",
+            transform=trans, fontsize=6.0, color=C["green"],
+            va="bottom", ha="right", style="italic")
 
     ax.set_xscale("log")
     ax.set_yscale("log")
