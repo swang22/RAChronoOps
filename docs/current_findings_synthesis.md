@@ -818,3 +818,32 @@ PCM-UCED = 0.497 (now filled in, was NaN previously).
 - `results/paper_tables/marginal_cc_all_methods_n20.csv` — wind-heavy N=20, M1/M1b/M1c/M2/M3 (15 rows)
 - `results/paper_tables/pcm_uced_marginal_cc.csv` — updated with wind-heavy N=20 row (9 rows total)
 - `results/paper_tables/main_method_comparison_with_runtime_cc.csv` — rebuilt with N=20 CC
+
+
+---
+
+## Future Diagnostic: PCM-UCED Storage Operation — Wind-Heavy Event
+
+**Date checked:** 2026-06-02
+
+**Finding:** PCM-UCED hourly storage and load-shedding data is available for all 20
+wind-heavy scenarios in .
+
+**Top scenario by EUE (wind-heavy):** s015 (PCM-UCED EUE = 4456.1 MWh in that single trajectory;
+mean across 20 scenarios = 660 MWh). The event at h4934 shows:
+- Battery fully charged (3932 MWh) at first shedding hour
+- PCM-UCED does NOT discharge at rel=0 (first shed) — sheds 220.5 MW instead
+- Then discharges 653 MW at rel=+1 (no shedding that hour)
+- Alternating discharge/shed pattern continues, consistent with commitment constraints
+
+**What is needed:** Run script 48 for VRE120_wind_hvy s015 to obtain M1c/M2/M3 dispatch
+for the same event window. Then create 
+comparing all four methods.
+
+**Recommended action (future):** Once M1c/M2/M3 wind-heavy hourly dispatch is generated,
+create the wind-heavy event figure and add to appendix as supporting evidence that
+commitment constraints affect event timing in both portfolio types.
+
+**Context:** The balanced VRE Scenario 15 event figure (Fig. 4 in the main paper) already
+shows this effect clearly and includes all four methods. The wind-heavy event would
+provide additional evidence but is not required for the main narrative.
