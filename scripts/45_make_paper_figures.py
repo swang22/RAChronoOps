@@ -269,7 +269,6 @@ def make_fig2():
 
 def make_fig3():
     """Log-log scatter: per-scenario runtime vs absolute EUE error vs PCM-UCED."""
-    import matplotlib.transforms as mtransforms
     df   = pd.read_csv(os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
     df_b = df[df["case"] == "VRE120_base"].copy()
 
@@ -323,12 +322,12 @@ def make_fig3():
     # Direct text labels using pixel-based offsets
     offsets = {
         # (dx_pts, dy_pts, va, ha)
-        "M1":      (0,  +14, "bottom", "center"),
-        "M1b":     (0,  -14, "top",    "center"),
-        "M1c":     (+6, +10, "bottom", "left"),
-        "M2":      (+6,  +9, "bottom", "left"),
-        "M3":      (+6,  +9, "bottom", "left"),
-        "HOPE-UC": (0,  +12, "bottom", "center"),
+        "M1":      (0,   +14, "bottom", "center"),
+        "M1b":     (+8,    0, "center", "left"),    # moved right to clear y-axis
+        "M1c":     (+6,  +10, "bottom", "left"),
+        "M2":      (+6,   +9, "bottom", "left"),
+        "M3":      (+6,   +9, "bottom", "left"),
+        "HOPE-UC": (-8,  +10, "bottom", "right"),   # moved left to clear green annotation
     }
     for r in rows:
         mid = r["mid"]
@@ -347,12 +346,11 @@ def make_fig3():
                     if (ox != 0 or oy != 0) else None,
         )
 
-    # Zero-error floor line: green with label on the right using a blended transform
+    # Zero-error floor line: green with label in upper-right empty area
     ax.axhline(FLOOR, color=C["green"], ls=":", lw=0.9, zorder=1, alpha=0.7)
-    trans = mtransforms.blended_transform_factory(ax.transAxes, ax.transData)
-    ax.text(0.985, FLOOR * 2.5,
+    ax.text(0.97, 0.17,
             "zero EUE error\nvs PCM-UCED",
-            transform=trans, fontsize=6.0, color=C["green"],
+            transform=ax.transAxes, fontsize=6.0, color=C["green"],
             va="bottom", ha="right", style="italic")
 
     ax.set_xscale("log")
