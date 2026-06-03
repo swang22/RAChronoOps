@@ -71,10 +71,10 @@ plt.rcParams.update({
     "ps.fonttype":         42,
 })
 
-C_M1C = "#1565C0"   # solid blue   — Emergency-only storage MCS
-C_M2  = "#2E7D32"   # solid green  — Event-window storage MCS
-C_M3  = "#E65100"   # dashed       — Full-year ED
-C_PCM = "#6A1B9A"   # dash-dot     — PCM-UCED
+C_M1C = "#388E3C"   # green        — Emergency-only storage MCS
+C_M2  = "#1565C0"   # blue         — Event-window storage MCS
+C_M3  = "#555555"   # dark gray    — Full-year ED
+C_PCM = "#6A1B9A"   # purple       — PCM-UCED
 
 LW     = 1.5    # primary linewidth
 LW_SEC = 1.0    # secondary (Full-year ED, PCM-UCED) linewidth

@@ -268,11 +268,11 @@ else:
                 vals.append(v / ref_val if ref_val > 0 else float("nan"))
         data[mk] = np.array(vals)
 
-    # Colours and markers per method
-    C_M1c  = "#2E7D32"   # green
+    # Colours and markers per method — consistent with METHOD_STYLE in script 45
+    C_M1c  = "#388E3C"   # green
     C_M2   = "#1565C0"   # blue
-    C_M3   = "#555555"   # grey (reference)
-    C_PCM  = "#C62828"   # red
+    C_M3   = "#555555"   # dark gray
+    C_PCM  = "#6A1B9A"   # purple
 
     METRIC_LABELS = ["Events/yr", "Mean dur.", "Max shortfall", "Max dur."]
     METRIC_KEYS   = [

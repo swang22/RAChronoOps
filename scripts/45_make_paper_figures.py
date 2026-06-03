@@ -71,6 +71,7 @@ plt.rcParams.update({
 # Colour palette
 C = {
     "gray":    "#9E9E9E",
+    "dgray":   "#555555",   # dark gray — Full-year ED
     "red":     "#C62828",
     "orange":  "#EF6C00",
     "green":   "#388E3C",
@@ -83,13 +84,15 @@ C = {
     "lred":    "#FFEBEE",
 }
 
-# Per-method marker/colour used in frontier and convergence figures
+# Per-method marker/colour — consistent across all figures
+# Naive: red X | SOC-floor: orange sq | Emergency: green circle
+# Event-window: blue diamond | Full-year ED: dark-gray triangle | PCM-UCED: purple +
 METHOD_STYLE = {
     "M1":      dict(color=C["red"],    marker="X",  ms=7),
     "M1b":     dict(color=C["orange"], marker="s",  ms=6),
     "M1c":     dict(color=C["green"],  marker="o",  ms=6),
-    "M2":      dict(color=C["sky"],    marker="D",  ms=6),
-    "M3":      dict(color=C["blue"],   marker="^",  ms=7),
+    "M2":      dict(color=C["blue"],   marker="D",  ms=6),
+    "M3":      dict(color=C["dgray"],  marker="^",  ms=7),
     "HOPE-ED": dict(color="#7B1FA2",   marker="v",  ms=6),
     "HOPE-UC": dict(color=C["purple"], marker="P",  ms=7),
 }
@@ -322,12 +325,12 @@ def make_fig3():
     # Direct text labels using pixel-based offsets
     offsets = {
         # (dx_pts, dy_pts, va, ha)
-        "M1":      (0,   +14, "bottom", "center"),
-        "M1b":     (+8,    0, "center", "left"),    # moved right to clear y-axis
+        "M1":      (+12,   0, "center", "left"),    # right of X marker
+        "M1b":     (  0, -14, "top",    "center"),  # below square marker
         "M1c":     (+6,  +10, "bottom", "left"),
         "M2":      (+6,   +9, "bottom", "left"),
         "M3":      (+6,   +9, "bottom", "left"),
-        "HOPE-UC": (-8,  +10, "bottom", "right"),   # moved left to clear green annotation
+        "HOPE-UC": (-8,  +10, "bottom", "right"),   # left to clear green annotation
     }
     for r in rows:
         mid = r["mid"]
@@ -399,11 +402,11 @@ def make_fig4():
         [m3_eue[i] + m3_ci95[i] for i in range(len(ns))],
         alpha=0.18, color=C["blue"], label="_CI95 band",
     )
-    ax1.plot(ns, m3_eue, color=C["blue"], marker="^", ms=6, lw=1.5,
+    ax1.plot(ns, m3_eue, color=C["dgray"], marker="^", ms=6, lw=1.5,
              label="Full-Year ED")
     ax1.plot(ns, m1c_eue, color=C["green"], marker="o", ms=5.5, lw=1.4,
              ls="--", label="Emergency-Only Storage MCS")
-    ax1.plot(ns, m2_eue,  color=C["sky"],   marker="D", ms=5.5, lw=1.4,
+    ax1.plot(ns, m2_eue,  color=C["blue"],  marker="D", ms=5.5, lw=1.4,
              ls=":",  label="Event-Window Storage MCS")
 
     ax1.set_xlabel("Monte Carlo scenarios (N)")
@@ -419,14 +422,14 @@ def make_fig4():
              bbox=dict(boxstyle="round,pad=0.2", facecolor=C["lgreen"],
                        edgecolor=C["green"], lw=0.7))
 
-    ax2.plot(ns, m3_ci95, color=C["blue"], marker="^", ms=6, lw=1.5,
+    ax2.plot(ns, m3_ci95, color=C["dgray"], marker="^", ms=6, lw=1.5,
              label="Full-Year ED EUE CI95 (MWh)")
-    ax2.plot(ns, m3_lolh_ci, color=C["blue"], marker="^", ms=6, lw=1.5,
+    ax2.plot(ns, m3_lolh_ci, color=C["dgray"], marker="^", ms=6, lw=1.5,
              ls="--", alpha=0.6, label="Full-Year ED LOLH CI95 (h)")
 
     ns_arr   = np.array(ns, dtype=float)
     ref_eue  = m3_ci95[0] * np.sqrt(ns[0] / ns_arr)
-    ax2.plot(ns, ref_eue, color=C["blue"], lw=0.7, ls="-.", alpha=0.4,
+    ax2.plot(ns, ref_eue, color=C["dgray"], lw=0.7, ls="-.", alpha=0.4,
              label="1/√N reference")
 
     ax2r = ax2.twinx()
@@ -549,8 +552,8 @@ def make_fig6():
     # Key storage-aware methods in display order (matches CSV method names exactly)
     METHODS = [
         ("Emergency-only storage MCS", "Emerg.-Only\nStorage MCS", C["green"]),
-        ("Event-window storage MCS",   "Event-Window\nStorage MCS", C["sky"]),
-        ("Full-year ED",               "Full-Year ED",               C["blue"]),
+        ("Event-window storage MCS",   "Event-Window\nStorage MCS", C["blue"]),
+        ("Full-year ED",               "Full-Year ED",               C["dgray"]),
         ("PCM-UCED",                   "PCM-UCED",                   C["purple"]),
     ]
     method_names  = [m[0] for m in METHODS]
