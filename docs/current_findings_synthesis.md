@@ -847,3 +847,31 @@ commitment constraints affect event timing in both portfolio types.
 **Context:** The balanced VRE Scenario 15 event figure (Fig. 4 in the main paper) already
 shows this effect clearly and includes all four methods. The wind-heavy event would
 provide additional evidence but is not required for the main narrative.
+
+---
+
+## Fig. 2 Annotation Offsets (runtime_accuracy_frontier) — 2026-06-02
+
+Label placement in `scripts/45_make_paper_figures.py` → `make_fig3()`:
+
+| Method      | dx (pts) | dy (pts) | va       | ha     | Note                                 |
+|-------------|----------|----------|----------|--------|--------------------------------------|
+| Naive       | +10      | +18      | bottom   | left   | right AND above red X                |
+| SOC-floor   | +8       | −28      | top      | left   | below AND right of orange square     |
+| Emergency   | +6       | +10      | bottom   | left   | above/right of green circle          |
+| Event-window| +6       | +9       | bottom   | left   | above/right of blue diamond          |
+| Full-year ED| +6       | +9       | bottom   | left   | above/right of dark gray triangle    |
+| PCM-UCED    | +6       | −12      | top      | left   | below marker, clear of green note    |
+
+Zero-error floor annotation: `ax.text(80, FLOOR*5, ...)` at data coordinates
+x=80 s (between Full-year ED at 9.56 s and PCM-UCED at 571.9 s), y=0.25 MWh.
+All labels use `bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.80)`
+to prevent visual bleed through markers and grid lines.
+
+Global method color/marker scheme (METHOD_STYLE in script 45):
+- Naive: red `#C62828`, marker X
+- SOC-floor: orange `#EF6C00`, marker s
+- Emergency: green `#388E3C`, marker o, solid line
+- Event-window: blue `#1565C0`, marker D, solid line
+- Full-year ED: dark gray `#555555`, marker ^, dashed line
+- PCM-UCED: purple `#6A1B9A`, marker P, dash-dot line

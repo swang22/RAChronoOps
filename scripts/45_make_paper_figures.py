@@ -217,8 +217,8 @@ def make_fig2():
         "M1":  C["red"],
         "M1b": C["orange"],
         "M1c": C["green"],
-        "M2":  C["sky"],
-        "M3":  C["blue"],
+        "M2":  C["blue"],
+        "M3":  C["dgray"],
     }
 
     panels = [
@@ -243,11 +243,11 @@ def make_fig2():
         # Full-Year ED reference dashed line
         m3_val = sub.loc["M3", "eue_mwh"] if "M3" in sub.index else None
         if m3_val is not None:
-            ax.axhline(m3_val, color=C["blue"], ls="--", lw=1.1,
+            ax.axhline(m3_val, color=C["dgray"], ls="--", lw=1.1,
                        alpha=0.70, zorder=3)
             # Label at right edge, just above the reference line
             ax.text(len(order_int) - 0.30, m3_val * 1.35,
-                    "Full-Year ED", fontsize=6.0, color=C["blue"],
+                    "Full-Year ED", fontsize=6.0, color=C["dgray"],
                     ha="right", va="bottom", style="italic")
 
         ax.set_xticks(x)
@@ -322,15 +322,17 @@ def make_fig3():
                        color=st["color"], marker=st["marker"], s=st["ms"]**2,
                        zorder=5, label=lbl, clip_on=False)
 
-    # Direct text labels using pixel-based offsets
+    # Direct text labels — explicit per-method offsets to eliminate overlap.
+    # White bbox behind each label prevents visual bleed through markers/grid.
+    LBOX = dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.80)
     offsets = {
         # (dx_pts, dy_pts, va, ha)
-        "M1":      (+12,   0, "center", "left"),    # right of X marker
-        "M1b":     (  0, -14, "top",    "center"),  # below square marker
+        "M1":      (+10, +18, "bottom", "left"),   # right AND above X marker
+        "M1b":     (+8,  -28, "top",    "left"),   # below AND right of square
         "M1c":     (+6,  +10, "bottom", "left"),
         "M2":      (+6,   +9, "bottom", "left"),
         "M3":      (+6,   +9, "bottom", "left"),
-        "HOPE-UC": (-8,  +10, "bottom", "right"),   # left to clear green annotation
+        "HOPE-UC": (+6,  -12, "top",    "left"),   # below marker, clear of green note
     }
     for r in rows:
         mid = r["mid"]
@@ -344,17 +346,20 @@ def make_fig3():
             xytext=(ox, oy),
             textcoords="offset points",
             fontsize=6.5, color=col, va=va, ha=ha,
+            bbox=LBOX,
             arrowprops=dict(arrowstyle="-", color=col, lw=0.4,
                             shrinkA=2, shrinkB=0)
                     if (ox != 0 or oy != 0) else None,
         )
 
-    # Zero-error floor line: green with label in upper-right empty area
+    # Zero-error floor line.  Place the label between M3 (~9.6 s) and
+    # PCM-UCED (~572 s) so it does not overlap any method marker or label.
     ax.axhline(FLOOR, color=C["green"], ls=":", lw=0.9, zorder=1, alpha=0.7)
-    ax.text(0.97, 0.17,
+    ax.text(80, FLOOR * 5,
             "zero EUE error\nvs PCM-UCED",
-            transform=ax.transAxes, fontsize=6.0, color=C["green"],
-            va="bottom", ha="right", style="italic")
+            fontsize=6.0, color=C["green"], va="bottom", ha="center",
+            style="italic",
+            bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.80))
 
     ax.set_xscale("log")
     ax.set_yscale("log")

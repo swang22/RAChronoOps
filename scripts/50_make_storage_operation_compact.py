@@ -174,8 +174,8 @@ ax_ls.yaxis.set_major_formatter(
 )
 
 legend_handles = [
-    Line2D([0], [0], color=C_M1C, lw=LW,     ls="-",          label="Emergency-only MCS"),
-    Line2D([0], [0], color=C_M2,  lw=LW,     ls="-",          label="Event-window MCS"),
+    Line2D([0], [0], color=C_M1C, lw=LW,     ls="-",          label="Emergency"),
+    Line2D([0], [0], color=C_M2,  lw=LW,     ls="-",          label="Event-window"),
     Line2D([0], [0], color=C_M3,  lw=LW_SEC, ls="--",         label="Full-year ED"),
     Line2D([0], [0], color=C_PCM, lw=LW_SEC, ls=(0,(4,1,1,1)),label="PCM-UCED"),
 ]

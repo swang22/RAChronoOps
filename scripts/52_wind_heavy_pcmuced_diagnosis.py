@@ -196,10 +196,10 @@ plt.rcParams.update({
     "savefig.pad_inches": 0.04, "pdf.fonttype": 42, "ps.fonttype": 42,
 })
 
-C_M1C = "#1565C0"   # Emergency-only MCS
-C_M2  = "#2E7D32"   # Event-window MCS
-C_M3  = "#E65100"   # Full-year ED
-C_PCM = "#6A1B9A"   # PCM-UCED
+C_M1C = "#388E3C"   # green        — Emergency-only MCS (matches global METHOD_STYLE)
+C_M2  = "#1565C0"   # blue         — Event-window MCS
+C_M3  = "#555555"   # dark gray    — Full-year ED
+C_PCM = "#6A1B9A"   # purple       — PCM-UCED
 LW     = 1.5
 LW_SEC = 1.0
 
@@ -237,8 +237,8 @@ ax_ls.yaxis.set_major_formatter(
 )
 
 legend_handles = [
-    Line2D([0], [0], color=C_M1C, lw=LW,     ls="-",           label="Emergency-only MCS"),
-    Line2D([0], [0], color=C_M2,  lw=LW,     ls="-",           label="Event-window MCS"),
+    Line2D([0], [0], color=C_M1C, lw=LW,     ls="-",           label="Emergency"),
+    Line2D([0], [0], color=C_M2,  lw=LW,     ls="-",           label="Event-window"),
     Line2D([0], [0], color=C_M3,  lw=LW_SEC, ls="--",          label="Full-year ED"),
     Line2D([0], [0], color=C_PCM, lw=LW_SEC, ls=(0,(4,1,1,1)), label="PCM-UCED"),
 ]
