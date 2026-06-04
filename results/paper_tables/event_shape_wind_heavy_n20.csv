@@ -1,0 +1,6 @@
+case,n_scenarios,method,events_per_yr,mean_event_duration_h,max_event_duration_h,max_event_duration_note,max_hourly_shortfall_mw,EUE_MWh_per_yr,LOLH_h_per_yr,NEUE_ppm
+Wind-heavy VRE portfolio,20,Emergency-only storage MCS,0.85,2.65,6.0,exact,225.5,648.24,2.25,14.38
+Wind-heavy VRE portfolio,20,Event-window storage MCS,1.05,1.86,7.0,exact,289.0,648.24,1.95,14.38
+Wind-heavy VRE portfolio,20,Full-year ED,0.85,2.65,6.0,exact,225.5,648.24,2.25,14.38
+Wind-heavy VRE portfolio,20,PCM-ED (cross-check),1.25,1.56,4.4,approx (from per-scenario p95),1462.2,648.24,1.95,14.38
+Wind-heavy VRE portfolio,20,PCM-UCED,1.55,1.71,5.2,approx (from per-scenario p95),1462.2,660.3,2.65,14.65
