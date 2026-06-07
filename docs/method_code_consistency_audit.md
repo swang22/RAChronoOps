@@ -3,7 +3,7 @@
 **Date:** 2026-06-06 (initial); 2026-06-07 (follow-up pass)
 **Manuscript commit before fixes:** `a50998a` (paper: remove code-style method labels)
 **Manuscript commit after initial fixes:** `e188a11` (paper: align methods with implementation)
-**Manuscript commit after follow-up fixes:** `<follow-up>` (paper: finalize method-code consistency wording)
+**Manuscript commit after follow-up fixes:** `ee31530` (paper: finalize method-code consistency wording)
 **Code base:** `RAChronoOps/` (no code changes required — all inconsistencies were in the manuscript)
 
 ---
