@@ -1,0 +1,66 @@
+┌ Info: Market-pattern storage MCS — diagnostic evaluation
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:85
+┌ Info: n=20 | seed=42
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:86
+┌ Info: Pattern CSV: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\data_processed\caiso_storage_patterns\season_hour_pattern.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:87
+┌ Info: Cases: VRE120_base, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:88
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:103
+┌ Info:   running MP_pure ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_pure: LOLH=51.45 h  EUE=14321.4 MWh  chg_ind=4.6%  (1.54 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running MP_pure_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_pure_cur: LOLH=46.1 h  EUE=13662.0 MWh  chg_ind=0.0%  (1.04 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running MP_emergency ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_emergency: LOLH=13.55 h  EUE=4668.2 MWh  chg_ind=11.7%  (0.98 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running MP_emergency_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_emergency_cur: LOLH=9.15 h  EUE=4338.3 MWh  chg_ind=0.0%  (0.98 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running M1c (benchmark)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:175
+┌ Info:   M1c: LOLH=5.95 h  SOC_pre=0.186  (1.13 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:181
+┌ Info:   running M2 event-window LP (benchmark)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:215
+┌ Info:   M2: LOLH=5.1 h  SOC_pre=0.511  (5.72 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:221
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:103
+┌ Info:   running MP_pure ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_pure: LOLH=27.45 h  EUE=7559.5 MWh  chg_ind=5.3%  (1.03 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running MP_pure_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_pure_cur: LOLH=23.9 h  EUE=7160.6 MWh  chg_ind=0.0%  (0.95 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running MP_emergency ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_emergency: LOLH=6.0 h  EUE=1455.6 MWh  chg_ind=26.2%  (1.41 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running MP_emergency_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:112
+┌ Info:   MP_emergency_cur: LOLH=2.85 h  EUE=1117.4 MWh  chg_ind=0.0%  (0.95 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:121
+┌ Info:   running M1c (benchmark)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:175
+┌ Info:   M1c: LOLH=2.25 h  SOC_pre=0.335  (0.92 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:181
+┌ Info:   running M2 event-window LP (benchmark)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:215
+┌ Info:   M2: LOLH=1.75 h  SOC_pre=0.543  (3.71 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:221
+┌ Info: Results → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\paper_tables\market_pattern_storage_results.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:262
+┌ Info: EUE decomposition → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\paper_tables\market_pattern_eue_decomposition.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:263
+┌ Info: SOC diagnostics → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\market_pattern_storage\soc_diagnostics.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\68_diagnose_market_pattern_storage.jl:264

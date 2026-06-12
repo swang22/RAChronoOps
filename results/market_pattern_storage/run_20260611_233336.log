@@ -1,0 +1,66 @@
+┌ Info: Event-start SOC diagnostics
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:84
+┌ Info: n=20 | seed=42 | skip_m3=false
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:85
+┌ Info: ── Case: VRE120_base ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:113
+┌ Info:   MP_pure ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_pure: n_events=540  mean=0.819  p10=0.769  <25%=0.0%  <50%=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   MP_pure_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_pure_cur: n_events=540  mean=0.812  p10=0.743  <25%=0.0%  <50%=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   MP_emergency ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_emergency: n_events=540  mean=0.849  p10=0.769  <25%=0.0%  <50%=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   MP_emergency_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_emergency_cur: n_events=540  mean=0.844  p10=0.759  <25%=0.0%  <50%=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   M1c ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:147
+┌ Info:   M1c: n_events=540  mean=0.999  p10=1.0  <25%=0.0%  <50%=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:152
+┌ Info:   M2 event-window LP ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:161
+┌ Info:   M2: n_events=540  mean=0.325  p10=0.03  <25%=51.3%  <50%=76.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:166
+┌ Info:   M3 full-year ED (this may take several minutes) ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:178
+┌ Info:   M3: n_events=540  mean=0.828  p10=0.622  <25%=0.4%  <50%=4.1%  (204.4 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:183
+┌ Info: ── Case: VRE120_wind_hvy ──────────────────────────────────────────────
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:113
+┌ Info:   MP_pure ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_pure: n_events=370  mean=0.817  p10=0.769  <25%=0.0%  <50%=0.3%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   MP_pure_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_pure_cur: n_events=370  mean=0.811  p10=0.744  <25%=0.0%  <50%=0.3%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   MP_emergency ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_emergency: n_events=370  mean=0.837  p10=0.769  <25%=0.3%  <50%=0.8%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   MP_emergency_cur ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:129
+┌ Info:   MP_emergency_cur: n_events=370  mean=0.831  p10=0.754  <25%=0.3%  <50%=1.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:137
+┌ Info:   M1c ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:147
+┌ Info:   M1c: n_events=370  mean=0.998  p10=1.0  <25%=0.0%  <50%=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:152
+┌ Info:   M2 event-window LP ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:161
+┌ Info:   M2: n_events=370  mean=0.404  p10=0.056  <25%=31.6%  <50%=61.6%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:166
+┌ Info:   M3 full-year ED (this may take several minutes) ...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:178
+┌ Info:   M3: n_events=370  mean=0.79  p10=0.547  <25%=0.8%  <50%=5.1%  (194.1 s)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:183
+┌ Info: Event-start SOC → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\paper_tables\market_pattern_event_start_soc.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\69_event_start_soc.jl:194
