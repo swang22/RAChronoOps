@@ -38,6 +38,7 @@ include("models/M2EventWindowLP.jl")
 include("models/M3EDDispatch.jl")
 include("models/McNoStorage.jl")
 include("models/M1dRiskHourAllocation.jl")
+include("models/MarketPatternStorage.jl")
 
 # 6. metrics (defines MetricsResult + individual metric functions)
 include("metrics/ReliabilityMetrics.jl")
@@ -72,6 +73,11 @@ export build_risk_windows
 export run_m3_ed_dispatch
 export run_mc_no_storage
 export run_m1d_risk_hour_allocation
+export SocBeforeShortage
+export run_market_pattern_storage
+export run_market_pattern_pure, run_market_pattern_emergency
+export compute_soc_before_shortage
+export load_market_pattern
 
 export MetricsResult, compute_metrics
 export compute_lolh, compute_lolp, compute_lole_days
