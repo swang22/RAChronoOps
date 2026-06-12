@@ -15,16 +15,16 @@
 | Balanced VRE | MP pure (curtailed) | 46.10 | 13 662 | 26 276 |
 | Balanced VRE | MP + emergency (uncurtailed) | 13.55 | 4 668 | 16 209 |
 | Balanced VRE | MP + emergency (curtailed) | 9.15 | 4 338 | 15 812 |
-| Balanced VRE | Emergency-only storage MCS (M1c) | 5.95 | 2 479 | 9 783 |
-| Balanced VRE | Event-window storage MCS (M2) | 5.10 | 2 479 | 9 783 |
+| Balanced VRE | Emergency-only storage MCS | 5.95 | 2 479 | 9 783 |
+| Balanced VRE | Event-window storage MCS | 5.10 | 2 479 | 9 783 |
 | Wind-heavy | MP pure (uncurtailed) | 27.45 | 7 560 | 15 264 |
 | Wind-heavy | MP pure (curtailed) | 23.90 | 7 161 | 14 518 |
 | Wind-heavy | MP + emergency (uncurtailed) | 6.00 | 1 456 | 6 267 |
 | Wind-heavy | MP + emergency (curtailed) | 2.85 | 1 117 | 5 509 |
-| Wind-heavy | Emergency-only storage MCS (M1c) | 2.25 | 648 | 3 528 |
-| Wind-heavy | Event-window storage MCS (M2) | 1.75 | 648 | 3 528 |
+| Wind-heavy | Emergency-only storage MCS | 2.25 | 648 | 3 528 |
+| Wind-heavy | Event-window storage MCS | 1.75 | 648 | 3 528 |
 
-*Curtailed = charging strictly limited to available surplus. Uncurtailed = original bug: charging limit = surplus + total_power.*
+*Curtailed = charging strictly limited to available surplus. Uncurtailed = charging limit = surplus + total_power, which can produce load shedding in non-shortage hours.*
 
 ---
 
@@ -42,7 +42,7 @@
 | Wind-heavy | MP + emergency (curtailed) | 0.0% | 0.0% | 90.3% |
 
 *Charging-induced: EUE in hours with no pre-storage shortfall, caused by charging that exceeded surplus.
-Missed-discharge: EUE that would have been avoided by emergency (M1c) discharge.
+Missed-discharge: EUE that would have been avoided by full emergency discharge.
 Low-SOC: EUE in shortage hours where pre-shortage SOC < 25% E_max.*
 
 ---
@@ -55,16 +55,14 @@ Low-SOC: EUE in shortage hours where pre-shortage SOC < 25% E_max.*
 | Balanced VRE | MP pure (curtailed) | 0.722 | 0.549 | 0.9% |
 | Balanced VRE | MP + emergency (uncurtailed) | 0.671 | 0.250 | 10.0% |
 | Balanced VRE | MP + emergency (curtailed) | 0.664 | 0.239 | 10.4% |
-| Balanced VRE | M1c (emergency-only) | 0.186 | 0.000 | 71.4% |
-| Balanced VRE | M2 (event-window LP) | 0.511 | 0.043 | 26.5% |
+| Balanced VRE | Emergency-only storage MCS | 0.186 | 0.000 | 71.4% |
+| Balanced VRE | Event-window storage MCS | 0.511 | 0.043 | 26.5% |
 | Wind-heavy | MP pure (uncurtailed) | 0.748 | 0.565 | 0.2% |
 | Wind-heavy | MP pure (curtailed) | 0.740 | 0.565 | 0.2% |
 | Wind-heavy | MP + emergency (uncurtailed) | 0.707 | 0.412 | 5.5% |
 | Wind-heavy | MP + emergency (curtailed) | 0.698 | 0.402 | 6.2% |
-| Wind-heavy | M1c (emergency-only) | 0.335 | 0.000 | 53.3% |
-| Wind-heavy | M2 (event-window LP) | 0.543 | 0.096 | 20.0% |
-
----
+| Wind-heavy | Emergency-only storage MCS | 0.335 | 0.000 | 53.3% |
+| Wind-heavy | Event-window storage MCS | 0.543 | 0.096 | 20.0% |
 
 ---
 
@@ -76,16 +74,16 @@ Low-SOC: EUE in shortage hours where pre-shortage SOC < 25% E_max.*
 | Balanced VRE | MP pure (curtailed) | 0.812 | 0.743 | 0.0% | 0.0% | 540 |
 | Balanced VRE | MP + emergency | 0.849 | 0.769 | 0.0% | 0.0% | 540 |
 | Balanced VRE | MP + emergency (curtailed) | 0.844 | 0.759 | 0.0% | 0.0% | 540 |
-| Balanced VRE | M1c | **0.999** | 1.000 | 0.0% | 0.0% | 540 |
-| Balanced VRE | M2 | 0.325 | 0.030 | 51.3% | 76.1% | 540 |
-| Balanced VRE | M3 | 0.828 | 0.622 | 0.4% | 4.1% | 540 |
+| Balanced VRE | Emergency-only storage MCS | **0.999** | 1.000 | 0.0% | 0.0% | 540 |
+| Balanced VRE | Event-window storage MCS | 0.325 | 0.030 | 51.3% | 76.1% | 540 |
+| Balanced VRE | Full-year ED | 0.828 | 0.622 | 0.4% | 4.1% | 540 |
 | Wind-heavy | MP pure | 0.817 | 0.769 | 0.0% | 0.3% | 370 |
 | Wind-heavy | MP pure (curtailed) | 0.811 | 0.744 | 0.0% | 0.3% | 370 |
 | Wind-heavy | MP + emergency | 0.837 | 0.769 | 0.3% | 0.8% | 370 |
 | Wind-heavy | MP + emergency (curtailed) | 0.831 | 0.754 | 0.3% | 1.1% | 370 |
-| Wind-heavy | M1c | **0.998** | 1.000 | 0.0% | 0.0% | 370 |
-| Wind-heavy | M2 | 0.404 | 0.056 | 31.6% | 61.6% | 370 |
-| Wind-heavy | M3 | 0.790 | 0.547 | 0.8% | 5.1% | 370 |
+| Wind-heavy | Emergency-only storage MCS | **0.998** | 1.000 | 0.0% | 0.0% | 370 |
+| Wind-heavy | Event-window storage MCS | 0.404 | 0.056 | 31.6% | 61.6% | 370 |
+| Wind-heavy | Full-year ED | 0.790 | 0.547 | 0.8% | 5.1% | 370 |
 
 *A shortage event is a maximal contiguous block of hours with pre-storage shortfall > 0.
 SOC measured at end-of-hour immediately before the first hour of each event.*
@@ -96,36 +94,39 @@ SOC measured at end-of-hour immediately before the first hour of each event.*
 
 ### 1. Does pure market-pattern dispatch increase EUE/LOLH vs emergency-only?
 
-**Yes — dramatically.** Market-pattern storage MCS (pure, uncurtailed) produces:
+**Yes, substantially.** Market-pattern storage MCS (pure, uncurtailed) produces:
 - Balanced VRE: LOLH = 51.45 h, EUE = 14 321 MWh — approximately **8.6× higher LOLH**
-  and **5.8× higher EUE** than emergency-only (M1c).
+  and **5.8× higher EUE** than emergency-only storage MCS.
 - Wind-heavy: LOLH = 27.45 h, EUE = 7 560 MWh — approximately **12× higher LOLH**
   and **11.7× higher EUE** than emergency-only.
 
-The EUE decomposition shows the dominant driver is **missed discharge** (92–97% of EUE):
-the battery has energy available (mean pre-shortage SOC 73–75%) but the market pattern
-does not call for adequate discharge during shortage hours. CAISO batteries charge midday
-(9am–2pm) and discharge in the evening ramp (5pm–9pm); shortage hours in this test system
-occur at different times and the pure variant does not deviate from the pattern.
+The EUE decomposition suggests the dominant driver is **missed discharge** (92–97% of EUE):
+market-pattern variants enter shortage events with reasonably high SOC (81–85% on average;
+see event-start SOC table), but the CAISO-calibrated dispatch pattern does not call for
+adequate discharge during RTS shortage hours. CAISO batteries charge midday (9am–2pm) and
+discharge in the evening ramp (5pm–9pm); shortage hours in the RTS-GMLC test system occur
+at different times, and the pure variant does not deviate from the pattern during scarcity.
+The performance gap is therefore driven primarily by dispatch timing mismatch, not
+pre-event SOC depletion.
 
-Charging beyond surplus (the uncurtailed bug) contributes only 4.6–5.3% of EUE for the pure
-variants — it is a secondary factor.
+Charging beyond surplus (in the uncurtailed variants) contributes only 4.6–5.3% of EUE for
+the pure variants — it is a secondary effect.
 
 ### 2. Does the emergency override (Variant 3) recover most EUE benefit?
 
 **Partially.** The emergency-override (uncurtailed) variant recovers a substantial fraction
 of the emergency-only benefit but not all:
 
-- Balanced VRE: LOLH = 13.55 h (vs 5.95 for M1c) — **2.3× higher** despite emergency override
-- Wind-heavy: LOLH = 6.00 h (vs 2.25 for M1c) — **2.7× higher** despite emergency override
+- Balanced VRE: LOLH = 13.55 h (vs 5.95 for emergency-only storage MCS) — **2.3× higher** despite emergency override
+- Wind-heavy: LOLH = 6.00 h (vs 2.25 for emergency-only) — **2.7× higher** despite emergency override
 
-The EUE decomposition explains the residual gap: with emergency override the missed-discharge
+The EUE decomposition helps explain the residual gap: with emergency override the missed-discharge
 component drops to 0% (the emergency rule fully substitutes for the pattern in shortage hours),
 but **low-SOC EUE rises to 66–85%** of total EUE. This means the battery enters many shortage
 hours with insufficient SOC — depleted by market-pattern charging and discharging in non-shortage
-hours. Furthermore, **11.7–26.2% of EUE is charging-induced** in the uncurtailed emergency
-variant: the market pattern charges beyond available surplus in non-shortage hours, directly
-creating load shedding in those hours.
+hours before and between shortage events. Furthermore, **11.7–26.2% of EUE is charging-induced**
+in the uncurtailed emergency variant: the market pattern charges beyond available surplus in
+non-shortage hours, directly creating load shedding in those hours.
 
 ### 3. Does storage charging create load shedding?
 
@@ -153,76 +154,90 @@ If `charging_induced_pct > 5%`, the uncurtailed charging rule is materially infl
 and the curtailed variant should be used for fair comparison. For the emergency variants,
 this threshold is clearly exceeded (11.7–26.2%).
 
-**The curtailed variants confirm the diagnosis:** charging-induced EUE drops to exactly 0%
-in all curtailed variants by construction. The remaining EUE in the curtailed emergency
-variants (MP_emergency_cur) is entirely from low-SOC (96.3% of EUE for balanced VRE),
-confirming that the residual gap vs M1c is explained by pre-shortage SOC depletion from
-market-pattern charging/discharging in non-shortage hours.
+**The curtailed variants confirm this diagnosis:** charging-induced EUE drops to exactly 0%
+in all curtailed variants by construction. The remaining EUE in the charge-curtailed emergency
+variant (MP + emergency, curtailed) is classified as low-SOC (96.3% of EUE for balanced VRE,
+90.3% for wind-heavy). This reflects lower SOC during shortage hour sequences: market-pattern
+dispatch in non-shortage hours — following the CAISO duck-curve timing rather than charging
+from all available surplus — leaves less energy available as shortage events progress through
+multiple hours. This is a real pre-positioning cost of market-pattern operation, but is
+distinct from charging-induced load shedding; the curtailed variant does not shed load in
+non-shortage hours.
 
-### 4. What does M1c's low per-shortage-hour SOC mean?
+### 4. What does the emergency-only method's low per-shortage-hour SOC mean?
 
-**An unexpected finding in the per-hour diagnostic: M1c enters shortage hours with the
-LOWEST average SOC** (mean 18.6% balanced, 33.5% wind-heavy vs 73–75% for pure
-market-pattern).
+**An apparent paradox in the per-hour diagnostic:** emergency-only storage MCS enters
+shortage hours with the lowest average SOC (mean 18.6% balanced, 33.5% wind-heavy vs
+73–75% for pure market-pattern variants).
 
 The explanation is **sequential event depletion**: during multi-hour shortage events,
-M1c discharges aggressively at each shortage hour. By the end of an event the battery is
-depleted. The per-hour mean averages across all hours in all events, including the later
-hours of long events where the battery is already nearly empty. This is correct behaviour —
-M1c is doing its job — but the metric is misleading without this context.
+emergency-only storage discharges aggressively at each shortage hour. By the end of an event
+the battery is depleted. The per-hour mean averages across all hours in all events, including
+the later hours of long events where the battery is already nearly empty. This reflects the
+method operating as intended, but the metric is not straightforward to interpret without
+knowing event length and sequencing.
 
-**The event-start SOC diagnostic resolves the apparent paradox.**
+**The event-start SOC diagnostic is a more appropriate diagnostic for this question.**
 
 ### 5. Event-start SOC: entering shortage events with energy
 
 **Event-start SOC** — measured at the end of the hour immediately before the first
 shortage hour of each event — removes intra-event depletion from the diagnostic. The
-results (script `69_event_start_soc.jl`) show a sharply different picture:
+results (script `69_event_start_soc.jl`) show a picture that differs substantially from
+the per-shortage-hour diagnostic:
 
 | Method | Balanced VRE | Wind-heavy |
 |---|---|---|
-| M1c | **0.999** | **0.998** |
-| MP variants | 0.81–0.85 | 0.81–0.84 |
-| M3 | 0.828 | 0.790 |
-| M2 | 0.325 | 0.404 |
+| Emergency-only storage MCS | **0.999** | **0.998** |
+| Market-pattern variants | 0.81–0.85 | 0.81–0.84 |
+| Full-year ED | 0.828 | 0.790 |
+| Event-window storage MCS | 0.325 | 0.404 |
 
-**M1c enters every shortage event at 99.9% SOC.** Charging from all available surplus
-guarantees near-maximum pre-event positioning. Zero events start below 50% SOC.
+**Emergency-only storage MCS enters every shortage event at 99.9% SOC.** Charging from
+all available surplus is consistent with near-maximum pre-event positioning. Zero events
+start below 50% SOC.
 
 **Market-pattern variants enter at 81–85%.** Market activity (charging on the duck-curve
-schedule, discharging on the evening-ramp schedule regardless of grid state) costs 15–19
-percentage points of pre-event SOC compared with M1c. However, zero events start below
-50% SOC and virtually none below 25%. This is important: the 15–19 pp pre-event SOC gap
-is much too small to explain the 8.6–12× LOLH gap between MP pure and M1c. It confirms
-that **dispatch pattern is the dominant driver**, not pre-event depletion.
+schedule, discharging on the evening-ramp schedule regardless of grid state) is associated
+with 15–19 percentage points lower event-start SOC compared with emergency-only storage
+MCS. Importantly, zero events start below 50% SOC and virtually none below 25% for the
+balanced VRE portfolio. The 15–19 pp pre-event SOC gap is smaller than would be needed,
+on its own, to account for the 8.6–12× LOLH gap between the pure market-pattern variants
+and emergency-only storage MCS. This is consistent with dispatch timing — not pre-event
+depletion — being the **dominant driver** of the reliability gap. Market-pattern variants
+have reasonably high event-start SOC; their poor performance relative to emergency-only is
+driven mainly by the CAISO pattern not calling for discharge during RTS shortage hours.
 
-**M3 (full-year LP) enters at 79–83%**, similar to market-pattern variants but with
-perfect foresight. Near-zero events start below 25%. M3 achieves the best reliability
-metrics in part by optimally timing discharge within events; pre-event SOC is comparable
-to the market-pattern variants.
+**Full-year ED enters at 79–83%**, comparable to market-pattern variants. Near-zero events
+start below 25%. Full-year ED achieves the best reliability metrics in part by optimally
+timing discharge within events using full-year foresight; pre-event SOC is similar to
+market-pattern variants.
 
-**M2 (event-window LP) enters at only 32–40% SOC**, with 32–51% of events starting
-below 25%. Yet M2 achieves the lowest LOLH of any sequential MCS method. This seems
-paradoxical but is explained by how M2 uses its available energy: the LP solves over the
-full event window and allocates discharge optimally across event hours. M2 can recover
-from a low-SOC event start by timing its discharge to the highest-impact hours within
-the event. M1c, by contrast, discharges greedily from the first shortage hour, which is
-efficient but not necessarily optimal if the event contains variation in shortfall magnitude.
+**Event-window storage MCS enters at only 32–40% SOC**, with 32–51% of events starting
+below 25%. Yet event-window storage MCS achieves the lowest LOLH of any sequential MCS
+method. The LP solves over the full event window and can allocate discharge optimally
+across event hours. The emergency-only method, by contrast, discharges greedily from the
+first shortage hour, which is energy-efficient but not necessarily optimal if shortfall
+magnitude varies across the event.
 
-The M2 result also reveals that M2 depletes storage proactively in non-shortage hours
-within its event window, accepting lower event-start SOC in exchange for more efficient
-dispatch during the event. The fact that M2 achieves lower or equal LOLH and identical
-EUE to M1c (same 2479 MWh / 648 MWh across both cases) confirms that this trade-off is
-efficient: the same total unserved energy is covered in fewer shortage hours.
+**Caution on event-window SOC comparisons:** Event-start SOC for event-window storage MCS
+is not directly comparable to rule-based methods. The screened LP window may begin before
+the first pre-storage shortfall hour and can dispatch storage in advance of the event
+boundary as defined here. This makes its event-start SOC structurally lower than would be
+expected from a method that charges from all surplus and discharges only in shortage hours.
+
+Event-window storage MCS also achieves the same EUE as emergency-only storage MCS
+(2479 MWh / 648 MWh across both cases) despite lower event-start SOC. This is consistent
+with the same total unserved energy being concentrated into fewer shortage hours through
+more efficient intra-event dispatch.
 
 **Key interpretation for the paper:**
-The per-shortage-hour SOC is a misleading diagnostic because it reflects intra-event
-depletion as well as pre-event positioning. Event-start SOC is the correct diagnostic for
-the question "did the battery enter shortage events with enough energy?" With this metric:
-- M1c is maximally conservative (99% entry SOC) — appropriate for an upper-bound reliability estimate
-- MP variants show a moderate SOC gap vs M1c (15–19 pp) — not the primary failure mode
-- The primary failure mode for MP pure is dispatch pattern: 93–97% of EUE is from missed discharge despite high entry SOC
-- For MP + emergency, the failure is low SOC at shortage hours *within* events (intra-event depletion from market-pattern non-event discharge)
+The per-shortage-hour SOC is a less informative diagnostic because it conflates event-entry
+positioning with intra-event depletion. Event-start SOC is a more appropriate diagnostic
+for this question. With this metric:
+- Emergency-only storage MCS provides maximal pre-event positioning (~99% entry SOC) and is appropriate as an upper-bound reliability estimate
+- Market-pattern variants show a moderate pre-event SOC gap (15–19 pp) but enter shortage events with reasonably high SOC (81–85%); their reliability gap is driven by dispatch timing mismatch, not pre-event depletion
+- For market-pattern + emergency (curtailed), residual EUE relative to emergency-only storage MCS comes from lower SOC during shortage hour sequences and market-pattern pre-positioning — not from charging-induced load shedding
 
 ### 6. Does this support the hypothesis about economic storage understating reliability?
 
@@ -242,7 +257,7 @@ This implies:
 2. A behaviorally realistic model of CAISO batteries that assumes "batteries will dispatch to
    serve shortage needs automatically" would substantially overstate battery's reliability value
    if real batteries follow market patterns.
-3. This is an argument for why the emergency-only and event-window methods (M1c, M2) —
+3. This is an argument for why the emergency-only and event-window storage methods —
    which reserve both energy *and* dispatch capacity for shortage hours — are appropriate
    upper-bound reliability estimates.
 
@@ -255,22 +270,26 @@ that they assume full dispatch cooperation during shortfalls.
 
 ### 7. Which variant is most defensible for paper use?
 
-**MP_emergency_curtailed (Variant 4)** is the most physically defensible:
-- Emergency override in shortage hours (batteries do respond to scarcity signals)
-- Charging strictly limited to surplus (no artificial load shedding)
-- All residual EUE vs M1c is from genuine pre-shortage SOC depletion from market activity
+**For manuscript use, the most defensible behavioral sensitivity is the charge-curtailed
+market-pattern + emergency variant.** The pure variants are useful diagnostics but are too
+strict to represent realistic RA response because they do not increase discharge during
+scarcity. The charge-curtailed market-pattern + emergency variant is preferred because:
+- Emergency override in shortage hours represents the minimum realistic response to scarcity
+- Charging strictly limited to surplus eliminates the artificial load-shedding artifact
+- All residual EUE vs emergency-only storage MCS is from genuine SOC depletion caused by market-pattern operation
 
-**MP_pure_curtailed (Variant 2)** is the most conservative lower bound:
+**The charge-curtailed pure market-pattern variant** provides the most conservative lower
+bound for this sensitivity:
 - No emergency response even during observed shortfalls
 - Charging limited to surplus
-- 97% of EUE from genuine missed dispatch in shortage hours
+- 97% of EUE attributable to dispatch timing mismatch (missed discharge in shortage hours)
 
 ### 8. Is the method stable enough for an appendix sensitivity?
 
 **Conditionally yes.** Practical assessment:
 
 **Strengths:**
-- Computationally lightweight: runs in <1 second, same order as M1c
+- Computationally lightweight: runs in <1 second, comparable to emergency-only storage MCS
 - Produces stable results: no LP solves, no random draws beyond scenario generation
 - Uses reproducible, publicly available data (EIA-930 downloadable without API key)
 - Results are strongly directionally consistent across both portfolios (large EUE increase)
@@ -286,10 +305,12 @@ that they assume full dispatch cooperation during shortfalls.
 - The method tests one specific behavioral assumption (follow CAISO-observed pattern); real
   storage behavior would be shaped by the test system's price signals
 
-**Recommendation:** Include as an appendix sensitivity using MP_pure_curtailed as the lower
-bound and MP_emergency_curtailed as the more realistic market-dispatch scenario. Frame both
-vs M1c and M2. Use the EUE decomposition to explain the mechanism. Do not include in the
-main results table (PCM-UCED is the benchmark; market-pattern is a behavioral sensitivity).
+**Recommendation:** Include as an appendix sensitivity using the charge-curtailed pure
+market-pattern variant as the lower bound and the charge-curtailed market-pattern +
+emergency variant as the more plausible behavioral scenario. Frame both relative to
+emergency-only and event-window storage MCS. Use the EUE decomposition to explain the
+mechanism. Do not include in the main results table (PCM-UCED is the benchmark;
+market-pattern is a behavioral sensitivity).
 
 ---
 
@@ -300,8 +321,8 @@ main results table (PCM-UCED is the benchmark; market-pattern is a behavioral se
 | `src/models/MarketPatternStorage.jl` | Julia implementation (four variants + SOC diagnostics + EUE decomposition) |
 | `scripts/build_caiso_storage_patterns.py` | EIA-930 download and pattern extraction |
 | `scripts/67_run_market_pattern_storage.jl` | Initial two-variant test runner |
-| `scripts/68_diagnose_market_pattern_storage.jl` | Full diagnostic runner (all 4 variants + M1c/M2) |
-| `scripts/69_event_start_soc.jl` | Event-start SOC runner (all 4 MP + M1c/M2/M3) |
+| `scripts/68_diagnose_market_pattern_storage.jl` | Full diagnostic runner (all 4 variants + emergency-only/event-window) |
+| `scripts/69_event_start_soc.jl` | Event-start SOC runner (all 4 MP + emergency-only/event-window/full-year ED) |
 | `data_processed/caiso_storage_patterns/caiso_storage_hourly.csv` | 8758-row hourly CISO 2023 dataset |
 | `data_processed/caiso_storage_patterns/season_hour_pattern.csv` | 96-row season×hour pattern |
 | `results/paper_tables/market_pattern_storage_results.csv` | Full results table (4 MP variants + benchmarks) |
