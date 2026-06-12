@@ -73,11 +73,12 @@ export build_risk_windows
 export run_m3_ed_dispatch
 export run_mc_no_storage
 export run_m1d_risk_hour_allocation
-export SocBeforeShortage, EueDecomposition
+export SocBeforeShortage, EueDecomposition, EventStartSoc
 export run_market_pattern_storage
 export run_market_pattern_pure, run_market_pattern_pure_curtailed
 export run_market_pattern_emergency, run_market_pattern_emergency_curtailed
 export compute_soc_before_shortage
+export compute_event_start_soc
 export load_market_pattern
 
 export MetricsResult, compute_metrics

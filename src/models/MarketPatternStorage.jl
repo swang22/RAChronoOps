@@ -499,6 +499,9 @@ end
 Compute pre-shortage SOC diagnostics from any `Vector{DispatchResult}`.
 Shortage hours are defined as load_shed > 0.
 SOC measured at end of the preceding hour (hour h-1; falls back to soc[1] at h=1).
+
+Note: this diagnostic is computed per shortage *hour*, not per shortage event.
+For a cleaner event-level diagnostic use `compute_event_start_soc`.
 """
 function compute_soc_before_shortage(results ::Vector{DispatchResult},
                                       system  ::SystemData)::SocBeforeShortage
@@ -527,4 +530,116 @@ function compute_soc_before_shortage(results ::Vector{DispatchResult},
         pct_low_soc_shortage   = count(x -> x < 0.25, soc_vals) / ntot,
         n_shortage_hours_total = ntot,
     )
+end
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Event-start SOC diagnostic
+# ─────────────────────────────────────────────────────────────────────────────
+
+"""
+    EventStartSoc
+
+SOC diagnostics measured at the start of each shortage event.
+
+A shortage event is a maximal contiguous block of hours with pre-storage
+shortfall δ_{h,ω} = max(0, load_h − thermal_avail_{h,ω} − VRE_h) > 0.
+SOC is measured at the end of hour h-1 (immediately before the first hour of
+each event).  This diagnostic is unaffected by intra-event depletion and
+directly shows whether storage entered the event with sufficient energy.
+
+Fields
+------
+- `mean_soc_frac`           : Mean SOC / E_max across all (scenario, event) pairs
+- `p10_soc_frac`            : 10th-percentile SOC / E_max
+- `pct_events_low_soc_025`  : Fraction of events starting with SOC < 25% E_max
+- `pct_events_low_soc_050`  : Fraction of events starting with SOC < 50% E_max
+- `n_shortage_events_total` : Total shortage events across all scenarios
+"""
+Base.@kwdef struct EventStartSoc
+    mean_soc_frac           ::Float64
+    p10_soc_frac            ::Float64
+    pct_events_low_soc_025  ::Float64
+    pct_events_low_soc_050  ::Float64
+    n_shortage_events_total ::Int
+end
+
+"""
+    compute_event_start_soc(results, system, availability) -> EventStartSoc
+
+Compute SOC at the start of each shortage event from any `Vector{DispatchResult}`.
+
+Shortage events are identified from the pre-storage shortfall
+δ_{h,ω} = max(0, load_h − Σ_g pmax_g·A_{g,h,ω} − VRE_h),
+which requires the generator availability matrix `availability`.
+Pass the same array (or `ScenarioSet`) used to generate `results`.
+
+SOC at event start = soc[h−1] (end of preceding hour; soc[1] for h=1).
+"""
+function compute_event_start_soc(results      ::Vector{DispatchResult},
+                                   system       ::SystemData,
+                                   availability ::Array{<:Integer, 3})::EventStartSoc
+    therm   = thermal_generators(system)
+    n_therm = nrow(therm)
+    pmax    = Float64.(therm.pmax_mw)
+
+    wind_cap  = wind_capacity_mw(system)
+    solar_cap = solar_capacity_mw(system)
+    n_hours   = system.n_hours
+
+    p_vre = [wind_cap * system.wind_cf[h] + solar_cap * system.solar_cf[h]
+             for h in 1:n_hours]
+
+    stor         = system.storage
+    total_energy = nrow(stor) > 0 ? sum(stor.energy_mwh) : 1.0
+    total_energy = max(total_energy, 1.0)
+
+    soc_vals = Float64[]
+
+    n_scen = length(results)
+    for s in 1:n_scen
+        r = results[s]
+        isempty(r.soc) && continue
+
+        in_event = false
+        for h in 1:n_hours
+            therm_avail = 0.0
+            @inbounds for g in 1:n_therm
+                therm_avail += pmax[g] * availability[s, g, h]
+            end
+            shortfall_pre = max(0.0, system.load_mw[h] - therm_avail - p_vre[h])
+
+            if shortfall_pre > 0.0 && !in_event
+                in_event = true
+                prev_soc = h > 1 ? r.soc[h-1] : r.soc[1]
+                push!(soc_vals, prev_soc / total_energy)
+            elseif shortfall_pre == 0.0
+                in_event = false
+            end
+        end
+    end
+
+    isempty(soc_vals) && return EventStartSoc(
+        mean_soc_frac=NaN, p10_soc_frac=NaN,
+        pct_events_low_soc_025=NaN, pct_events_low_soc_050=NaN,
+        n_shortage_events_total=0)
+
+    ntot = length(soc_vals)
+    EventStartSoc(
+        mean_soc_frac           = mean(soc_vals),
+        p10_soc_frac            = quantile(soc_vals, 0.10),
+        pct_events_low_soc_025  = count(x -> x < 0.25, soc_vals) / ntot,
+        pct_events_low_soc_050  = count(x -> x < 0.50, soc_vals) / ntot,
+        n_shortage_events_total = ntot,
+    )
+end
+
+"""
+    compute_event_start_soc(results, system, scenarios::ScenarioSet) -> EventStartSoc
+
+ScenarioSet overload — extracts the availability array and delegates.
+"""
+function compute_event_start_soc(results   ::Vector{DispatchResult},
+                                   system    ::SystemData,
+                                   scenarios ::ScenarioSet)::EventStartSoc
+    return compute_event_start_soc(results, system, scenarios.availability)
 end
