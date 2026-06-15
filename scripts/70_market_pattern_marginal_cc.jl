@@ -1,37 +1,34 @@
 #!/usr/bin/env julia
 # 70_market_pattern_marginal_cc.jl
 #
-# Parts B–C–E–G of the market-pattern manuscript experiment suite.
+# Marginal capacity credit (CC) and Table IV rows for market-pattern storage.
 #
-# Part B: Marginal capacity credit (CC) for all 4 MP variants + M1c/M2 benchmarks.
-#         CC(δ) = [EUE(x) − EUE(x+δ_S)] / [EUE(x) − EUE(x+δ_F)]
-#         Denominator uses explicit perfect-firm rerun (consistent with script 61).
+# CC formula (consistent with scripts 61/64):
+#   CC(δ) = [EUE(x) − EUE(x+ΔS)] / [EUE(x) − EUE(x+ΔF)]
+#   Denominator: explicit perfect-firm rerun with CRN (common random numbers).
 #
-# Part C: Table IV candidate rows for the 2 paper-facing variants:
-#         • Market-pattern storage MCS (MP_pure_cur: no emergency, charge-curtailed)
-#         • Market-pattern + emergency storage MCS (MP_emergency_cur: both flags)
-#         Includes LOLH, EUE, NEUE, CVaR-EUE, runtime/scenario, CC at δ=1 MW.
+# Methods: MP_pure_cur, MP_emergency_cur, M1c (reference)
+# Cases:   VRE120_base, VRE120_wind_hvy
+# δ:       1, 5, 10 MW
+# N:       nested — generate N_MAX=1000 once; subsample first N for each N in N_SIZES
 #
-# Part E: SOC boundary check — initial vs end-of-year SOC distribution.
-#         Compares fixed 50% init vs cyclic-init (init_soc = prior-year final mean).
-#
-# Part G: Sampling convergence for 2 paper-facing variants at N=20,50,100,200.
+# Calibration: pattern_energy_balanced.csv (preferred per calibration_audit.md)
+# SOC init:    cyclic fixed-point = 23.1% (per soc_boundary_study.csv / script 72)
 #
 # Outputs:
-#   results/paper_tables/market_pattern_capacity_credit.csv   (Part B)
-#   results/paper_tables/market_pattern_table_iv_rows.csv     (Part C)
-#   results/paper_tables/market_pattern_soc_boundary_check.csv (Part E)
-#   results/paper_tables/market_pattern_sampling_convergence.csv (Part G)
+#   results/market_pattern_cc/scenario_level_cc_components.csv
+#   results/market_pattern_cc/policy_switching_diagnostics.csv
+#   results/paper_tables/market_pattern_capacity_credit.csv
+#   results/paper_tables/market_pattern_table_iv_rows.csv
 #
 # Usage:
-#   julia --project=. scripts/70_market_pattern_marginal_cc.jl [--skip-m2] [--skip-part-e]
-#                                                                [--skip-part-g]
+#   julia --project=. scripts/70_market_pattern_marginal_cc.jl [--with-m2]
 
 using Pkg
 Pkg.activate(joinpath(@__DIR__, ".."))
 
 using RAChronoOps
-using CSV, DataFrames, Statistics, Printf, Dates
+using CSV, DataFrames, Statistics, Printf, Dates, Random
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Configuration
@@ -40,66 +37,66 @@ using CSV, DataFrames, Statistics, Printf, Dates
 const CASES       = ["VRE120_base", "VRE120_wind_hvy"]
 const CASE_LABELS = Dict("VRE120_base" => "Balanced VRE", "VRE120_wind_hvy" => "Wind-heavy")
 
-const PAPER_N     = 20          # N matching Table IV
-const SEED        = 42
+const N_MAX        = 1000
+const N_SIZES      = [20, 50, 100, 200, 500, 1000]
+const SEED         = 42
+
 const DELTA_MWS   = [1.0, 5.0, 10.0]
-const DURATION_H  = 4.0         # storage duration for CC increment (matches script 61)
-const SOC_INIT_FRAC = 0.5       # 50% initial SOC for CC increment
+const DURATION_H  = 4.0      # storage duration for CC increment (matches scripts 61/64)
 
-const M2_RISK_MW  = 1000.0      # matches Table IV (script 38)
-const M2_BUF_H    = 48          # matches Table IV (script 38)
+const CYCLIC_SOC_FRAC = 0.231   # energy-balanced pattern fixed point (docs/market_pattern_calibration_audit.md)
 
-# Four MP variants: (label, paper_label, emergency_override, charge_curtailed)
-const MP_VARIANTS = [
-    ("MP_pure",          "Market-pattern pure",                    false, false),
-    ("MP_pure_cur",      "Market-pattern pure (curtailed)",        false, true),
-    ("MP_emergency",     "Market-pattern + emergency",             true,  false),
-    ("MP_emergency_cur", "Market-pattern + emergency (curtailed)", true,  true),
+const M2_RISK_MW  = 1000.0
+const M2_BUF_H    = 48
+
+const BOOT_SAMPLES = 2000
+const BOOT_SEED    = 1234
+
+const METHODS = [
+    # (label, paper_name, emergency_override, charge_curtailed)
+    ("MP_pure_cur",      "Market-pattern storage MCS",             false, true),
+    ("MP_emergency_cur", "Market-pattern + emergency storage MCS", true,  true),
+    ("M1c",              "Emergency-only storage MCS",             false, false),
 ]
 
-# Paper-facing variants (subset for Table IV rows and sampling convergence)
-const PAPER_VARIANTS = [
-    ("MP_pure_cur",      "Market-pattern storage MCS",              false, true),
-    ("MP_emergency_cur", "Market-pattern + emergency storage MCS",  true,  true),
-]
-
-const CONV_NS = [20, 50, 100, 200]   # Part G convergence check
+const CALIBRATION_VERSION = "pattern_energy_balanced"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# CLI flags
+# CLI
 # ─────────────────────────────────────────────────────────────────────────────
 
-function parse_flags(args)
-    f = Set(args)
-    return (
-        skip_m2    = "--skip-m2"     in f,
-        skip_part_e = "--skip-part-e" in f,
-        skip_part_g = "--skip-part-g" in f,
-    )
-end
-
-flags = parse_flags(ARGS)
+WITH_M2 = "--with-m2" in ARGS
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Paths
 # ─────────────────────────────────────────────────────────────────────────────
 
-const REPO      = abspath(joinpath(@__DIR__, ".."))
-const DATA_ROOT = joinpath(REPO, "data_processed", "cases")
-const PT_DIR    = joinpath(REPO, "results", "paper_tables")
-const PAT_CSV   = joinpath(REPO, "data_processed", "caiso_storage_patterns",
-                            "season_hour_pattern.csv")
+const REPO       = abspath(joinpath(@__DIR__, ".."))
+const DATA_ROOT  = joinpath(REPO, "data_processed", "cases")
+const PT_DIR     = joinpath(REPO, "results", "paper_tables")
+const MPC_DIR    = joinpath(REPO, "results", "market_pattern_cc")
+const PAT_CSV    = joinpath(REPO, "data_processed", "caiso_storage_patterns",
+                             "pattern_energy_balanced.csv")
 
 mkpath(PT_DIR)
-isfile(PAT_CSV) || error("Pattern CSV not found: $PAT_CSV\nRun scripts/build_caiso_storage_patterns.py first.")
+mkpath(MPC_DIR)
+isfile(PAT_CSV) || error("Energy-balanced pattern CSV not found: $PAT_CSV\n" *
+                          "Run scripts/build_caiso_storage_patterns.py first.")
+
+# Git commit for provenance
+const CODE_COMMIT = try
+    strip(read(Cmd(["git", "-C", REPO, "rev-parse", "--short", "HEAD"]), String))
+catch
+    "unknown"
+end
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Helper functions (consistent with scripts 59 and 61)
+# Helper functions
 # ─────────────────────────────────────────────────────────────────────────────
 
 function with_marginal_storage(sys::SystemData, δ::Float64;
-                                dur::Float64 = DURATION_H,
-                                soc_frac::Float64 = SOC_INIT_FRAC)::SystemData
+                                dur::Float64    = DURATION_H,
+                                soc_frac::Float64 = CYCLIC_SOC_FRAC)::SystemData
     eta   = sqrt(0.90)
     extra = DataFrame(
         storage_id            = ["MARG_$(δ)MW"],
@@ -142,455 +139,380 @@ function avail_with_perfect_firm(avail::Array{Int8,3})::Array{Int8,3}
     return cat(avail, ones(Int8, N, 1, T); dims=2)
 end
 
-eue_mean(results::Vector{DispatchResult})::Float64 =
-    isempty(results) ? 0.0 : mean(sum(r.load_shed) for r in results)
+eue_per_scen(results::Vector{DispatchResult})::Vector{Float64} =
+    [sum(r.load_shed) for r in results]
 
-function run_mp(sys, avail, cfg; emerg, curtailed)
-    return run_market_pattern_storage(sys, avail, cfg;
-                                      pattern_csv = PAT_CSV,
-                                      emergency_override = emerg,
-                                      charge_curtailed   = curtailed)
+function subcfg(n::Int)::SimConfig
+    return SimConfig(n_scenarios=n, seed=SEED,
+                     risk_margin_mw=M2_RISK_MW,
+                     window_buffer_hours=M2_BUF_H,
+                     merge_gap_hours=24,
+                     min_window_length_hours=24)
+end
+
+function run_dispatch(method::String, sys::SystemData,
+                      avail::Array{<:Integer,3}, cfg::SimConfig)
+    if method == "M1c"
+        return run_m1c_emergency_only(sys, avail, cfg), nothing, nothing
+    elseif method == "M2"
+        return run_m2_event_window_lp(sys, avail, cfg), nothing, nothing
+    else
+        emerg     = (method == "MP_emergency_cur")
+        curtailed = true
+        return run_market_pattern_storage(sys, avail, cfg;
+                                          pattern_csv            = PAT_CSV,
+                                          emergency_override     = emerg,
+                                          charge_curtailed       = curtailed,
+                                          override_init_soc_frac = CYCLIC_SOC_FRAC)
+    end
+end
+
+"""
+Paired bootstrap resampling of CC = numerator / denominator.
+Returns named tuple with cc estimate, 95% CI, denominator CI, status, and n_valid.
+
+Status is "unstable/not identified" when the 95% CI of the denominator includes zero,
+indicating that the firm-increment effect is not reliably identified at this sample size.
+"""
+function bootstrap_cc_paired(eue_base::Vector{Float64},
+                              eue_stor::Vector{Float64},
+                              eue_firm::Vector{Float64};
+                              n_boot::Int = BOOT_SAMPLES,
+                              boot_seed::Int = BOOT_SEED)
+    N   = length(eue_base)
+    rng = MersenneTwister(boot_seed)
+
+    cc_boots    = Vector{Float64}(undef, n_boot)
+    denom_boots = Vector{Float64}(undef, n_boot)
+    numer_boots = Vector{Float64}(undef, n_boot)
+
+    for b in 1:n_boot
+        idx    = rand(rng, 1:N, N)
+        numer  = mean(eue_base[idx]) - mean(eue_stor[idx])
+        denom  = mean(eue_base[idx]) - mean(eue_firm[idx])
+        numer_boots[b] = numer
+        denom_boots[b] = denom
+        cc_boots[b]    = denom > 1e-12 ? numer / denom : NaN
+    end
+
+    denom_lo = quantile(denom_boots, 0.025)
+    denom_hi = quantile(denom_boots, 0.975)
+    denom_stable = denom_lo > 0.0
+
+    valid_ccs  = filter(!isnan, cc_boots)
+    n_valid    = length(valid_ccs)
+    status     = (denom_stable && n_valid >= n_boot * 0.9) ? "identified" :
+                 "unstable/not identified"
+
+    if n_valid == 0
+        return (cc=NaN, ci_lo=NaN, ci_hi=NaN,
+                denom_ci_lo=denom_lo, denom_ci_hi=denom_hi,
+                status=status, n_valid_boots=0)
+    end
+
+    cc_lo = quantile(valid_ccs, 0.025)
+    cc_hi = quantile(valid_ccs, 0.975)
+    return (cc=mean(valid_ccs), ci_lo=cc_lo, ci_hi=cc_hi,
+            denom_ci_lo=denom_lo, denom_ci_hi=denom_hi,
+            status=status, n_valid_boots=n_valid)
 end
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Part B: Marginal CC for all 4 MP variants (+ M1c + M2 benchmarks)
+# Main loop
 # ─────────────────────────────────────────────────────────────────────────────
 
 println("=" ^ 72)
 println("70_market_pattern_marginal_cc.jl")
-println("Date:  ", Dates.now())
-println("Parts: B (CC), C (Table IV rows), E (SOC boundary), G (convergence)")
+println("Date:      ", Dates.now())
+println("Commit:    ", CODE_COMMIT)
+println("N_MAX:     ", N_MAX, "  N_SIZES: ", join(N_SIZES, ","))
+println("δ (MW):    ", join(DELTA_MWS, ", "))
+println("Bootstrap: ", BOOT_SAMPLES, " samples (seed=", BOOT_SEED, ")")
+println("Calibration: ", CALIBRATION_VERSION)
+println("SOC init:  cyclic fixed-point = ", CYCLIC_SOC_FRAC)
 println("=" ^ 72)
 
-println("\n▶ Part B: Marginal capacity credit")
-println("  δ = ", join(DELTA_MWS, ", "), " MW | N=", PAPER_N, " | seed=", SEED)
-
-cc_rows = NamedTuple[]
+# Accumulate output rows
+cc_rows     = NamedTuple[]   # aggregate CC per (case, method, N, δ)
+scen_rows   = NamedTuple[]   # per-scenario CC components at N_MAX
+switch_rows = NamedTuple[]   # policy switching diagnostics (MP_emergency_cur only)
+tab4_rows   = NamedTuple[]   # Table IV rows (N=20 only)
 
 for cname in CASES
     cdir = joinpath(DATA_ROOT, cname)
     isdir(cdir) || error("Case directory not found: $cdir")
     sys  = load_system_data(cdir)
-    cfg  = SimConfig(n_scenarios = PAPER_N, seed = SEED)
-    m2cfg = SimConfig(n_scenarios = PAPER_N, seed = SEED,
-                      risk_margin_mw      = M2_RISK_MW,
-                      window_buffer_hours = M2_BUF_H)
+    cfg_max = subcfg(N_MAX)
 
-    println("\n  ── Case: $cname (N=$PAPER_N) ──")
-    scen       = generate_scenarios(sys, cfg)
-    avail      = scen.availability
-    avail_perf = avail_with_perfect_firm(avail)
+    println("\n" * "─" ^ 72)
+    println("Case: $cname  N_MAX=$N_MAX")
+    println("─" ^ 72)
 
-    # ── 4 MP variants ────────────────────────────────────────────────────────
-    for (lbl, _, emerg, curtailed) in MP_VARIANTS
-        println("\n    $lbl")
-        t0       = time()
-        r_base, _, _ = run_mp(sys, avail, cfg; emerg, curtailed)
-        rt_base  = time() - t0
-        eue_base = eue_mean(r_base)
-        @printf("      baseline  EUE=%8.3f MWh  (%.2f s)\n", eue_base, rt_base)
+    # Generate N_MAX scenarios once — first N scenarios used for each N in N_SIZES
+    scen_max      = generate_scenarios(sys, cfg_max)
+    avail_max     = scen_max.availability            # (N_MAX, n_therm, T)
+    avail_firm_max = avail_with_perfect_firm(avail_max)
 
-        for δ in DELTA_MWS
-            # Storage numerator
-            sys_s  = with_marginal_storage(sys, δ)
-            t0     = time()
-            r_s, _, _ = run_mp(sys_s, avail, cfg; emerg, curtailed)
-            rt_s   = time() - t0
-            eue_s  = eue_mean(r_s)
-            numer  = eue_base - eue_s
+    for (method, paper_name, _, _) in METHODS
+        println("\n  Method: $method")
 
-            # Perfect-firm rerun denominator
-            sys_f    = with_perfect_firm(sys, δ)
-            t0       = time()
-            r_f, _, _ = run_mp(sys_f, avail_perf, cfg; emerg, curtailed)
-            rt_f     = time() - t0
-            eue_f    = eue_mean(r_f)
-            denom    = eue_base - eue_f
+        # ── Run base system at N_MAX ──────────────────────────────────────────
+        t0 = time()
+        results_base, _, eue_decomp_base = run_dispatch(method, sys, avail_max, cfg_max)
+        rt_base = time() - t0
+        eue_base_all = eue_per_scen(results_base)  # length N_MAX
+        @printf("    base N=%d  EUE_mean=%.2f MWh  (%.1f s)\n",
+                N_MAX, mean(eue_base_all), rt_base)
 
-            cc = denom > 1e-9 ? numer / denom : NaN
-            @printf("      δ=%2.0fMW  +stor EUE=%8.3f ΔEUE=%7.4f  +firm EUE=%8.3f ΔEUE=%7.4f  CC=%7.4f\n",
-                    δ, eue_s, numer, eue_f, denom, isnan(cc) ? -999.0 : cc)
-
-            push!(cc_rows, (
-                case_name            = cname,
-                case_label           = CASE_LABELS[cname],
-                method               = lbl,
-                n_scenarios          = PAPER_N,
-                seed                 = SEED,
-                delta_mw             = δ,
-                eue_baseline_mwh     = eue_base,
-                eue_plus_storage_mwh = eue_s,
-                eue_plus_firm_mwh    = eue_f,
-                delta_eue_storage_mwh = numer,
-                delta_eue_firm_mwh   = denom,
-                marginal_cc          = cc,
+        # ── Policy switching diagnostics (MP_emergency_cur only) ──────────────
+        if method == "MP_emergency_cur" && !isnothing(eue_decomp_base)
+            d = eue_decomp_base
+            push!(switch_rows, (
+                portfolio              = cname,
+                case_label             = CASE_LABELS[cname],
+                method                 = method,
+                N                      = N_MAX,
+                seed                   = SEED,
+                calibration_version    = CALIBRATION_VERSION,
+                cyclic_soc_frac        = CYCLIC_SOC_FRAC,
+                total_eue              = d.total_eue,
+                pre_storage_shortfall_eue = d.pre_storage_shortfall_eue,
+                missed_discharge_eue   = d.missed_discharge_eue,
+                charging_induced_eue   = d.charging_induced_eue,
+                low_soc_shortfall_eue  = d.low_soc_shortfall_eue,
+                pre_storage_pct        = d.pre_storage_pct,
+                missed_discharge_pct   = d.missed_discharge_pct,
+                charging_induced_pct   = d.charging_induced_pct,
+                low_soc_pct            = d.low_soc_pct,
+                code_commit            = CODE_COMMIT,
             ))
         end
-    end
-
-    # ── M1c benchmark ────────────────────────────────────────────────────────
-    println("\n    M1c (emergency-only, benchmark)")
-    r_m1c_base = run_m1c_emergency_only(sys, avail, cfg)
-    eue_m1c    = eue_mean(r_m1c_base)
-    @printf("      baseline  EUE=%8.3f MWh\n", eue_m1c)
-
-    for δ in DELTA_MWS
-        sys_s    = with_marginal_storage(sys, δ)
-        r_m1c_s  = run_m1c_emergency_only(sys_s, avail, cfg)
-        eue_m1c_s = eue_mean(r_m1c_s)
-        numer    = eue_m1c - eue_m1c_s
-
-        sys_f    = with_perfect_firm(sys, δ)
-        r_m1c_f  = run_m1c_emergency_only(sys_f, avail_perf, cfg)
-        eue_m1c_f = eue_mean(r_m1c_f)
-        denom    = eue_m1c - eue_m1c_f
-
-        cc = denom > 1e-9 ? numer / denom : NaN
-        @printf("      δ=%2.0fMW  ΔEUE_stor=%7.4f  ΔEUE_firm=%7.4f  CC=%7.4f\n",
-                δ, numer, denom, isnan(cc) ? -999.0 : cc)
-
-        push!(cc_rows, (
-            case_name            = cname,
-            case_label           = CASE_LABELS[cname],
-            method               = "M1c",
-            n_scenarios          = PAPER_N,
-            seed                 = SEED,
-            delta_mw             = δ,
-            eue_baseline_mwh     = eue_m1c,
-            eue_plus_storage_mwh = eue_m1c_s,
-            eue_plus_firm_mwh    = eue_m1c_f,
-            delta_eue_storage_mwh = numer,
-            delta_eue_firm_mwh   = denom,
-            marginal_cc          = cc,
-        ))
-    end
-
-    # ── M2 benchmark (correct Table IV params) ───────────────────────────────
-    if !flags.skip_m2
-        println("\n    M2 (event-window LP, risk=1000 MW, buf=48 h)")
-        r_m2_base = run_m2_event_window_lp(sys, avail, m2cfg)
-        eue_m2    = eue_mean(r_m2_base)
-        @printf("      baseline  EUE=%8.3f MWh\n", eue_m2)
 
         for δ in DELTA_MWS
-            sys_s    = with_marginal_storage(sys, δ)
-            r_m2_s   = run_m2_event_window_lp(sys_s, avail, m2cfg)
-            eue_m2_s = eue_mean(r_m2_s)
-            numer    = eue_m2 - eue_m2_s
+            sys_s = with_marginal_storage(sys, δ)
+            sys_f = with_perfect_firm(sys, δ)
 
-            sys_f    = with_perfect_firm(sys, δ)
-            r_m2_f   = run_m2_event_window_lp(sys_f, avail_perf, m2cfg)
-            eue_m2_f = eue_mean(r_m2_f)
-            denom    = eue_m2 - eue_m2_f
+            # ── Run +δS at N_MAX ──────────────────────────────────────────────
+            t0 = time()
+            results_stor, _, _ = run_dispatch(method, sys_s, avail_max, cfg_max)
+            rt_s = time() - t0
+            eue_stor_all = eue_per_scen(results_stor)
 
-            cc = denom > 1e-9 ? numer / denom : NaN
-            @printf("      δ=%2.0fMW  ΔEUE_stor=%7.4f  ΔEUE_firm=%7.4f  CC=%7.4f\n",
-                    δ, numer, denom, isnan(cc) ? -999.0 : cc)
+            # ── Run +δF at N_MAX ──────────────────────────────────────────────
+            t0 = time()
+            results_firm, _, _ = run_dispatch(method, sys_f, avail_firm_max, cfg_max)
+            rt_f = time() - t0
+            eue_firm_all = eue_per_scen(results_firm)
 
-            push!(cc_rows, (
-                case_name            = cname,
-                case_label           = CASE_LABELS[cname],
-                method               = "M2",
-                n_scenarios          = PAPER_N,
-                seed                 = SEED,
-                delta_mw             = δ,
-                eue_baseline_mwh     = eue_m2,
-                eue_plus_storage_mwh = eue_m2_s,
-                eue_plus_firm_mwh    = eue_m2_f,
-                delta_eue_storage_mwh = numer,
-                delta_eue_firm_mwh   = denom,
-                marginal_cc          = cc,
-            ))
-        end
-    end
-end
+            eue_b_mean = mean(eue_base_all)
+            eue_s_mean = mean(eue_stor_all)
+            eue_f_mean = mean(eue_firm_all)
+            delta_stor_full = eue_b_mean - eue_s_mean
+            delta_firm_full = eue_b_mean - eue_f_mean
+            cc_full = delta_firm_full > 1e-9 ? delta_stor_full / delta_firm_full : NaN
+            @printf("    δ=%2.0f MW  ΔEUE_stor=%7.3f  ΔEUE_firm=%7.3f  CC=%7.4f  (stor %.1f s, firm %.1f s)\n",
+                    δ, delta_stor_full, delta_firm_full, isnan(cc_full) ? -999.0 : cc_full, rt_s, rt_f)
 
-# Save Part B
-cc_path = joinpath(PT_DIR, "market_pattern_capacity_credit.csv")
-CSV.write(cc_path, DataFrame(cc_rows))
-println("\n  ✓ Part B → $cc_path")
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Part C: Table IV candidate rows for 2 paper-facing variants
-# ─────────────────────────────────────────────────────────────────────────────
-
-println("\n▶ Part C: Table IV candidate rows (2 paper-facing variants)")
-
-# Build CC lookup from Part B results (δ=1 MW only)
-cc_lookup = Dict{Tuple{String,String}, NamedTuple}()
-for r in cc_rows
-    if r.delta_mw == 1.0
-        cc_lookup[(r.case_name, r.method)] = r
-    end
-end
-
-tab4_rows = NamedTuple[]
-
-for cname in CASES
-    cdir = joinpath(DATA_ROOT, cname)
-    sys  = load_system_data(cdir)
-    cfg  = SimConfig(n_scenarios = PAPER_N, seed = SEED)
-    scen = generate_scenarios(sys, cfg)
-    avail = scen.availability
-
-    for (lbl, paper_name, emerg, curtailed) in PAPER_VARIANTS
-        println("  $cname / $lbl ...")
-        t0 = time()
-        r, _, _ = run_mp(sys, avail, cfg; emerg, curtailed)
-        rt = time() - t0
-        rt_per_scen = rt / PAPER_N
-
-        m = compute_metrics(r, sys)
-        cc_entry = get(cc_lookup, (cname, lbl), nothing)
-        cc_val   = cc_entry === nothing ? NaN : cc_entry.marginal_cc
-        cc_numer = cc_entry === nothing ? NaN : cc_entry.delta_eue_storage_mwh
-        cc_denom = cc_entry === nothing ? NaN : cc_entry.delta_eue_firm_mwh
-
-        @printf("    LOLH=%5.2f h  EUE=%8.3f MWh  NEUE=%6.3f ppm  CVaR=%8.3f MWh  CC=%6.4f  %.3f s/scen\n",
-                m.lolh, m.eue, m.neue * 1e6, m.cvar_eue, isnan(cc_val) ? -999.0 : cc_val, rt_per_scen)
-
-        push!(tab4_rows, (
-            case_name              = cname,
-            case_label             = CASE_LABELS[cname],
-            method                 = lbl,
-            paper_name             = paper_name,
-            n_scenarios            = PAPER_N,
-            seed                   = SEED,
-            m2_risk_margin_mw      = "N/A",
-            m2_window_buffer_hours = "N/A",
-            lolh_hours             = m.lolh,
-            eue_mwh                = m.eue,
-            neue_ppm               = m.neue * 1e6,
-            cvar_eue_mwh           = m.cvar_eue,
-            runtime_s_per_scenario = rt_per_scen,
-            cc_delta_1mw           = cc_val,
-            cc_numerator_mwh       = cc_numer,
-            cc_denominator_mwh     = cc_denom,
-            source_script          = "70_market_pattern_marginal_cc.jl",
-            configuration          = "pattern=CAISO_season_hour, emergency_override=$emerg, charge_curtailed=$curtailed, N=$PAPER_N, seed=$SEED",
-        ))
-    end
-
-    # Also include M1c reference row (correct params match Table IV)
-    println("  $cname / M1c (benchmark) ...")
-    scen = generate_scenarios(sys, cfg)
-    avail = scen.availability
-    t0 = time()
-    r_m1c = run_m1c_emergency_only(sys, avail, cfg)
-    rt_m1c = time() - t0
-    m_m1c = compute_metrics(r_m1c, sys)
-    cc_m1c = get(cc_lookup, (cname, "M1c"), nothing)
-
-    push!(tab4_rows, (
-        case_name              = cname,
-        case_label             = CASE_LABELS[cname],
-        method                 = "M1c",
-        paper_name             = "Emergency-only storage MCS",
-        n_scenarios            = PAPER_N,
-        seed                   = SEED,
-        m2_risk_margin_mw      = "N/A",
-        m2_window_buffer_hours = "N/A",
-        lolh_hours             = m_m1c.lolh,
-        eue_mwh                = m_m1c.eue,
-        neue_ppm               = m_m1c.neue * 1e6,
-        cvar_eue_mwh           = m_m1c.cvar_eue,
-        runtime_s_per_scenario = rt_m1c / PAPER_N,
-        cc_delta_1mw           = cc_m1c === nothing ? NaN : cc_m1c.marginal_cc,
-        cc_numerator_mwh       = cc_m1c === nothing ? NaN : cc_m1c.delta_eue_storage_mwh,
-        cc_denominator_mwh     = cc_m1c === nothing ? NaN : cc_m1c.delta_eue_firm_mwh,
-        source_script          = "70_market_pattern_marginal_cc.jl",
-        configuration          = "M1c emergency-only, N=$PAPER_N, seed=$SEED",
-    ))
-
-    # M2 reference row with correct Table IV params
-    if !flags.skip_m2
-        println("  $cname / M2 (correct params, benchmark) ...")
-        m2cfg = SimConfig(n_scenarios = PAPER_N, seed = SEED,
-                          risk_margin_mw      = M2_RISK_MW,
-                          window_buffer_hours = M2_BUF_H)
-        t0 = time()
-        r_m2 = run_m2_event_window_lp(sys, avail, m2cfg)
-        rt_m2 = time() - t0
-        m_m2 = compute_metrics(r_m2, sys)
-        cc_m2 = get(cc_lookup, (cname, "M2"), nothing)
-
-        push!(tab4_rows, (
-            case_name              = cname,
-            case_label             = CASE_LABELS[cname],
-            method                 = "M2",
-            paper_name             = "Event-window storage MCS",
-            n_scenarios            = PAPER_N,
-            seed                   = SEED,
-            m2_risk_margin_mw      = string(M2_RISK_MW),
-            m2_window_buffer_hours = string(M2_BUF_H),
-            lolh_hours             = m_m2.lolh,
-            eue_mwh                = m_m2.eue,
-            neue_ppm               = m_m2.neue * 1e6,
-            cvar_eue_mwh           = m_m2.cvar_eue,
-            runtime_s_per_scenario = rt_m2 / PAPER_N,
-            cc_delta_1mw           = cc_m2 === nothing ? NaN : cc_m2.marginal_cc,
-            cc_numerator_mwh       = cc_m2 === nothing ? NaN : cc_m2.delta_eue_storage_mwh,
-            cc_denominator_mwh     = cc_m2 === nothing ? NaN : cc_m2.delta_eue_firm_mwh,
-            source_script          = "70_market_pattern_marginal_cc.jl",
-            configuration          = "risk_margin=$(M2_RISK_MW)MW, window_buffer=$(M2_BUF_H)h, N=$PAPER_N, seed=$SEED",
-        ))
-    end
-end
-
-tab4_path = joinpath(PT_DIR, "market_pattern_table_iv_rows.csv")
-CSV.write(tab4_path, DataFrame(tab4_rows))
-println("\n  ✓ Part C → $tab4_path")
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Part E: SOC boundary check
-# ─────────────────────────────────────────────────────────────────────────────
-
-if !flags.skip_part_e
-    println("\n▶ Part E: SOC boundary check")
-
-    soc_rows = NamedTuple[]
-
-    for cname in CASES
-        cdir = joinpath(DATA_ROOT, cname)
-        sys  = load_system_data(cdir)
-        cfg  = SimConfig(n_scenarios = PAPER_N, seed = SEED)
-        scen = generate_scenarios(sys, cfg)
-        avail = scen.availability
-
-        stor         = sys.storage
-        total_energy = nrow(stor) > 0 ? sum(stor.energy_mwh) : 1.0
-        nominal_init = nrow(stor) > 0 ? sum(stor.initial_soc_mwh) : 0.0
-        init_frac    = nominal_init / max(total_energy, 1.0)
-
-        println("  $cname | E_max=$total_energy MWh | init_soc=$nominal_init MWh ($(round(init_frac*100, digits=1))%)")
-
-        for (lbl, _, emerg, curtailed) in PAPER_VARIANTS
-            r, _, _ = run_mp(sys, avail, cfg; emerg, curtailed)
-
-            # End-of-year SOC distribution (last SOC element for each scenario)
-            final_socs = [res.soc[end] for res in r] ./ total_energy
-            mean_final  = mean(final_socs)
-            p10_final   = quantile(final_socs, 0.10)
-            p90_final   = quantile(final_socs, 0.90)
-
-            # Compare: how different is end-of-year SOC from initial?
-            soc_drift  = mean_final - init_frac    # positive = gained charge
-
-            # Cyclic SOC test: re-run with init_soc = mean end-of-year (MWh)
-            cyclic_init_mwh = mean_final * total_energy
-            sys_cyc  = let
-                stor_cyc = copy(sys.storage)
-                if nrow(stor_cyc) > 0
-                    # Distribute proportionally across storage units
-                    frac = cyclic_init_mwh / max(nominal_init, 0.01)
-                    stor_cyc[!, :initial_soc_mwh] .= stor_cyc.initial_soc_mwh .* frac
-                end
-                SystemData(sys.generators, stor_cyc, sys.load_mw,
-                           sys.wind_cf, sys.solar_cf, sys.n_hours)
+            # ── Save per-scenario CC components at N_MAX ──────────────────────
+            for i in 1:N_MAX
+                push!(scen_rows, (
+                    portfolio    = cname,
+                    method       = method,
+                    delta_mw     = δ,
+                    scenario_idx = i,
+                    eue_base_mwh  = eue_base_all[i],
+                    eue_stor_mwh  = eue_stor_all[i],
+                    eue_firm_mwh  = eue_firm_all[i],
+                    delta_stor_mwh = eue_base_all[i] - eue_stor_all[i],
+                    delta_firm_mwh = eue_base_all[i] - eue_firm_all[i],
+                ))
             end
-            r_cyc, _, _ = run_mp(sys_cyc, avail, cfg; emerg, curtailed)
-            m_base = compute_metrics(r, sys)
-            m_cyc  = compute_metrics(r_cyc, sys_cyc)
 
-            eue_delta = m_cyc.eue - m_base.eue
+            # ── Per-N bootstrap CC ────────────────────────────────────────────
+            for N in N_SIZES
+                eue_b = eue_base_all[1:N]
+                eue_s = eue_stor_all[1:N]
+                eue_f = eue_firm_all[1:N]
 
-            @printf("    %-20s  init=%5.3f  final_mean=%5.3f  p10=%5.3f  p90=%5.3f  drift=%+6.3f  ΔEUE_cyclic=%+7.3f MWh\n",
-                    lbl, init_frac, mean_final, p10_final, p90_final, soc_drift, eue_delta)
+                eue_base_pt = mean(eue_b)
+                delta_stor  = eue_base_pt - mean(eue_s)
+                delta_firm  = eue_base_pt - mean(eue_f)
+                cc_pt       = delta_firm > 1e-9 ? delta_stor / delta_firm : NaN
 
-            push!(soc_rows, (
-                case_name            = cname,
-                case_label           = CASE_LABELS[cname],
-                method               = lbl,
-                n_scenarios          = PAPER_N,
-                total_energy_mwh     = total_energy,
-                nominal_init_soc_mwh = nominal_init,
-                nominal_init_soc_frac = init_frac,
-                mean_final_soc_frac  = mean_final,
-                p10_final_soc_frac   = p10_final,
-                p90_final_soc_frac   = p90_final,
-                soc_drift_frac       = soc_drift,
-                eue_baseline_mwh     = m_base.eue,
-                eue_cyclic_init_mwh  = m_cyc.eue,
-                delta_eue_cyclic_mwh = eue_delta,
+                boot = bootstrap_cc_paired(eue_b, eue_s, eue_f)
+
+                push!(cc_rows, (
+                    portfolio              = cname,
+                    case_label             = CASE_LABELS[cname],
+                    method                 = method,
+                    paper_name             = paper_name,
+                    N                      = N,
+                    seed                   = SEED,
+                    delta_mw               = δ,
+                    eue_base_mwh           = eue_base_pt,
+                    eue_storage_increment_mwh = mean(eue_s),
+                    eue_firm_increment_mwh = mean(eue_f),
+                    delta_eue_storage      = delta_stor,
+                    delta_eue_firm         = delta_firm,
+                    cc                     = cc_pt,
+                    cc_bootstrap_mean      = boot.cc,
+                    cc_ci_lo               = boot.ci_lo,
+                    cc_ci_hi               = boot.ci_hi,
+                    denom_ci_lo            = boot.denom_ci_lo,
+                    denom_ci_hi            = boot.denom_ci_hi,
+                    denominator_status     = boot.status,
+                    n_bootstrap_valid      = boot.n_valid_boots,
+                    n_bootstrap_total      = BOOT_SAMPLES,
+                    calibration_version    = CALIBRATION_VERSION,
+                    cyclic_soc_frac        = CYCLIC_SOC_FRAC,
+                    code_commit            = CODE_COMMIT,
+                ))
+            end
+        end  # δ loop
+
+        # ── Table IV row at N=20 (paper N, δ=1 MW) ───────────────────────────
+        # Use first 20 of the N_MAX run (same scenarios by nested construction);
+        # avoids a redundant dispatch call.  For calibrated runtime use script 71.
+        begin
+            N20 = 20
+            results20 = results_base[1:N20]
+            m20 = compute_metrics(results20, sys)
+            rt_per_scen_est = rt_base / N_MAX   # rough estimate; script 71 gives IQR
+
+            cc_entry = filter(r -> r.portfolio == cname &&
+                                   r.method == method &&
+                                   r.N == N20 &&
+                                   r.delta_mw == 1.0, cc_rows)
+            cc20      = isempty(cc_entry) ? NaN : cc_entry[1].cc
+            cc_lo     = isempty(cc_entry) ? NaN : cc_entry[1].cc_ci_lo
+            cc_hi     = isempty(cc_entry) ? NaN : cc_entry[1].cc_ci_hi
+            cc_status = isempty(cc_entry) ? "" : cc_entry[1].denominator_status
+            cc_numer  = isempty(cc_entry) ? NaN : cc_entry[1].delta_eue_storage
+            cc_denom  = isempty(cc_entry) ? NaN : cc_entry[1].delta_eue_firm
+
+            push!(tab4_rows, (
+                portfolio           = cname,
+                method              = method,
+                paper_name          = paper_name,
+                N                   = N20,
+                seed                = SEED,
+                lolh_hours          = m20.lolh,
+                eue_mwh             = m20.eue,
+                neue_ppm            = m20.neue * 1e6,
+                cvar_eue_mwh        = m20.cvar_eue,
+                lolh_ci95_hw        = m20.lolh_ci95_halfwidth,
+                eue_ci95_hw         = m20.eue_ci95_halfwidth,
+                runtime_median      = rt_per_scen_est,   # s/scenario from N_MAX run
+                runtime_IQR         = NaN,               # run script 71 for IQR
+                cc                  = cc20,
+                cc_lower_95         = cc_lo,
+                cc_upper_95         = cc_hi,
+                cc_status           = cc_status,
+                cc_numerator_mwh    = cc_numer,
+                cc_denominator_mwh  = cc_denom,
+                calibration_version = CALIBRATION_VERSION,
+                code_commit         = CODE_COMMIT,
             ))
         end
-    end
+    end  # method loop
 
-    soc_path = joinpath(PT_DIR, "market_pattern_soc_boundary_check.csv")
-    CSV.write(soc_path, DataFrame(soc_rows))
-    println("  ✓ Part E → $soc_path")
-else
-    println("\n  Part E skipped (--skip-part-e)")
-end
+    # ── M2 benchmark (optional, slow) ────────────────────────────────────────
+    if WITH_M2
+        println("\n  Method: M2 (event-window LP, optional benchmark)")
+        m2cfg_max = SimConfig(n_scenarios=N_MAX, seed=SEED,
+                              risk_margin_mw=M2_RISK_MW,
+                              window_buffer_hours=M2_BUF_H,
+                              merge_gap_hours=24, min_window_length_hours=24)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Part G: Sampling convergence
-# ─────────────────────────────────────────────────────────────────────────────
+        t0 = time()
+        results_m2_base = run_m2_event_window_lp(sys, avail_max, m2cfg_max)
+        rt_m2 = time() - t0
+        eue_base_m2 = eue_per_scen(results_m2_base)
+        @printf("    M2 base N=%d  EUE_mean=%.2f MWh  (%.1f s)\n",
+                N_MAX, mean(eue_base_m2), rt_m2)
 
-if !flags.skip_part_g
-    println("\n▶ Part G: Sampling convergence (N = ", join(CONV_NS, ", "), ")")
+        for δ in DELTA_MWS
+            sys_s = with_marginal_storage(sys, δ)
+            sys_f = with_perfect_firm(sys, δ)
 
-    conv_rows = NamedTuple[]
+            results_m2_s = run_m2_event_window_lp(sys_s, avail_max, m2cfg_max)
+            results_m2_f = run_m2_event_window_lp(sys_f, avail_firm_max, m2cfg_max)
+            eue_stor_m2 = eue_per_scen(results_m2_s)
+            eue_firm_m2 = eue_per_scen(results_m2_f)
 
-    for cname in CASES
-        cdir = joinpath(DATA_ROOT, cname)
-        sys  = load_system_data(cdir)
+            for N in N_SIZES
+                eue_b = eue_base_m2[1:N]
+                eue_s = eue_stor_m2[1:N]
+                eue_f = eue_firm_m2[1:N]
+                delta_stor  = mean(eue_b) - mean(eue_s)
+                delta_firm  = mean(eue_b) - mean(eue_f)
+                cc_pt = delta_firm > 1e-9 ? delta_stor / delta_firm : NaN
+                boot  = bootstrap_cc_paired(eue_b, eue_s, eue_f)
 
-        println("\n  Case: $cname")
-
-        for n in CONV_NS
-            cfg   = SimConfig(n_scenarios = n, seed = SEED)
-            scen  = generate_scenarios(sys, cfg)
-            avail = scen.availability
-
-            for (lbl, paper_name, emerg, curtailed) in PAPER_VARIANTS
-                t0 = time()
-                r, _, _ = run_mp(sys, avail, cfg; emerg, curtailed)
-                rt = time() - t0
-                m  = compute_metrics(r, sys)
-
-                # CC at δ=1 MW
-                sys_s = with_marginal_storage(sys, 1.0)
-                r_s, _, _ = run_mp(sys_s, avail, cfg; emerg, curtailed)
-                eue_s = eue_mean(r_s)
-
-                sys_f   = with_perfect_firm(sys, 1.0)
-                avail_p = avail_with_perfect_firm(avail)
-                r_f, _, _ = run_mp(sys_f, avail_p, cfg; emerg, curtailed)
-                eue_f = eue_mean(r_f)
-
-                numer_cc = m.eue - eue_s
-                denom_cc = m.eue - eue_f
-                cc_val   = denom_cc > 1e-9 ? numer_cc / denom_cc : NaN
-
-                @printf("    N=%3d  %-20s  LOLH=%5.2f  EUE=%8.3f  CC=%6.4f  (%.1f s)\n",
-                        n, lbl, m.lolh, m.eue, isnan(cc_val) ? -999.0 : cc_val, rt)
-
-                push!(conv_rows, (
-                    case_name   = cname,
-                    case_label  = CASE_LABELS[cname],
-                    method      = lbl,
-                    paper_name  = paper_name,
-                    n_scenarios = n,
-                    seed        = SEED,
-                    lolh_hours  = m.lolh,
-                    eue_mwh     = m.eue,
-                    neue_ppm    = m.neue * 1e6,
-                    cvar_eue_mwh = m.cvar_eue,
-                    lolh_ci95_halfwidth = m.lolh_ci95_halfwidth,
-                    eue_ci95_halfwidth  = m.eue_ci95_halfwidth,
-                    cc_delta_1mw = cc_val,
-                    runtime_s    = rt,
+                push!(cc_rows, (
+                    portfolio              = cname,
+                    case_label             = CASE_LABELS[cname],
+                    method                 = "M2",
+                    paper_name             = "Event-window storage MCS",
+                    N                      = N,
+                    seed                   = SEED,
+                    delta_mw               = δ,
+                    eue_base_mwh           = mean(eue_b),
+                    eue_storage_increment_mwh = mean(eue_s),
+                    eue_firm_increment_mwh = mean(eue_f),
+                    delta_eue_storage      = delta_stor,
+                    delta_eue_firm         = delta_firm,
+                    cc                     = cc_pt,
+                    cc_bootstrap_mean      = boot.cc,
+                    cc_ci_lo               = boot.ci_lo,
+                    cc_ci_hi               = boot.ci_hi,
+                    denom_ci_lo            = boot.denom_ci_lo,
+                    denom_ci_hi            = boot.denom_ci_hi,
+                    denominator_status     = boot.status,
+                    n_bootstrap_valid      = boot.n_valid_boots,
+                    n_bootstrap_total      = BOOT_SAMPLES,
+                    calibration_version    = "N/A",
+                    cyclic_soc_frac        = NaN,
+                    code_commit            = CODE_COMMIT,
                 ))
             end
         end
     end
+end  # case loop
 
-    conv_path = joinpath(PT_DIR, "market_pattern_sampling_convergence.csv")
-    CSV.write(conv_path, DataFrame(conv_rows))
-    println("\n  ✓ Part G → $conv_path")
-else
-    println("\n  Part G skipped (--skip-part-g)")
+# ─────────────────────────────────────────────────────────────────────────────
+# Finite-difference check: CC should be consistent across δ=1,5,10 MW
+# ─────────────────────────────────────────────────────────────────────────────
+
+println("\n" * "=" ^ 72)
+println("Finite-difference check: CC vs δ (N=$N_MAX, nested scenarios)")
+println("=" ^ 72)
+@printf("  %-20s  %-18s  %5s  %8s  %8s  %8s  %8s  %-28s\n",
+        "Portfolio", "Method", "N", "δ(MW)", "CC", "CI_lo", "CI_hi", "Status")
+println("  " * "─" ^ 100)
+for r in filter(row -> row.N == N_MAX, cc_rows)
+    @printf("  %-20s  %-18s  %5d  %8.1f  %8.4f  %8.4f  %8.4f  %-28s\n",
+            r.case_label, r.method, r.N, r.delta_mw,
+            isnan(r.cc) ? -999.0 : r.cc,
+            isnan(r.cc_ci_lo) ? -999.0 : r.cc_ci_lo,
+            isnan(r.cc_ci_hi) ? -999.0 : r.cc_ci_hi,
+            r.denominator_status)
+end
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Write outputs
+# ─────────────────────────────────────────────────────────────────────────────
+
+cc_path     = joinpath(PT_DIR,  "market_pattern_capacity_credit.csv")
+scen_path   = joinpath(MPC_DIR, "scenario_level_cc_components.csv")
+switch_path = joinpath(MPC_DIR, "policy_switching_diagnostics.csv")
+tab4_path   = joinpath(PT_DIR,  "market_pattern_table_iv_rows.csv")
+
+CSV.write(cc_path,     DataFrame(cc_rows))
+CSV.write(scen_path,   DataFrame(scen_rows))
+CSV.write(tab4_path,   DataFrame(tab4_rows))
+if !isempty(switch_rows)
+    CSV.write(switch_path, DataFrame(switch_rows))
 end
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -598,34 +520,37 @@ end
 # ─────────────────────────────────────────────────────────────────────────────
 
 println("\n" * "=" ^ 72)
-println("Part B CC summary (δ=1 MW, N=$PAPER_N, seed=$SEED)")
+println("CC summary: δ=1 MW, N=20 (paper N)")
 println("=" ^ 72)
-@printf("  %-24s  %-10s  %6s  %8s  %8s  %8s\n",
-        "Case", "Method", "δ=1", "EUE_base", "ΔEUE_S", "CC")
-println("  " * "─" ^ 72)
-for r in sort(filter(x -> x.delta_mw == 1.0, cc_rows), by = x -> (x.case_name, x.method))
-    @printf("  %-24s  %-10s  %6.1f  %8.3f  %8.4f  %8.4f\n",
-            r.case_label, r.method, r.delta_mw,
-            r.eue_baseline_mwh, r.delta_eue_storage_mwh,
-            isnan(r.marginal_cc) ? -999.0 : r.marginal_cc)
+@printf("  %-20s  %-18s  %8s  %8s  %8s  %-28s\n",
+        "Portfolio", "Method", "CC", "CI_lo", "CI_hi", "Status")
+println("  " * "─" ^ 90)
+for r in filter(row -> row.N == 20 && row.delta_mw == 1.0, cc_rows)
+    @printf("  %-20s  %-18s  %8.4f  %8.4f  %8.4f  %-28s\n",
+            r.case_label, r.method,
+            isnan(r.cc) ? -999.0 : r.cc,
+            isnan(r.cc_ci_lo) ? -999.0 : r.cc_ci_lo,
+            isnan(r.cc_ci_hi) ? -999.0 : r.cc_ci_hi,
+            r.denominator_status)
 end
 
 println("\n" * "=" ^ 72)
-println("Part C Table IV candidate rows")
+println("Table IV rows (N=20, δ=1 MW CC)")
 println("=" ^ 72)
-@printf("  %-24s  %-28s  %6s  %8s  %6s  %6s\n",
-        "Case", "Method", "LOLH", "EUE", "NEUE", "CC")
-println("  " * "─" ^ 72)
+@printf("  %-20s  %-18s  %7s  %9s  %7s  %7s  %8s\n",
+        "Portfolio", "Method", "LOLH", "EUE(MWh)", "NEUE", "CC", "CC_status")
+println("  " * "─" ^ 80)
 for r in tab4_rows
-    @printf("  %-24s  %-28s  %6.2f  %8.3f  %6.3f  %6.4f\n",
-            r.case_label, r.paper_name, r.lolh_hours, r.eue_mwh,
+    @printf("  %-20s  %-18s  %7.2f  %9.1f  %7.3f  %7.4f  %s\n",
+            r.case_label, r.method, r.lolh_hours, r.eue_mwh,
             r.neue_ppm,
-            isnan(r.cc_delta_1mw) ? -999.0 : r.cc_delta_1mw)
+            isnan(r.cc) ? -999.0 : r.cc,
+            r.cc_status)
 end
 
 println("\nOutputs:")
-println("  $cc_path")
-println("  $tab4_path")
-flags.skip_part_e || println("  $(joinpath(PT_DIR, "market_pattern_soc_boundary_check.csv"))")
-flags.skip_part_g || println("  $(joinpath(PT_DIR, "market_pattern_sampling_convergence.csv"))")
+println("  CC aggregate:      $cc_path")
+println("  Scenario-level:    $scen_path")
+println("  Policy switching:  $switch_path")
+println("  Table IV rows:     $tab4_path")
 println("Done: ", Dates.now())
