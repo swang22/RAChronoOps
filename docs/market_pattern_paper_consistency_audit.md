@@ -185,3 +185,121 @@ covers it. No correction required.
 | `RAChronoOps/results/paper_tables/runtime_common_benchmark.csv` | RAChronoOps (local) | ✓ read |
 | `RAChronoOps/docs/caiso_storage_data_source_check.md` | RAChronoOps (GitHub + local) | ✓ read |
 | `RAChronoOps/docs/market_pattern_manuscript_readiness.md` | RAChronoOps (local) | ✓ read |
+
+---
+
+## ADDENDUM — Revalidation Corrections (2026-06-15)
+
+**Commit:** `paper: correct validated market-pattern sensitivity`
+**Scope:** Corrections applied after energy-balance calibration revalidation (scripts 72, 70-rewrite, 71-rewrite).
+**Authoritative sources:** `market_pattern_revalidated_metrics.csv` (script 72), `runtime_common_benchmark.csv` (script 71), `market_pattern_calibration_audit.md`.
+
+### A. Table IV Number Corrections
+
+The prior audit (above) verified values against `market_pattern_table_iv_rows.csv`, which
+used the **raw proxy calibration** (50% fixed initial SOC). The revalidated metrics use
+the **energy-balanced calibration** (`pattern_energy_balanced.csv`, cyclic SOC = 23.1%).
+
+| Row | Metric | Prior (raw proxy) | Revalidated (energy-balanced) | Change |
+|---|---|---|---|---|
+| MP_pure_cur (balanced) | EUE | 13,662 | **13,655** | −0.05% |
+| MP_pure_cur (balanced) | CVaR | 26,276 | **26,227** | −0.2% |
+| MP_pure_cur (balanced) | LOLH | 46.1 | **46.0** | −0.2% |
+| MP_emergency_cur (balanced) | LOLH | 9.2 | **7.7** | **−16%** |
+| MP_emergency_cur (balanced) | EUE | 4,338 | **3,596** | **−17%** |
+| MP_emergency_cur (balanced) | NEUE | 96 | **80** | **−17%** |
+| MP_emergency_cur (balanced) | CVaR | 15,812 | **13,429** | **−15%** |
+| MP_emergency_cur (wind-heavy) | LOLH | 2.9 | **2.4** | **−17%** |
+| MP_emergency_cur (wind-heavy) | EUE | 1,117 | **836** | **−25%** |
+| MP_emergency_cur (wind-heavy) | NEUE | 25 | **19** | **−24%** |
+| MP_emergency_cur (wind-heavy) | CVaR | 5,509 | **4,375** | **−21%** |
+
+**Explanation:** Raw proxy has annual SOC drift −382,756 MWh/capacity-year, depleting
+a 4-hour battery to 0% within ~4 months. Energy-balanced calibration (k_ch=1.099)
+achieves zero drift and cyclic fixed-point SOC 23.1%. MP_emergency_cur is sensitive
+because it relies on available SOC for emergency discharge; the raw proxy deprived
+storage of energy before late-year shortage events. MP_pure_cur is robust (<0.2%).
+
+### B. CC Values — Em Dash
+
+All CC values for MP variants replaced with `---` (em dash) in Table IV and
+tab:mp_variants because:
+1. Prior CC values were computed with raw proxy calibration and 50% fixed SOC
+2. The revalidated EUE changed by 17–25% for MP_emergency_cur, making the old CC
+   values inconsistent with the new baseline EUE
+3. Bootstrap-validated CC with the energy-balanced calibration has not yet been
+   computed (pending script 70 re-run)
+
+Table footnote updated to explain the em dash and reference the appendix for prior
+provisional estimates.
+
+### C. Runtime Updates
+
+All runtime values updated from `runtime_common_benchmark.csv` (committed file,
+3-rep warm-start medians):
+
+| Method | Prior | Updated | Benchmark |
+|---|---|---|---|
+| Naive MCS (balanced) | 0.07 | **0.04** | 0.0440 s/scen |
+| Emergency-only MCS (balanced) | 0.06 | **0.04** | 0.0426 s/scen |
+| Event-window MCS (balanced) | 0.43 | **0.40** | 0.3985 s/scen |
+| Full-year ED (balanced) | 9.56 | **9.40** | 9.405 s/scen |
+| Event-window MCS (wind-heavy) | 0.43 | **0.37** | 0.3698 s/scen |
+| Full-year ED (wind-heavy) | 9.37 | **8.76** | 8.758 s/scen |
+
+### D. SOC Boundary Section Correction
+
+**Error corrected:** Prior manuscript claimed cyclic equilibrium "near 0% SOC"
+and that charge-curtailed dispatch "fully depletes storage within each simulation year."
+
+**Correct values:**
+- Cyclic fixed-point SOC = **23.1%** (energy-balanced calibration)
+- Annual SOC drift = **0.000** under energy-balanced calibration
+- 0% depletion was an artifact of raw proxy calibration (−382,756 MWh/year drift)
+- Battery spends ~540–543 h/year near 0% SOC due to surplus limitation in RTS-GMLC,
+  NOT due to net annual over-discharge
+
+### E. Method Equations Additions
+
+- Added net-dispatch rule: $\tilde{n}_h = \tilde{d}_h - \tilde{c}_h$
+- Added sign convention (>0 = discharge-only, ≤0 = charge-only)
+- Added explicit no-simultaneous-charge-discharge statement
+- Added pure-variant shortfall behavior (pattern dispatch, no emergency augmentation)
+- Added $\delta_{h,\omega}=0$ qualifier to charge equation
+
+### F. Historical Data Description Additions
+
+- Added non-battery baseline correction (~37 MW)
+- Added energy-balance factor $k_{\text{ch}}=1.099$
+- Added raw-proxy depletion rate (~383 GWh/year)
+- Added cyclic fixed-point SOC (23.1%)
+- Updated abstract: "historical dispatch" → "historical proxy"
+
+### G. Appendix Additions
+
+- New calibration comparison table (tab:calibration_comparison): raw vs. baseline-corrected vs. energy-balanced
+- Updated variants table (tab:mp_variants): EUE corrected for paper-facing variants; CC → em dash
+- Updated convergence table (tab:mp_convergence): N=20 EUE corrected; CC → em dash; denominator stability language
+- Updated CC finite-difference section: removed "stable/representative" claim; bootstrap CI required
+- New runtime benchmark protocol section (5-rep warm-start, exclusions listed)
+- M2 parameters: added minimum window length 24 h to appendix sensitivity text
+
+### H. Claims Removed
+
+| Claim | Reason for removal |
+|---|---|
+| "cyclic equilibrium is near 0% SOC" | Energy-balanced calibration gives 23.1% |
+| "fully depletes storage by year-end" | Artifact of raw proxy calibration |
+| "low SOC explains CC gap" | Incorrect mechanism; timing mismatch is primary |
+| "CC 0.143/0.128/0.336/0.430" from main table | Inconsistent with revalidated EUE |
+| "approximately stable; 1 MW is representative" | Bootstrap CI required for confirmation |
+| "two to three orders of magnitude faster" (runtime) | Corrected to "four orders of magnitude" (~0.04 vs ~572 s) |
+
+### I. Pending Items
+
+| Item | Action required |
+|---|---|
+| Bootstrap CC (energy-balanced) | Run `scripts/70_market_pattern_marginal_cc.jl` |
+| Updated runtime (5-rep benchmark) | Run `scripts/71_common_runtime_benchmark.jl` |
+| Fill in em dashes in Table IV | After script 70 output reviewed |
+| Policy-switching diagnostics | Check `policy_switching_diagnostics.csv` from script 70 |
