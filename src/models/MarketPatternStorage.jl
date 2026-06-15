@@ -189,12 +189,13 @@ Returns
   charging-induced, and low-SOC components.
 """
 function run_market_pattern_storage(
-        system            ::SystemData,
-        availability      ::Array{<:Integer, 3},
-        _config           ::SimConfig;
-        pattern_csv       ::String,
-        emergency_override::Bool = false,
-        charge_curtailed  ::Bool = false
+        system                 ::SystemData,
+        availability           ::Array{<:Integer, 3},
+        _config                ::SimConfig;
+        pattern_csv            ::String,
+        emergency_override     ::Bool              = false,
+        charge_curtailed       ::Bool              = false,
+        override_init_soc_frac ::Union{Float64,Nothing} = nothing
         )::Tuple{Vector{DispatchResult}, SocBeforeShortage, EueDecomposition}
 
     pat_charge, pat_dis = load_market_pattern(pattern_csv)
@@ -220,6 +221,11 @@ function run_market_pattern_storage(
         eta_ch       = mean(stor.charge_efficiency)
         eta_dis      = mean(stor.discharge_efficiency)
     end
+    # Override initial SOC fraction if caller requests a specific boundary condition.
+    if !isnothing(override_init_soc_frac)
+        init_soc = clamp(override_init_soc_frac, 0.0, 1.0) * total_energy
+    end
+
     e_max_safe = max(total_energy, 1.0)
 
     # ── VRE output per hour ───────────────────────────────────────────────────
@@ -312,6 +318,10 @@ function run_market_pattern_storage(
 
             else
                 # ── Non-shortage hour: apply market pattern ───────────────────
+                # Net-dispatch rule (no simultaneous charge and discharge):
+                #   net_pat = r^dis × P^max − r^ch × P^max
+                #   net_pat > 0 → discharge-only; net_pat < 0 → charge-only
+                # This formulation matches the paper's Eq. for normal-hour dispatch.
                 target_dis = pat_dis_h[h] * total_power
                 target_chg = pat_chg_h[h] * total_power
                 net_pat    = target_dis - target_chg   # + = discharge, - = charge
@@ -359,6 +369,17 @@ function run_market_pattern_storage(
         sum_low_soc_eue += scen_low_soc_eue
     end
 
+    # Invariant: charge-curtailed variants cannot introduce load shedding in
+    # hours that had no pre-storage shortfall.  Charging is bounded by surplus
+    # (σ_{h,ω} = max(0, net_supply − load_h)), so post-charging net balance
+    # is non-negative in non-shortage hours.
+    if charge_curtailed && sum_chg_ind_eue > 1e-9
+        @warn "charge_curtailed=true invariant violated: " *
+              "charging_induced_eue=$(round(sum_chg_ind_eue/n_scen, digits=4)) MWh > 0 " *
+              "(expected exactly 0)"
+    end
+    @assert !charge_curtailed || sum_chg_ind_eue ≤ 1e-6 "charging_induced_eue must be 0 for charge_curtailed=true"
+
     # ── aggregate diagnostics ─────────────────────────────────────────────────
     soc_diag = if isempty(soc_before_shortage_vals)
         SocBeforeShortage(
@@ -391,7 +412,8 @@ function run_market_pattern_storage(
     return results, soc_diag, eue_decomp
 end
 
-# ScenarioSet overload
+# ScenarioSet overload — passes all keyword arguments through, including
+# override_init_soc_frac for SOC boundary condition studies.
 function run_market_pattern_storage(system   ::SystemData,
                                      scenarios::ScenarioSet,
                                      config   ::SimConfig;

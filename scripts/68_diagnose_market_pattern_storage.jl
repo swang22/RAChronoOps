@@ -211,8 +211,13 @@ let
 
         # ── M2 benchmark + SOC diagnostics ───────────────────────────────────
         try
-            cfg = SimConfig(; n_scenarios, seed)
-            @info "  running M2 event-window LP (benchmark)..."
+            # Paper parameters: risk_margin_mw=1000, window_buffer_hours=48,
+            # merge_gap_hours=24, min_window_length_hours=24 (Table II caption).
+            # Default SimConfig uses 500/24 — wrong for paper comparisons.
+            cfg = SimConfig(; n_scenarios, seed,
+                            risk_margin_mw=1000.0, window_buffer_hours=48,
+                            merge_gap_hours=24, min_window_length_hours=24)
+            @info "  running M2 event-window LP (benchmark, risk_margin=1000 MW, buffer=48 h)..."
             t0   = time()
             r_m2 = run_m2_event_window_lp(sys, scenarios, cfg)
             rt   = time() - t0

@@ -1,6 +1,23 @@
 #!/usr/bin/env julia
 # 67_run_market_pattern_storage.jl
 #
+# RETIRED — DO NOT USE FOR PAPER RESULTS.
+#
+# This prototype calls run_market_pattern_pure / run_market_pattern_emergency
+# (the UNCURTAILED variants, charge_curtailed=false) but labels the outputs
+# with the paper-facing names "Market-pattern storage MCS" and
+# "Market-pattern + emergency MCS", which in the paper refer to the
+# CHARGE-CURTAILED variants (charge_curtailed=true).
+#
+# The paper-facing charge-curtailed variants are MP_pure_cur and
+# MP_emergency_cur; the corresponding wrappers are
+# run_market_pattern_pure_curtailed / run_market_pattern_emergency_curtailed.
+#
+# Use scripts/72_market_pattern_revalidation.jl for all final paper results.
+# Use scripts/68_diagnose_market_pattern_storage.jl for diagnostic runs of
+# all four variants.
+#
+# ── Original description (for reference only) ─────────────────────────────────
 # Prototype evaluation of Market-pattern storage MCS on the main paper cases.
 # Tests two variants:
 #   1. Market-pattern storage MCS       (pure — no emergency override)

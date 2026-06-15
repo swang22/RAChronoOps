@@ -1,0 +1,25 @@
+case_name,case_label,method,calibration,soc_init,init_soc_frac,final_soc_mean_frac,final_soc_std_frac,soc_drift_frac,lolh_hours,eue_mwh,cvar_eue_mwh,n_shortage_events,mean_shortage_duration_h,max_shortage_duration_h,max_shortfall_mw,mean_event_start_soc_frac,mean_empty_hours_per_year,mean_full_hours_per_year,charging_induced_eue_mwh,runtime_s
+VRE120_base,Balanced VRE,MP_pure_cur,raw,fixed_50pct,0.5,0.0,0.0,-0.5,46.1,13661.96,26276.41,18.45,2.499,10.0,849.2,0.8124,1267.0,182.2,0.0,1.28
+VRE120_base,Balanced VRE,MP_pure_cur,raw,cyclic,0.0,0.0,0.0,0.0,46.1,13661.96,26276.41,18.45,2.499,10.0,849.2,0.8124,1280.0,179.2,0.0,1.83
+VRE120_base,Balanced VRE,MP_emergency_cur,raw,fixed_50pct,0.5,0.0,0.0,-0.5,9.15,4338.32,15811.6,2.95,3.102,7.0,594.9,0.8438,1234.4,195.7,0.0,0.9
+VRE120_base,Balanced VRE,MP_emergency_cur,raw,cyclic,0.0,0.0,0.0,0.0,9.15,4338.32,15811.6,2.95,3.102,7.0,594.9,0.8438,1247.4,192.7,0.0,1.89
+VRE120_base,Balanced VRE,MP_pure_cur,baseline_corrected,fixed_50pct,0.5,0.0527,0.0,-0.4473,47.0,14059.76,26870.52,18.65,2.52,9.0,857.9,0.8569,449.2,240.5,0.0,1.2
+VRE120_base,Balanced VRE,MP_pure_cur,baseline_corrected,cyclic,0.0527,0.0527,0.0,0.0,47.0,14059.76,26870.52,18.65,2.52,9.0,857.9,0.8569,467.2,179.5,0.0,1.86
+VRE120_base,Balanced VRE,MP_emergency_cur,baseline_corrected,fixed_50pct,0.5,0.0527,0.0,-0.4473,8.1,3831.24,14240.15,2.5,3.24,7.0,574.5,0.9007,421.9,273.4,0.0,0.89
+VRE120_base,Balanced VRE,MP_emergency_cur,baseline_corrected,cyclic,0.0527,0.0527,0.0,0.0,8.1,3831.24,14240.15,2.5,3.24,7.0,574.5,0.9007,439.9,212.4,0.0,1.81
+VRE120_base,Balanced VRE,MP_pure_cur,energy_balanced,fixed_50pct,0.5,0.2308,0.0,-0.2692,46.0,13655.08,26226.96,18.45,2.493,9.0,849.2,0.8845,543.4,349.2,0.0,0.89
+VRE120_base,Balanced VRE,MP_pure_cur,energy_balanced,cyclic,0.2308,0.2308,0.0,-0.0,46.0,13655.08,26226.96,18.45,2.493,9.0,849.2,0.8845,543.4,347.2,0.0,2.14
+VRE120_base,Balanced VRE,MP_emergency_cur,energy_balanced,fixed_50pct,0.5,0.2308,0.0,-0.2692,7.7,3595.95,13429.24,2.3,3.348,7.0,548.4,0.9201,512.0,386.0,0.0,0.94
+VRE120_base,Balanced VRE,MP_emergency_cur,energy_balanced,cyclic,0.2308,0.2308,0.0,-0.0,7.7,3595.95,13429.24,2.3,3.348,7.0,548.4,0.9201,512.0,384.0,0.0,1.88
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,raw,fixed_50pct,0.5,0.0,0.0,-0.5,23.9,7160.64,14518.04,10.65,2.244,6.0,759.2,0.8111,1265.6,183.0,0.0,1.29
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,raw,cyclic,0.0,0.0,0.0,0.0,23.9,7160.64,14518.04,10.65,2.244,6.0,759.2,0.8111,1278.6,180.0,0.0,1.88
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,raw,fixed_50pct,0.5,0.0,0.0,-0.5,2.85,1117.39,5509.26,1.15,2.478,6.0,316.8,0.8312,1244.0,191.9,0.0,0.97
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,raw,cyclic,0.0,0.0,0.0,0.0,2.85,1117.39,5509.26,1.15,2.478,6.0,316.8,0.8312,1257.0,188.9,0.0,1.95
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,baseline_corrected,fixed_50pct,0.5,0.0527,0.0,-0.4473,24.5,7364.93,14804.85,10.9,2.248,6.0,766.5,0.8569,444.6,241.2,0.0,1.19
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,baseline_corrected,cyclic,0.0527,0.0527,0.0,0.0,24.5,7364.93,14804.85,10.9,2.248,6.0,766.5,0.8569,462.6,180.2,0.0,1.82
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,baseline_corrected,fixed_50pct,0.5,0.0527,0.0,-0.4473,2.55,910.03,4756.58,1.05,2.429,6.0,280.0,0.888,425.6,261.0,0.0,0.9
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,baseline_corrected,cyclic,0.0527,0.0527,0.0,0.0,2.55,910.03,4756.58,1.05,2.429,6.0,280.0,0.888,443.6,200.0,0.0,1.85
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,energy_balanced,fixed_50pct,0.5,0.2308,0.0,-0.2692,23.9,7160.64,14518.04,10.65,2.244,6.0,759.2,0.8841,540.2,350.2,0.0,0.91
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,energy_balanced,cyclic,0.2308,0.2308,0.0,-0.0,23.9,7160.64,14518.04,10.65,2.244,6.0,759.2,0.8841,540.2,348.2,0.0,2.17
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,energy_balanced,fixed_50pct,0.5,0.2308,0.0,-0.2692,2.4,836.21,4375.33,0.95,2.526,6.0,266.6,0.9099,517.9,373.0,0.0,0.89
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,energy_balanced,cyclic,0.2308,0.2308,0.0,-0.0,2.4,836.21,4375.33,0.95,2.526,6.0,266.6,0.9099,517.9,371.0,0.0,1.8

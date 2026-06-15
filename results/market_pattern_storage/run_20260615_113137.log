@@ -1,0 +1,222 @@
+┌ Info: Market-pattern storage revalidation — script 72
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:211
+┌ Info: n=20 | seed=42
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:212
+┌ Info: Preferred pattern: pattern_energy_balanced.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:213
+┌ Info: Cases: VRE120_base, VRE120_wind_hvy
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:214
+┌ Info: ━━━━  Case: VRE120_base  ━━━━
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:242
+┌ Info:   M1a (rule-based)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:251
+┌ Info:   M1a: LOLH=95.4 h  EUE=31017.1 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:260
+┌ Info:   M1b (reserve-aware)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:270
+┌ Info:   M1b: LOLH=83.55 h  EUE=28272.4 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:279
+┌ Info:   M1c (emergency-only)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:289
+┌ Info:   M1c: LOLH=5.95 h  EUE=2479.2 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:298
+┌ Info:   M2 (event-window LP, risk_margin=1000.0MW buffer=48h)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:313
+┌ Info:   M2: LOLH=5.75 h  EUE=2479.2 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:322
+┌ Info:   M3: loaded from prior results (lolh=5.95 h)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:343
+┌ Info:   MP_pure_cur (market-pattern, curtailed, preferred calibration, cyclic SOC)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:360
+┌ Info:   MP_pure_cur: LOLH=46.0 h  EUE=13655.1 MWh  init_soc=23.1%  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:378
+┌ Info:   MP_emergency_cur (market-pattern + emergency, curtailed, preferred calibration, cyclic SOC)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:388
+┌ Info:   MP_emergency_cur: LOLH=7.7 h  EUE=3596.0 MWh  init_soc=23.1%  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:405
+┌ Info: ━━━━  Case: VRE120_wind_hvy  ━━━━
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:242
+┌ Info:   M1a (rule-based)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:251
+┌ Info:   M1a: LOLH=52.4 h  EUE=15801.1 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:260
+┌ Info:   M1b (reserve-aware)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:270
+┌ Info:   M1b: LOLH=25.0 h  EUE=8982.4 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:279
+┌ Info:   M1c (emergency-only)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:289
+┌ Info:   M1c: LOLH=2.25 h  EUE=648.2 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:298
+┌ Info:   M2 (event-window LP, risk_margin=1000.0MW buffer=48h)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:313
+┌ Info:   M2: LOLH=1.95 h  EUE=648.2 MWh
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:322
+┌ Info:   M3: loaded from prior results (lolh=2.25 h)
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:343
+┌ Info:   MP_pure_cur (market-pattern, curtailed, preferred calibration, cyclic SOC)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:360
+┌ Info:   MP_pure_cur: LOLH=23.9 h  EUE=7160.6 MWh  init_soc=23.1%  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:378
+┌ Info:   MP_emergency_cur (market-pattern + emergency, curtailed, preferred calibration, cyclic SOC)...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:388
+┌ Info:   MP_emergency_cur: LOLH=2.4 h  EUE=836.2 MWh  init_soc=23.1%  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:405
+┌ Info: Main comparison table → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\paper_tables\market_pattern_revalidated_metrics.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:416
+┌ Info: ━━━━  SOC boundary study: VRE120_base  ━━━━
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:427
+┌ Info:   MP_pure_cur | raw | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=46.1 h  EUE=13662.0 MWh  init=50.0%  final=0.0%  empty_h=1267.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | raw | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=46.1 h  EUE=13662.0 MWh  init=0.0%  final=0.0%  empty_h=1280.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | raw | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=9.15 h  EUE=4338.3 MWh  init=50.0%  final=0.0%  empty_h=1234.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | raw | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=9.15 h  EUE=4338.3 MWh  init=0.0%  final=0.0%  empty_h=1247.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | baseline_corrected | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=47.0 h  EUE=14059.8 MWh  init=50.0%  final=5.3%  empty_h=449.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | baseline_corrected | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=47.0 h  EUE=14059.8 MWh  init=5.3%  final=5.3%  empty_h=467.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | baseline_corrected | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=8.1 h  EUE=3831.2 MWh  init=50.0%  final=5.3%  empty_h=422.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | baseline_corrected | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=8.1 h  EUE=3831.2 MWh  init=5.3%  final=5.3%  empty_h=440.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | energy_balanced | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=46.0 h  EUE=13655.1 MWh  init=50.0%  final=23.1%  empty_h=543.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | energy_balanced | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=46.0 h  EUE=13655.1 MWh  init=23.1%  final=23.1%  empty_h=543.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | energy_balanced | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=7.7 h  EUE=3596.0 MWh  init=50.0%  final=23.1%  empty_h=512.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | energy_balanced | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=7.7 h  EUE=3596.0 MWh  init=23.1%  final=23.1%  empty_h=512.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info: ━━━━  SOC boundary study: VRE120_wind_hvy  ━━━━
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:427
+┌ Info:   MP_pure_cur | raw | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=23.9 h  EUE=7160.6 MWh  init=50.0%  final=0.0%  empty_h=1266.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | raw | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=23.9 h  EUE=7160.6 MWh  init=0.0%  final=0.0%  empty_h=1279.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | raw | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=2.85 h  EUE=1117.4 MWh  init=50.0%  final=0.0%  empty_h=1244.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | raw | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=2.85 h  EUE=1117.4 MWh  init=0.0%  final=0.0%  empty_h=1257.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | baseline_corrected | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=24.5 h  EUE=7364.9 MWh  init=50.0%  final=5.3%  empty_h=445.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | baseline_corrected | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=24.5 h  EUE=7364.9 MWh  init=5.3%  final=5.3%  empty_h=463.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | baseline_corrected | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=2.55 h  EUE=910.0 MWh  init=50.0%  final=5.3%  empty_h=426.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | baseline_corrected | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=2.55 h  EUE=910.0 MWh  init=5.3%  final=5.3%  empty_h=444.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | energy_balanced | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=23.9 h  EUE=7160.6 MWh  init=50.0%  final=23.1%  empty_h=540.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_pure_cur | energy_balanced | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=23.9 h  EUE=7160.6 MWh  init=23.1%  final=23.1%  empty_h=540.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | energy_balanced | fixed_50pct...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=2.4 h  EUE=836.2 MWh  init=50.0%  final=23.1%  empty_h=518.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info:   MP_emergency_cur | energy_balanced | cyclic...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:449
+┌ Info:     LOLH=2.4 h  EUE=836.2 MWh  init=23.1%  final=23.1%  empty_h=518.0
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:486
+┌ Info: SOC boundary study → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\market_pattern_storage\soc_boundary_study.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:499
+┌ Info: ━━━━  Calibration comparison: VRE120_base  ━━━━
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:510
+┌ Info:   MP_pure_cur | raw...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=46.1 h  EUE=13662.0 MWh  final_soc=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_emergency_cur | raw...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=9.15 h  EUE=4338.3 MWh  final_soc=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_pure_cur | baseline_corrected...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=47.0 h  EUE=14059.8 MWh  final_soc=5.3%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_emergency_cur | baseline_corrected...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=8.1 h  EUE=3831.2 MWh  final_soc=5.3%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_pure_cur | energy_balanced...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=46.0 h  EUE=13655.1 MWh  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_emergency_cur | energy_balanced...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=7.7 h  EUE=3596.0 MWh  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info: ━━━━  Calibration comparison: VRE120_wind_hvy  ━━━━
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:510
+┌ Info:   MP_pure_cur | raw...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=23.9 h  EUE=7160.6 MWh  final_soc=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_emergency_cur | raw...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=2.85 h  EUE=1117.4 MWh  final_soc=0.0%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_pure_cur | baseline_corrected...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=24.5 h  EUE=7364.9 MWh  final_soc=5.3%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_emergency_cur | baseline_corrected...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=2.55 h  EUE=910.0 MWh  final_soc=5.3%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_pure_cur | energy_balanced...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=23.9 h  EUE=7160.6 MWh  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info:   MP_emergency_cur | energy_balanced...
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:527
+┌ Info:     LOLH=2.4 h  EUE=836.2 MWh  final_soc=23.1%
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:559
+┌ Info: Calibration comparison → D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\..\results\market_pattern_storage\calibration_comparison.csv
+└ @ Main D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\scripts\72_market_pattern_revalidation.jl:569

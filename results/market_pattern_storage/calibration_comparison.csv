@@ -1,0 +1,13 @@
+case_name,case_label,method,calibration,soc_init,lolh_hours,eue_mwh,neue_ppm,cvar_eue_mwh,final_soc_mean_frac,final_soc_std_frac,soc_drift_frac,mean_event_start_soc_frac,mean_empty_hours_per_year,charging_induced_eue_mwh,runtime_s
+VRE120_base,Balanced VRE,MP_pure_cur,raw,fixed_50pct,46.1,13661.96,303.1035,26276.41,0.0,0.0,-0.5,0.8124,1267.0,0.0,1.27
+VRE120_base,Balanced VRE,MP_emergency_cur,raw,fixed_50pct,9.15,4338.32,96.2497,15811.6,0.0,0.0,-0.5,0.8438,1234.4,0.0,0.92
+VRE120_base,Balanced VRE,MP_pure_cur,baseline_corrected,fixed_50pct,47.0,14059.76,311.9291,26870.52,0.0527,0.0,-0.4473,0.8569,449.2,0.0,0.9
+VRE120_base,Balanced VRE,MP_emergency_cur,baseline_corrected,fixed_50pct,8.1,3831.24,84.9996,14240.15,0.0527,0.0,-0.4473,0.9007,421.9,0.0,0.95
+VRE120_base,Balanced VRE,MP_pure_cur,energy_balanced,fixed_50pct,46.0,13655.08,302.9508,26226.96,0.2308,0.0,-0.2692,0.8845,543.4,0.0,0.9
+VRE120_base,Balanced VRE,MP_emergency_cur,energy_balanced,fixed_50pct,7.7,3595.95,79.7796,13429.24,0.2308,0.0,-0.2692,0.9201,512.0,0.0,0.92
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,raw,fixed_50pct,23.9,7160.64,158.8655,14518.04,0.0,0.0,-0.5,0.8111,1265.6,0.0,1.28
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,raw,fixed_50pct,2.85,1117.39,24.7905,5509.26,0.0,0.0,-0.5,0.8312,1244.0,0.0,0.88
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,baseline_corrected,fixed_50pct,24.5,7364.93,163.3979,14804.85,0.0527,0.0,-0.4473,0.8569,444.6,0.0,0.88
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,baseline_corrected,fixed_50pct,2.55,910.03,20.1898,4756.58,0.0527,0.0,-0.4473,0.888,425.6,0.0,0.87
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,energy_balanced,fixed_50pct,23.9,7160.64,158.8655,14518.04,0.2308,0.0,-0.2692,0.8841,540.2,0.0,0.87
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,energy_balanced,fixed_50pct,2.4,836.21,18.5521,4375.33,0.2308,0.0,-0.2692,0.9099,517.9,0.0,0.9
