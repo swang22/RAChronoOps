@@ -26,6 +26,8 @@
 
 *Curtailed = charging strictly limited to available surplus. Uncurtailed = charging limit = surplus + total_power, which can produce load shedding in non-shortage hours.*
 
+*Note on event-window storage MCS LOLH: values shown here (5.10h balanced, 1.75h wind-heavy) use default SimConfig params (`risk_margin_mw=500`, `window_buffer_hours=24`). Table IV uses `risk_margin_mw=1000`, `window_buffer_hours=48`, giving LOLH = 5.75h / 1.95h. See `docs/market_pattern_table_iv_source_audit.md`. EUE is identical (2479 / 648 MWh) regardless of config.*
+
 ---
 
 ## EUE Decomposition (market-pattern variants)

@@ -1,0 +1,5 @@
+case_name,case_label,method,n_scenarios,total_energy_mwh,nominal_init_soc_mwh,nominal_init_soc_frac,mean_final_soc_frac,p10_final_soc_frac,p90_final_soc_frac,soc_drift_frac,eue_baseline_mwh,eue_cyclic_init_mwh,delta_eue_cyclic_mwh
+VRE120_base,Balanced VRE,MP_pure_cur,20,3932.0,1966.0,0.5,0.0,0.0,0.0,-0.5,13661.964293680852,13661.964293680852,0.0
+VRE120_base,Balanced VRE,MP_emergency_cur,20,3932.0,1966.0,0.5,0.0,0.0,0.0,-0.5,4338.3190474742105,4338.3190474742105,0.0
+VRE120_wind_hvy,Wind-heavy,MP_pure_cur,20,3932.0,1966.0,0.5,0.0,0.0,0.0,-0.5,7160.637802265563,7160.637802265563,0.0
+VRE120_wind_hvy,Wind-heavy,MP_emergency_cur,20,3932.0,1966.0,0.5,0.0,0.0,0.0,-0.5,1117.3947300403315,1117.3947300403315,0.0
