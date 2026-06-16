@@ -20,8 +20,9 @@
 #        0 ≤ soc[t]         ≤ total_energy_mwh
 #        ls[t], curt[t] ≥ 0
 #
-# HiGHS is used (not Gurobi) to avoid per-model license overhead; window LPs
-# are small (24–several-hundred hours) so HiGHS is fast enough.
+# Gurobi is used with a shared Env() created once per run_m2_with_diagnostics call,
+# avoiding per-model license overhead. With risk_margin=1000 MW the windows can span
+# several hundred to ~2000 hours, making Gurobi significantly faster than HiGHS.
 
 """
     Ra2ScenarioDiag
@@ -190,27 +191,28 @@ end
 # On success: writes dispatch arrays, returns (final_soc, true).
 # On failure: returns (soc_init, false) without touching the arrays.
 function _solve_window_lp!(
-        h_start      ::Int,
-        h_end        ::Int,
-        therm_avail  ::Vector{Float64},
-        p_vre        ::Vector{Float64},
-        load_mw      ::Vector{Float64},
-        total_power  ::Float64,
-        total_energy ::Float64,
-        eta_ch       ::Float64,
-        eta_dis      ::Float64,
-        soc_init     ::Float64,
-        voll         ::Float64,
-        eps_cyc      ::Float64,
-        load_shed    ::Vector{Float64},
-        st_dis       ::Vector{Float64},
-        st_chg       ::Vector{Float64},
-        soc          ::Vector{Float64},
-        curtailmt    ::Vector{Float64})::Tuple{Float64, Bool}
+        h_start          ::Int,
+        h_end            ::Int,
+        therm_avail      ::Vector{Float64},
+        p_vre            ::Vector{Float64},
+        load_mw          ::Vector{Float64},
+        total_power      ::Float64,
+        total_energy     ::Float64,
+        eta_ch           ::Float64,
+        eta_dis          ::Float64,
+        soc_init         ::Float64,
+        voll             ::Float64,
+        eps_cyc          ::Float64,
+        load_shed        ::Vector{Float64},
+        st_dis           ::Vector{Float64},
+        st_chg           ::Vector{Float64},
+        soc              ::Vector{Float64},
+        curtailmt        ::Vector{Float64};
+        optimizer_factory = HiGHS.Optimizer)::Tuple{Float64, Bool}
 
     W = h_end - h_start + 1
 
-    mdl = Model(HiGHS.Optimizer)
+    mdl = Model(optimizer_factory)
     set_silent(mdl)
 
     @variable(mdl, p_th[1:W]   >= 0.0)
@@ -318,6 +320,9 @@ function run_m2_with_diagnostics(
     merge_gap   = config.merge_gap_hours
     min_len     = config.min_window_length_hours
 
+    gurobi_env     = Gurobi.Env()
+    opt_factory    = () -> Gurobi.Optimizer(gurobi_env)
+
     results = Vector{DispatchResult}(undef, n_scen)
     diags   = Vector{Ra2ScenarioDiag}(undef, n_scen)
 
@@ -368,7 +373,8 @@ function run_m2_with_diagnostics(
                 total_power, total_energy, eta_ch, eta_dis,
                 curr_soc,
                 config.voll, config.epsilon_cycling,
-                load_shed, st_dis, st_chg, soc, curtailmt)
+                load_shed, st_dis, st_chg, soc, curtailmt;
+                optimizer_factory = opt_factory)
 
             if ok
                 curr_soc = final_soc
