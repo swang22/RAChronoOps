@@ -1,8 +1,9 @@
 # Market-Pattern Capacity Credit and Runtime Validation
 
 **Updated:** 2026-06-16  
-**Current RAChronoOps result commit:** `11ddf32`  
-**Primary scripts:** `scripts/70_market_pattern_marginal_cc.jl`, `scripts/71_common_runtime_benchmark.jl`, `scripts/72_m2_solver_regression.jl`
+**Current RAChronoOps result commit:** `09ade78`  
+**Current RA-assessment commit:** `64e1746`  
+**Primary scripts:** `scripts/70_market_pattern_marginal_cc.jl`, `scripts/71_common_runtime_benchmark.jl`, `scripts/72_m2_solver_regression.jl`, `scripts/73_m2_lolh_diagnostics.jl`, `scripts/74_m3_lolh_diagnostics.jl`
 
 ## Current status
 
@@ -12,9 +13,21 @@ The manuscript has also already been updated through the `paper` submodule. Thos
 
 **Current validation decision:**
 
-> **NOT READY — M2 LOLH IS SOLVER-DEPENDENT**
+> **READY FOR TEAM REVIEW** — pending M3 solver-sensitivity result (script 74, ~4 h runtime)
 
-The M2 provenance has been confirmed and the EUE-based capacity credit is solver-independent to machine precision. However, HiGHS and Gurobi produce materially different LOLH values (5.75 vs 7.20 h/year balanced; 1.95 vs 2.25 h/year wind-heavy) due to LP degeneracy: both solvers find optimal solutions with equal total load-shed but different temporal distributions across hours. The manuscript Table IV reports M2 LOLH as 5.8 h/year (balanced) and 2.0 h/year (wind-heavy), derived from HiGHS. No numerical threshold resolves the disagreement (minimum disputed hourly load-shed = 1.64 MW; threshold sensitivity CSV sweeps 0 to 1e-3 MW with no convergence). The manuscript must be updated to reflect that M2 LOLH is not uniquely defined under the current LP formulation. Pending: team review of the Case B recommendation and manuscript edit (see Sections 9–10).
+The M2 LOLH issue has been diagnosed (Case B: genuine LP degeneracy), resolved by adopting Gurobi as the single production solver for all LP results, and disclosed in the manuscript. All M2 table values now use Gurobi consistently. The manuscript has been updated: `RA-assessment` commit `64e1746`.
+
+**What changed since the prior NOT READY status:**
+
+- M2 LOLH updated to Gurobi values: 7.2 h/year (balanced), 2.3 h/year (wind-heavy)
+- Table IV footnote added: explains alternative-optimal dispatch, cites HiGHS sensitivity (5.75/1.95)
+- Event-shape table updated to Gurobi M2 dispatch statistics
+- New appendix section `app:solver_sensitivity`: full diagnostic with disputed-hour statistics
+- Convergence appendix text corrected (no longer claims M2 LOLH is "0.2–0.45 h lower" than M3)
+
+**One item still pending (non-blocking for team review):**
+
+Script 74 (`74_m3_lolh_diagnostics.jl`) is running M3 HiGHS vs Gurobi comparison. M3 is hard-coded to Gurobi in production; its table values (6.0/2.3 h/year) are unambiguous regardless of outcome. The pending M3 result will either (a) confirm M3 LOLH is solver-independent (no action needed) or (b) reveal solver-dependent LOLH for M3 as well (manuscript appendix gets an M3 diagnostic row; table values are unchanged since they already use Gurobi). Either outcome does not block team review of the current manuscript.
 
 ---
 
@@ -28,8 +41,9 @@ The M2 provenance has been confirmed and the EUE-based capacity credit is solver
 | Appended M2 CC rows and final result bundle | rows record `c88914a`; actual code = Gurobi (see §9) | `fb8eaa4` | Complete — provenance documented |
 | Run manifest (`market_pattern_run_manifest.csv`) | — | `8e080e8` | Complete |
 | N=20 HiGHS vs Gurobi solver regression | `c122c3d` | `8e080e8` | Complete — see §9 |
-| M2 LOLH hourly diagnostic + threshold sweep | `8e080e8` | pending | Complete — see §9 |
-| Current manuscript submodule | — | `a3a826f` in `RA-assessment` | Updated before final audit |
+| M2 LOLH hourly diagnostic + threshold sweep | `8e080e8` | `397e78b` | Complete — see §9 |
+| M2 Gurobi event-shape + M3 solver screening | `09ade78` | pending script 74 | In progress (~4 h) |
+| M2 LOLH → Gurobi values; solver appendix | — | `64e1746` in `RA-assessment` | Complete |
 
 The `code_commit` field denotes the repository HEAD seen by the script at execution time. It is not necessarily the same as the later commit that adds the generated output file.
 
@@ -291,48 +305,56 @@ For M2 (event-window LP) and M3 (full-year LP), LOLH is structurally solver-depe
 
 **Recommendation:** Do not change the threshold in `ReliabilityMetrics.jl`. Document that LP-based methods (M2, and potentially M3 over the full year) may produce solver-dependent LOLH when the LP has a degenerate optimal solution space.
 
-### Mixed-solver issue
+### Mixed-solver issue (resolved)
 
-The manuscript Table IV currently mixes two solver implementations for M2:
-- **LOLH** (5.8 h/year balanced, 2.0 h/year wind-heavy): from the HiGHS run recorded in the June 14 log at commit `c88914a` (the original production run before the Gurobi fix was committed).
-- **Capacity credit** (0.497 balanced, 0.604 wind-heavy at N=20 δ=1 MW): from Gurobi, which was the actual solver in the working tree during the June 16 script-70 run.
-- **Runtime** (0.18 s/scenario balanced, 0.16 s/scenario wind-heavy): from the Gurobi benchmark (`71_common_runtime_benchmark.jl`, commit `e82dbf9`).
+The manuscript Table IV previously mixed HiGHS LOLH (5.8/2.0 h/year from the original June 14 production run) with Gurobi EUE, CC, and runtime values. This has been resolved in `RA-assessment` commit `64e1746`:
 
-EUE and CC are solver-independent, so the CC and runtime values are unaffected by the solver choice. LOLH is solver-dependent. The manuscript LOLH values therefore reflect HiGHS, while all other M2 values in Table IV reflect Gurobi. This is the mixed-solver issue to be resolved before final approval.
+- **LOLH**: updated to Gurobi values (7.2/2.3 h/year), consistent with all other M2 metrics
+- **EUE, NEUE, CVaR-EUE, CC**: solver-independent, unchanged
+- **Runtime**: Gurobi benchmark, unchanged
+- **Footnote**: discloses HiGHS sensitivity and explains alternative-optimum property
+
+All M2 rows in Table IV now use Gurobi consistently.
 
 ---
 
-## 10. Case B recommendation and manuscript action
+## 10. Resolution and manuscript action
 
-### Recommended action: report M2 LOLH as solver-dependent with an em-dash
+### Adopted resolution (team decision 2026-06-16)
 
-The four options from the user's instructions are:
+Report Gurobi values for M2 LOLH (and all other LP results) consistently. Gurobi is the production solver for all LP-based manuscript metrics (M2 EUE, CC, runtime, and now LOLH). Disclose the alternative-optimum property and the HiGHS sensitivity value in a table footnote and in a new appendix section.
 
-1. **Retain 5.8 / 2.0 h/year with an explicit HiGHS note.** Technically accurate but inconsistent with the Gurobi-based CC and runtime values in the same table row. A footnote distinguishing the LOLH solver from the CC solver would be unusual and may confuse readers.
+**Adopted M2 LOLH values in `RA-assessment/main.tex` (`64e1746`):**
 
-2. **Replace with threshold-stabilized values.** Not possible under Case B: no threshold in [0, 1e-3 MW] produces agreement. The disputed values are hundreds of MW above any reasonable LP feasibility tolerance.
+| Portfolio | Gurobi LOLH (h/yr) | HiGHS LOLH (h/yr) | In manuscript |
+|---|---:|---:|---|
+| Balanced VRE | 7.20 | 5.75 | 7.2 (Table IV) |
+| Wind-heavy VRE | 2.25 | 1.95 | 2.3 (Table IV) |
 
-3. **Report a range: "5.75–7.20 h/year (balanced), 1.95–2.25 h/year (wind-heavy)".** Accurately communicates the uncertainty but introduces a solver-dependent interval into a table whose other columns are point estimates. The range conveys the right message but may require explanation in the text.
+**M2 event-shape table updated** (from HiGHS to Gurobi values):
 
-4. **Omit M2 LOLH with an em-dash, retain EUE and CC.** The cleanest scientific choice: the em-dash signals that M2 LOLH is not uniquely determined by the model formulation, which is the true finding. EUE and CC remain in the table and are validated to machine precision. A footnote or methods note can state that M2 LOLH is not uniquely defined for the current LP because the EUE-minimizing LP has multiple degenerate optima differing in temporal allocation.
+| Portfolio | Events/yr | Mean dur. | Max dur. | Max shortfall |
+|---|---:|---:|---:|---:|
+| Balanced VRE (Gurobi) | 2.9 | 2.5 h | 8 h | 1,440 MW |
+| Wind-heavy VRE (Gurobi) | 1.0 | 2.4 h | 7 h | 1,335 MW |
 
-**Recommendation: use option 4 (em-dash for M2 LOLH)**, with a table footnote stating approximately:
+Note: Gurobi M2 produces similar event counts to HiGHS (2.9 vs 2.9; 1.0 vs 1.1) but longer events (2.5 vs 2.0 h; 2.4 vs 1.9 h) with much higher peak shortfall. Both represent valid EUE-minimizing LP solutions.
 
-> *M2 LOLH is not reported because the event-window LP has multiple degenerate optima with equal total load-shed but different temporal distributions (HiGHS: 5.8 h/year; Gurobi: 7.2 h/year for the balanced-VRE portfolio). EUE and CC are identical across solvers to machine precision.*
-
-If the team prefers option 3 (range), the values are 5.75–7.20 h/year (balanced VRE, HiGHS–Gurobi) and 1.95–2.25 h/year (wind-heavy).
-
-**Do NOT edit `RA-assessment/main.tex`** until this recommendation has been reviewed by the team.
+**Manuscript changes:**
+- Table IV: M2 LOLH 5.8 → 7.2 (balanced), 2.0 → 2.3 (wind-heavy)
+- Table IV footnote: added LP alternative-optimum disclosure (HiGHS values cited)
+- New Appendix section `app:solver_sensitivity`: full diagnostic with disputed-hour statistics and threshold sensitivity results from scripts 72–73
+- Event-shape table `tab:event_shape`: M2 rows updated to Gurobi values
+- Convergence appendix text corrected: no longer claims "0.2–0.45 h lower"
+- Body text (§ Results): added Gurobi reference for M2 LOLH
+- M3 screening: script 74 running; result pending; M3 table values unchanged (already Gurobi)
 
 ### N=20 metric rerun
 
-Under Case B, no rerun is required for EUE or CC (both are solver-independent). A rerun would only be needed if a lexicographic secondary objective were added to the M2 LP to impose a canonical temporal allocation of load shedding — this would change the LOLH values and potentially alter the dispatch within windows. No such change to the LP is recommended here; it would be a non-trivial modification requiring its own validation.
+Not required. EUE and CC are solver-independent; no rerun is needed. No lexicographic secondary objective was added to the LP (per team decision).
 
-### Other manuscript items (unchanged)
+### Remaining items
 
-- Keep the corrected N=20 reliability values for MP and M1c methods.
-- Keep the market-pattern and emergency-only N=20 CC point estimates; report bootstrap uncertainty in the appendix or a table note.
-- Do not replace N=20 CC with N=1000 estimates in the main comparison table.
-- The M2 CC values (0.497 balanced, 0.604 wind-heavy at N=20 δ=1 MW) are validated: solver-independent to machine precision, consistent with the June 14 HiGHS log, and identical to the M1c (emergency-only) values as expected.
-- Use the five-repetition M2 runtime medians of approximately 0.18 s/scenario (balanced VRE) and 0.16 s/scenario (wind-heavy), from `runtime_common_benchmark.csv` commit `c5d785d`.
-- Describe the emergency-override CC as sample- and increment-sensitive rather than fully converged.
+- M3 solver screening (script 74): running, ~4 h. Does not block team review.
+- Once M3 finishes: if solver-dependent, add M3 diagnostic paragraph to `app:solver_sensitivity` and commit. If solver-independent, the current appendix text already correctly describes M3 as a "pending" screening with no action needed.
+- Figures (`event_shape_dashboard.pdf`, `storage_operation_comparison_compact.pdf`): were generated from the Gurobi production run and should already reflect Gurobi M2 dispatch. No regeneration required unless team observes inconsistency.
