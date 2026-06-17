@@ -291,8 +291,16 @@ def make_fig3():
         os.path.join(RES, "paper_tables", "market_pattern_revalidated_metrics.csv"))
     df_b   = df_met[df_met["case_name"] == "VRE120_base"].copy()
 
-    # PCM-UCED reference EUE = M1c EUE for balanced VRE (exact agreement)
-    pcm_uced_eue = float(df_b.loc[df_b["method"] == "M1c", "eue_mwh"].values[0])
+    # PCM-UCED reference EUE: authoritative HOPE-UC row from paper_hope_validation.csv
+    df_pv = pd.read_csv(
+        os.path.join(RES, "paper_tables", "paper_hope_validation.csv"))
+    pcm_uced_eue = float(
+        df_pv.loc[
+            (df_pv["case"]           == "VRE120_base") &
+            (df_pv["model_internal"] == "HOPE-UC"),
+            "eue_mwh"
+        ].values[0]
+    )
 
     # ── Runtime source: controlled benchmark for all storage MCS methods ──────
     df_rt   = pd.read_csv(
@@ -381,9 +389,13 @@ def make_fig3():
     LBOX = dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.80)
     offsets = {
         # (dx_pts, dy_pts, va, ha)
-        # Heuristics at x≈0.043–0.044, y≈26k–29k — stagger upper-right / lower-left
-        "M1a":              (+15, +14, "bottom", "left"),
-        "M1b":              (-12, -14, "top",    "right"),
+        # Heuristics at x≈0.043–0.044, y≈26k–29k.
+        # Both labels go RIGHT into the unoccupied gap before M2 (x=0.18).
+        # M1a uses va="bottom" with +10 dy so the text box sits ABOVE the
+        # MP_pure label (which is at similar screen-x but lower screen-y).
+        # The explicit ylim below provides headroom so this does not clip.
+        "M1a":              (+40, +10, "bottom", "left"),
+        "M1b":              (+40, -14, "top",    "left"),
         # Accurate MCS at floor — label above, slight horizontal spread
         "M1c":              ( -6, +11, "bottom", "right"),
         "M2":               ( +5, +11, "bottom", "left"),
@@ -440,6 +452,10 @@ def make_fig3():
 
     ax.set_xscale("log")
     ax.set_yscale("log")
+    # Explicit y-limit: ceiling of 100 000 MWh gives ~0.5-decade headroom
+    # above y=28538 (M1a), preventing the "Naive" label from clipping against
+    # the axis top.  Floor at 0.04 keeps the floor-line annotation in frame.
+    ax.set_ylim(0.04, 100_000)
     ax.set_xlabel("Runtime per scenario (s)")
     ax.set_ylabel("Absolute EUE error vs PCM-UCED (MWh)")
     ax.set_title("Accuracy–runtime comparison (balanced VRE)", fontsize=9, fontweight="bold")
