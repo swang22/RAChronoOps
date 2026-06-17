@@ -1,0 +1,107 @@
+Set parameter Username
+Academic license - for non-commercial use only - expires 2026-12-09
+========================================================================
+M2 Solver Regression: HiGHS vs Gurobi
+Date: 2026-06-16T22:39:57.974
+N=20, seed=42, δ=[1.0, 5.0, 10.0] MW
+M2: risk=1000.0 MW, buf=48h, gap=24h, min=24h
+Tolerances: EUE≤1.0e-6 MWh, CC≤1.0e-8, OBJ≤1.0e-6 MWh/scen
+========================================================================
+
+────────────────────────────────────────────────────────────────────────
+Portfolio: VRE120_base
+  δ = 1 MW
+    HiGHS    … EUE=2479.1696  CC=0.497437  LOLH=5.75  wins=4.2/scen  (23.0 s)
+    Gurobi   … EUE=2479.1696  CC=0.497437  LOLH=7.20  wins=4.2/scen  (8.7 s)
+
+  [VRE120_base | δ=1 MW]  HiGHS vs Gurobi:
+    EUE_base diff : 9.09e-13 MWh  PASS
+    EUE_stor diff : 0.00e+00 MWh  PASS
+    EUE_firm diff : 0.00e+00 MWh  PASS
+    CC diff       : 3.43e-14      PASS
+    LOLH match    : false          FAIL
+    Wins identical: true          PASS (solver-indep.)
+    LP obj max abs: 1.82e-12 MWh  PASS
+    OVERALL       : FAIL ✗
+  δ = 5 MW
+    HiGHS    … EUE=2479.1696  CC=0.498654  LOLH=5.75  wins=4.2/scen  (20.3 s)
+    Gurobi   … EUE=2479.1696  CC=0.498654  LOLH=7.20  wins=4.2/scen  (7.4 s)
+
+  [VRE120_base | δ=5 MW]  HiGHS vs Gurobi:
+    EUE_base diff : 9.09e-13 MWh  PASS
+    EUE_stor diff : 0.00e+00 MWh  PASS
+    EUE_firm diff : 0.00e+00 MWh  PASS
+    CC diff       : 6.83e-15      PASS
+    LOLH match    : false          FAIL
+    Wins identical: true          PASS (solver-indep.)
+    LP obj max abs: 1.82e-12 MWh  PASS
+    OVERALL       : FAIL ✗
+  δ = 10 MW
+    HiGHS    … EUE=2479.1696  CC=0.500947  LOLH=5.75  wins=4.2/scen  (20.8 s)
+    Gurobi   … EUE=2479.1696  CC=0.500947  LOLH=7.20  wins=4.2/scen  (7.4 s)
+
+  [VRE120_base | δ=10 MW]  HiGHS vs Gurobi:
+    EUE_base diff : 9.09e-13 MWh  PASS
+    EUE_stor diff : 9.09e-13 MWh  PASS
+    EUE_firm diff : 0.00e+00 MWh  PASS
+    CC diff       : 3.44e-15      PASS
+    LOLH match    : false          FAIL
+    Wins identical: true          PASS (solver-indep.)
+    LP obj max abs: 1.82e-12 MWh  PASS
+    OVERALL       : FAIL ✗
+
+────────────────────────────────────────────────────────────────────────
+Portfolio: VRE120_wind_hvy
+  δ = 1 MW
+    HiGHS    … EUE=648.2369  CC=0.604107  LOLH=1.95  wins=3.8/scen  (19.7 s)
+    Gurobi   … EUE=648.2369  CC=0.604107  LOLH=2.25  wins=3.8/scen  (6.5 s)
+
+  [VRE120_wind_hvy | δ=1 MW]  HiGHS vs Gurobi:
+    EUE_base diff : 0.00e+00 MWh  PASS
+    EUE_stor diff : 0.00e+00 MWh  PASS
+    EUE_firm diff : 0.00e+00 MWh  PASS
+    CC diff       : 0.00e+00      PASS
+    LOLH match    : false          FAIL
+    Wins identical: true          PASS (solver-indep.)
+    LP obj max abs: 4.55e-13 MWh  PASS
+    OVERALL       : FAIL ✗
+  δ = 5 MW
+    HiGHS    … EUE=648.2369  CC=0.604107  LOLH=1.95  wins=3.8/scen  (19.8 s)
+    Gurobi   … EUE=648.2369  CC=0.604107  LOLH=2.25  wins=3.8/scen  (6.5 s)
+
+  [VRE120_wind_hvy | δ=5 MW]  HiGHS vs Gurobi:
+    EUE_base diff : 0.00e+00 MWh  PASS
+    EUE_stor diff : 1.14e-13 MWh  PASS
+    EUE_firm diff : 2.27e-13 MWh  PASS
+    CC diff       : 1.22e-14      PASS
+    LOLH match    : false          FAIL
+    Wins identical: true          PASS (solver-indep.)
+    LP obj max abs: 4.55e-13 MWh  PASS
+    OVERALL       : FAIL ✗
+  δ = 10 MW
+    HiGHS    … EUE=648.2369  CC=0.601830  LOLH=1.95  wins=3.8/scen  (20.0 s)
+    Gurobi   … EUE=648.2369  CC=0.601830  LOLH=2.25  wins=3.8/scen  (6.6 s)
+
+  [VRE120_wind_hvy | δ=10 MW]  HiGHS vs Gurobi:
+    EUE_base diff : 0.00e+00 MWh  PASS
+    EUE_stor diff : 0.00e+00 MWh  PASS
+    EUE_firm diff : 1.14e-13 MWh  PASS
+    CC diff       : 1.67e-15      PASS
+    LOLH match    : false          FAIL
+    Wins identical: true          PASS (solver-indep.)
+    LP obj max abs: 4.55e-13 MWh  PASS
+    OVERALL       : FAIL ✗
+
+========================================================================
+SUMMARY
+========================================================================
+Overall regression: SOME FAIL ✗
+  VRE120_base          δ=   1  EUE:✓ CC:✓ LOLH:✗ OBJ:✓  → FAIL
+  VRE120_base          δ=   5  EUE:✓ CC:✓ LOLH:✗ OBJ:✓  → FAIL
+  VRE120_base          δ=  10  EUE:✓ CC:✓ LOLH:✗ OBJ:✓  → FAIL
+  VRE120_wind_hvy      δ=   1  EUE:✓ CC:✓ LOLH:✗ OBJ:✓  → FAIL
+  VRE120_wind_hvy      δ=   5  EUE:✓ CC:✓ LOLH:✗ OBJ:✓  → FAIL
+  VRE120_wind_hvy      δ=  10  EUE:✓ CC:✓ LOLH:✗ OBJ:✓  → FAIL
+
+Writing: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\results\paper_tables\m2_solver_regression.csv
+Done.
