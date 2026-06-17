@@ -1,0 +1,63 @@
+Set parameter Username
+Academic license - for non-commercial use only - expires 2026-12-09
+========================================================================
+M2 LOLH Diagnostics: HiGHS vs Gurobi
+Date: 2026-06-16T23:09:44.402
+========================================================================
+
+────────────────────────────────────────────────────────────────────────
+Portfolio: VRE120_base
+  Running HiGHS …
+    done in 9.0 s
+  Running Gurobi …
+    done in 3.9 s
+  Disputed scenario-hours (one solver positive, other zero): 101
+  Total EUE in disputed hours (max of the two):  3.5820e+04 MWh
+  Disputed load-shed  min=1.6443e+00  median=2.9065e+02  mean=3.5465e+02  max=9.3484e+02 MW
+  LOLH threshold sensitivity:
+    threshold (MW)   HiGHS     Gurobi  
+    0.0              5.7500   7.2000
+    1.0e-10          5.7500   7.2000
+    1.0e-9           5.7500   7.2000
+    1.0e-8           5.7500   7.2000
+    1.0e-7           5.7500   7.2000
+    1.0e-6           5.7500   7.2000
+    1.0e-5           5.7500   7.2000
+    0.0001           5.7500   7.2000
+    0.001            5.7500   7.2000
+
+────────────────────────────────────────────────────────────────────────
+Portfolio: VRE120_wind_hvy
+  Running HiGHS …
+    done in 6.4 s
+  Running Gurobi …
+    done in 2.5 s
+  Disputed scenario-hours (one solver positive, other zero): 28
+  Total EUE in disputed hours (max of the two):  9.4107e+03 MWh
+  Disputed load-shed  min=4.2551e+01  median=2.7989e+02  mean=3.3610e+02  max=8.2470e+02 MW
+  LOLH threshold sensitivity:
+    threshold (MW)   HiGHS     Gurobi  
+    0.0              1.9500   2.2500
+    1.0e-10          1.9500   2.2500
+    1.0e-9           1.9500   2.2500
+    1.0e-8           1.9500   2.2500
+    1.0e-7           1.9500   2.2500
+    1.0e-6           1.9500   2.2500
+    1.0e-5           1.9500   2.2500
+    0.0001           1.9500   2.2500
+    0.001            1.9500   2.2500
+
+Writing: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\results\paper_tables\m2_lolh_solver_diagnostics.csv
+Writing: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\results\paper_tables\m2_lolh_threshold_sensitivity.csv
+
+========================================================================
+SUMMARY ASSESSMENT
+========================================================================
+Total disputed scenario-hours:  129
+Max disputed hourly load shed:  9.3484e+02 MW
+Total EUE in disputed hours:    4.5231e+04 MWh
+
+Case B: At least one disputed value exceeds 1e-6 MW.
+  → Nontrivial redistribution detected. Cannot claim solver independence for LOLH.
+
+Done.
