@@ -1,6 +1,6 @@
 case,n_scenarios,method,events_per_yr,mean_event_duration_h,max_event_duration_h,p95_event_duration_h,mean_event_energy_mwh,max_hourly_shortfall_mw,mean_shortfall_when_shedding_mw,EUE_MWh_per_yr,NEUE_ppm
 Balanced VRE portfolio,20,Emergency-only storage MCS,2.0,2.98,7.0,6.049999999999997,1239.6,461.1,416.7,2479.17,55.0
-Balanced VRE portfolio,20,Event-window storage MCS,2.9,1.98,7.0,5.0,854.9,534.7,431.2,2479.17,55.0
+Balanced VRE portfolio,20,Event-window storage MCS,2.9,2.4827586,8.0,8.0,854.9,1439.837,431.2,2479.17,55.0
 Balanced VRE portfolio,20,Full-year ED,2.0,2.98,7.0,6.049999999999997,1239.6,461.1,416.7,2479.17,55.0
 Balanced VRE portfolio,20,PCM-ED cross-check,4.25,1.47,5.0,3.799999999999997,583.3,552.4,396.7,2479.17,55.0
 Balanced VRE portfolio,20,PCM-UCED,4.1,1.77,6.0,5.0,604.7,506.6,342.0,2479.17,55.0
