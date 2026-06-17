@@ -1,2 +1,82 @@
 Set parameter Username
 Academic license - for non-commercial use only - expires 2026-12-09
+========================================================================
+Script 74: M3 LOLH diagnostics + Gurobi M2 event-shape
+Date: 2026-06-16T23:41:30.380
+========================================================================
+
+========================================================================
+PART 1: Gurobi M2 event-shape statistics
+========================================================================
+
+── Portfolio: VRE120_base ──
+  Running M2 Gurobi …
+    done in 5.3 s
+  Gurobi M2: LOLH=7.2000 h/yr  EUE=2479.1696 MWh
+    events/yr=2.90  mean_dur=2.48 h  max_dur=8 h  max_sf=1439.8 MW
+
+── Portfolio: VRE120_wind_hvy ──
+  Running M2 Gurobi …
+    done in 2.4 s
+  Gurobi M2: LOLH=2.2500 h/yr  EUE=648.2369 MWh
+    events/yr=0.95  mean_dur=2.37 h  max_dur=7 h  max_sf=1335.0 MW
+
+Wrote: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\results\paper_tables\m2_gurobi_event_shape.csv
+
+========================================================================
+PART 2: M3 full-year ED — HiGHS vs Gurobi (N=20)
+========================================================================
+
+── Portfolio: VRE120_base ──
+  Running M3 Gurobi …
+    done in 184.4 s
+  Gurobi M3: LOLH=5.9500 h/yr  EUE=2479.1696 MWh
+  Running M3 HiGHS …
+    done in 8435.2 s
+  HiGHS M3: LOLH=5.7000 h/yr  EUE=2479.1696 MWh
+
+── Portfolio: VRE120_wind_hvy ──
+  Running M3 Gurobi …
+    done in 169.4 s
+  Gurobi M3: LOLH=2.2500 h/yr  EUE=648.2369 MWh
+  Running M3 HiGHS …
+    done in 8029.4 s
+  HiGHS M3: LOLH=1.9500 h/yr  EUE=648.2369 MWh
+
+Wrote: D:\MIT Dropbox\Shen Wang\MIT\RA\RA_assessment\RAChronoOps\results\paper_tables\m3_lolh_comparison.csv
+
+========================================================================
+PART 3: M3 LOLH comparison and disputed-hour diagnostics
+========================================================================
+
+VRE120_base:
+  HiGHS  LOLH=5.7000 h/yr  EUE=2479.169585 MWh
+  Gurobi LOLH=5.9500 h/yr  EUE=2479.169585 MWh
+  EUE diff = 9.0949e-13 MWh   LOLH diff = 0.2500 h/yr
+  → LOLH differs: computing disputed-hour diagnostics …
+  Disputed hours: 93   min=1.40e+01  median=4.37e+02  max=9.68e+02 MW
+  Case B: disputed values include >1e-6 MW (genuine redistribution).
+
+VRE120_wind_hvy:
+  HiGHS  LOLH=1.9500 h/yr  EUE=648.236865 MWh
+  Gurobi LOLH=2.2500 h/yr  EUE=648.236865 MWh
+  EUE diff = 0.0000e+00 MWh   LOLH diff = 0.3000 h/yr
+  → LOLH differs: computing disputed-hour diagnostics …
+  Disputed hours: 20   min=2.07e+01  median=2.70e+02  max=9.71e+02 MW
+  Case B: disputed values include >1e-6 MW (genuine redistribution).
+
+========================================================================
+SUMMARY
+========================================================================
+
+Gurobi M2 event-shape:
+  VRE120_base             LOLH=7.20 h/yr  events=2.9/yr  mean_dur=2.5 h  max_dur=8 h  max_sf=1440 MW
+  VRE120_wind_hvy         LOLH=2.25 h/yr  events=0.9/yr  mean_dur=2.4 h  max_dur=7 h  max_sf=1335 MW
+
+M3 LOLH comparison (N=20):
+  VRE120_base             HiGHS LOLH=5.7000  Gurobi LOLH=5.9500  EUE diff=4.55e-13 MWh
+  VRE120_wind_hvy         HiGHS LOLH=1.9500  Gurobi LOLH=2.2500  EUE diff=1.14e-13 MWh
+
+M3 LOLH is solver-independent at N=20  (no dispute detected).
+
+Done: 2026-06-17T04:22:07.668
