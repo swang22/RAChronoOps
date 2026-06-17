@@ -1,199 +1,234 @@
 # Market-Pattern Capacity Credit and Runtime Validation
 
-**Date:** 2026-06-15
-**Scripts:** `scripts/70_market_pattern_marginal_cc.jl`, `scripts/71_common_runtime_benchmark.jl`
-**Purpose:** Document the capacity credit (CC) validation protocol and runtime benchmark
-for the two paper-facing market-pattern storage methods.
+**Updated:** 2026-06-16  
+**Current RAChronoOps result commit:** `fb8eaa4`  
+**Primary scripts:** `scripts/70_market_pattern_marginal_cc.jl`, `scripts/71_common_runtime_benchmark.jl`, `scripts/72_market_pattern_revalidation.jl`
 
-**Constraint:** `RA-assessment/main.tex` has NOT been edited in this task.
-Manuscript values are provisional until research team review.
+## Current status
+
+The energy-balanced market-pattern capacity-credit and common runtime experiments have been completed and pushed. The previous version of this document described them as pending; that language is now superseded.
+
+The manuscript has also already been updated through the `paper` submodule. Those manuscript values are therefore no longer merely hypothetical, but they remain subject to the provenance and consistency checks documented below.
+
+**Current validation decision:**
+
+> **NOT READY — M2 PROVENANCE UNRESOLVED**
+
+The market-pattern and emergency-only results are structurally complete and internally consistent. The remaining blocking issue is the provenance of the appended M2 capacity-credit rows after the M2 solver was changed from HiGHS to Gurobi.
 
 ---
 
-## 1. Capacity Credit Protocol
+## 1. Commit and provenance map
 
-### Formula
+| Item | Source/execution commit recorded in output | Result commit | Current status |
+|---|---:|---:|---|
+| Market-pattern and M1c CC run | `c88914a` | `e82dbf9` | Complete |
+| M2 solver change to Gurobi | — | `e82dbf9` | Code change complete |
+| Common runtime benchmark | `e82dbf9` | `c5d785d` | Complete |
+| Appended M2 CC rows and final result bundle | rows record `c88914a` | `fb8eaa4` | **Provenance requires confirmation** |
+| Current manuscript submodule | — | `a3a826f` in `RA-assessment` | Updated before final audit |
 
-```
-CC(δ) = [EUE(x) − EUE(x+ΔS)] / [EUE(x) − EUE(x+ΔF)]
+The `code_commit` field denotes the repository HEAD seen by the script at execution time. It is not necessarily the same as the later commit that adds the generated output file.
+
+For future runs, provenance should distinguish at least:
+
+- model-code commit;
+- execution commit;
+- result commit;
+- solver name and version;
+- exact command line;
+- whether the working tree was clean.
+
+---
+
+## 2. Capacity-credit definition and experiment protocol
+
+The marginal capacity credit is
+
+```text
+CC(δ) = [EUE(x) - EUE(x + ΔS)] / [EUE(x) - EUE(x + ΔF)]
 ```
 
 where:
-- `x` = baseline system (VRE120_base or VRE120_wind_hvy)
-- `x+ΔS` = system with δ MW marginal storage (4-hour duration, η_rt=0.90)
-- `x+ΔF` = system with δ MW perfect-firm capacity (FOR=0, always available)
-- `EUE(·)` = Expected Unserved Energy (MWh/year), mean over N scenarios
 
-The denominator uses an **explicit rerun** with perfect-firm capacity and common random numbers (CRN) — the same scenario trajectories as the baseline.
+- `x` is the baseline system;
+- `x + ΔS` adds δ MW of four-hour storage;
+- `x + ΔF` adds δ MW of perfect-firm capacity;
+- all three cases use common random numbers;
+- the perfect-firm denominator is obtained by an explicit model rerun.
 
-### Calibration and SOC
+### Experiment configuration
 
-| Parameter | Value | Source |
+| Parameter | Value |
+|---|---|
+| Portfolios | `VRE120_base`, `VRE120_wind_hvy` |
+| Scenario seed | 42 |
+| Nested sample sizes | 20, 50, 100, 200, 500, 1000 |
+| Marginal increments | 1, 5, 10 MW |
+| Bootstrap | 2,000 paired draws, seed 1234 |
+| Market-pattern calibration | `pattern_energy_balanced` |
+| Market-pattern initial SOC | 0.231 of energy capacity |
+| M2 event-window parameters | 1000 MW / 48 h / 24 h merge gap / 24 h minimum window |
+
+The N=1000 scenario set is generated once, and the first N scenarios are used for each smaller sample size. This makes estimates directly comparable across N. It **does not** imply that point estimates must move monotonically as N increases.
+
+### Denominator status
+
+A row is marked `identified` when the paired-bootstrap denominator interval remains positive and at least 90% of bootstrap CC draws are finite.
+
+If the denominator interval contains zero, the ratio is **not statistically resolved for that specific N and δ**. This should not be described as proof of a permanent or structural identification failure.
+
+---
+
+## 3. Output inventory
+
+| File | Contents | Current status |
 |---|---|---|
-| Pattern | `pattern_energy_balanced.csv` | `docs/market_pattern_calibration_audit.md` |
-| SOC init | 23.1% (cyclic fixed-point) | `docs/market_pattern_calibration_audit.md` §5 |
-| Marginal storage SOC init | 23.1% of unit capacity | Same fixed-point assumption |
+| `results/paper_tables/market_pattern_capacity_credit.csv` | 144 CC rows: 2 portfolios × 4 methods × 6 N values × 3 increments | Complete |
+| `results/paper_tables/market_pattern_table_iv_rows.csv` | N=20, δ=1 rows for the two market-pattern methods and M1c | Complete |
+| `results/market_pattern_cc/scenario_level_cc_components.csv` | 18,000 scenario-level rows at N=1000 | Complete |
+| `results/market_pattern_cc/policy_switching_diagnostics.csv` | N=1000 diagnostics for `MP_emergency_cur` | Complete |
+| `results/paper_tables/runtime_common_benchmark.csv` | Common N=20 runtime benchmark with median and IQR | Complete |
 
-The cyclic fixed-point (23.1% SOC) is the annual equilibrium for the energy-balanced
-pattern on the RTS-GMLC system. Using this for both the baseline and marginal unit
-ensures that neither accumulates or depletes SOC systematically over the year.
+The capacity-credit CSV contains four methods:
 
-### Nested Scenario Sequence
+- `MP_pure_cur`;
+- `MP_emergency_cur`;
+- `M1c`;
+- `M2`.
 
-N_MAX = 1000 scenarios are generated once (seed=42). The first N scenarios are
-used for all N ∈ {20, 50, 100, 200, 500, 1000}. This ensures that:
-- CC estimates are nested (adding scenarios never changes earlier results)
-- Bootstrap CI at each N reflects only Monte Carlo variance, not scenario selection
-- Convergence plots are monotone in N
-
-### Bootstrap Uncertainty
-
-- 2000 paired bootstrap resamples (fixed seed=1234)
-- Resample scenario index with replacement; apply same index to base, +ΔS, +ΔF
-- Denominator 95% CI computed separately from the same bootstrap draws
-- **Status = "unstable/not identified"** if the denominator 95% CI includes zero,
-  meaning the firm-increment effect is not reliably separated from Monte Carlo noise
-  at the given N. This is a structural identification problem, not simply noise.
-
-### Finite-Difference Check (δ = 1, 5, 10 MW)
-
-CC is reported for all three δ values. Physical consistency requires that CC should
-be approximately independent of δ for small δ (linearity of EUE in storage capacity
-for the first few MW). Overlapping bootstrap CIs across δ = 1, 5, 10 MW confirm this.
-
-If CIs diverge significantly across δ values, this indicates either:
-1. Nonlinear EUE response (system is near a threshold), or
-2. Insufficient N to resolve CC at that δ
+The Table IV candidate CSV currently contains only the first three. The manuscript M2 row therefore must be traced separately to the M2 reliability and CC outputs.
 
 ---
 
-## 2. Methods Included
+## 4. N=20 reliability consistency
 
-| Method | Label | emergency_override | charge_curtailed |
-|---|---|---|---|
-| MP_pure_cur | Market-pattern storage MCS | false | true |
-| MP_emergency_cur | Market-pattern + emergency storage MCS | true | true |
-| M1c | Emergency-only storage MCS | — | — |
+The current N=20 results agree with the authoritative energy-balanced revalidation to rounding:
 
-M1c is the reference benchmark (no market-pattern pattern; always uses emergency
-discharge in shortage hours). M2 is optional (`--with-m2` flag) due to runtime.
+| Portfolio | Method | LOLH (h) | EUE (MWh) |
+|---|---|---:|---:|
+| Balanced VRE | Market-pattern | 46.0 | 13,655.1 |
+| Balanced VRE | Market-pattern + emergency | 7.7 | 3,596.0 |
+| Balanced VRE | Emergency-only | 5.95 | 2,479.2 |
+| Wind-heavy | Market-pattern | 23.9 | 7,160.6 |
+| Wind-heavy | Market-pattern + emergency | 2.4 | 836.2 |
+| Wind-heavy | Emergency-only | 2.25 | 648.2 |
 
----
-
-## 3. Output Files
-
-### Primary Outputs
-
-| File | Contents |
-|---|---|
-| `results/paper_tables/market_pattern_capacity_credit.csv` | Aggregate CC + bootstrap CI for all (portfolio, method, N, δ) |
-| `results/paper_tables/market_pattern_table_iv_rows.csv` | Table IV rows: LOLH, EUE, NEUE, CVaR, CC, CI, runtime (N=20) |
-| `results/market_pattern_cc/scenario_level_cc_components.csv` | Per-scenario base/stor/firm EUE at N_MAX |
-| `results/market_pattern_cc/policy_switching_diagnostics.csv` | EueDecomposition for MP_emergency_cur at N_MAX |
-| `results/paper_tables/runtime_common_benchmark.csv` | 5-rep warm-start runtime benchmark (script 71) |
-
-### Columns in `market_pattern_capacity_credit.csv`
-
-| Column | Description |
-|---|---|
-| portfolio | Case name (VRE120_base / VRE120_wind_hvy) |
-| method | MP_pure_cur / MP_emergency_cur / M1c |
-| N | Scenario count (20/50/100/200/500/1000) |
-| seed | RNG seed (42) |
-| delta_mw | Marginal capacity increment (1/5/10 MW) |
-| eue_base_mwh | Mean EUE of baseline system |
-| eue_storage_increment_mwh | Mean EUE with δ MW storage |
-| eue_firm_increment_mwh | Mean EUE with δ MW perfect-firm |
-| delta_eue_storage | EUE reduction from storage (numerator) |
-| delta_eue_firm | EUE reduction from firm (denominator) |
-| cc | Point CC estimate |
-| cc_bootstrap_mean | Bootstrap mean CC |
-| cc_ci_lo / cc_ci_hi | 95% CI on CC |
-| denom_ci_lo / denom_ci_hi | 95% CI on denominator |
-| denominator_status | "identified" or "unstable/not identified" |
-| n_bootstrap_valid | Number of bootstrap samples with finite CC |
-| calibration_version | pattern_energy_balanced |
-| code_commit | Git short SHA at time of run |
-
-### Note on `runtime_median` and `runtime_IQR` in Table IV rows
-
-`market_pattern_table_iv_rows.csv` is generated by script 70.
-The `runtime_median` column contains a rough estimate (total N_MAX runtime / N_MAX).
-The `runtime_IQR` column is NaN.
-
-**For paper-quality runtime figures**, run script 71 and join on (portfolio, method):
-```
-runtime_common_benchmark.csv → median_rt_s_per_scenario, iqr_rt_s_per_scenario
-```
+The paper-facing market-pattern methods use `charge_curtailed=true`. The charging-induced EUE invariant is therefore zero by construction, up to numerical tolerance.
 
 ---
 
-## 4. Policy Switching Diagnostics (MP_emergency_cur)
+## 5. Manuscript-facing N=20 capacity credit
 
-`policy_switching_diagnostics.csv` records the `EueDecomposition` struct from
-`run_market_pattern_storage` for MP_emergency_cur at N_MAX scenarios.
+The main comparison uses N=20 reliability metrics. Therefore, the internally consistent manuscript-facing CC values are the N=20, δ=1 MW point estimates—not the N=1000 estimates.
 
-Key fields:
+| Portfolio | Method | CC | Bootstrap mean | 95% CI | Denominator status |
+|---|---|---:|---:|---:|---|
+| Balanced VRE | Market-pattern | 0.1438 | 0.1438 | [0.1306, 0.1569] | identified |
+| Balanced VRE | Market-pattern + emergency | 0.3583 | 0.3584 | [0.3291, 0.3894] | identified |
+| Balanced VRE | Emergency-only | 0.4974 | 0.4980 | [0.4822, 0.5183] | identified |
+| Wind-heavy | Market-pattern | 0.1280 | 0.1280 | [0.1144, 0.1409] | identified |
+| Wind-heavy | Market-pattern + emergency | 0.4935 | 0.4976 | [0.4412, 0.5760] | identified |
+| Wind-heavy | Emergency-only | 0.6041 | 0.6045 | [0.5486, 0.6545] | identified |
 
-| Field | Meaning |
-|---|---|
-| pre_storage_shortfall_eue | EUE in hours where emergency override could trigger |
-| missed_discharge_eue | EUE remaining after emergency override (SOC constraint binding) |
-| charging_induced_eue | EUE from charging beyond surplus (0 by construction for charge_curtailed=true) |
-| low_soc_shortfall_eue | EUE in shortage hours where SOC < 25% E_max |
+These values support retaining the N=20 point estimates in the main table, provided that the manuscript or appendix reports the corresponding uncertainty and clearly states the N=20 sampling basis.
 
-`missed_discharge_eue > 0` indicates that even with emergency override, the battery
-could not eliminate all EUE because the SOC was depleted at the time of shortage.
-With the energy-balanced pattern and cyclic SOC init = 23.1%, the battery maintains
-some stored energy throughout the year, reducing missed discharge compared to the
-raw pattern (which depletes to 0% by month 4).
+The larger-N estimates should be used for convergence analysis, not silently substituted into the N=20 comparison table.
 
 ---
 
-## 5. Runtime Benchmark Protocol (script 71)
+## 6. Convergence and finite-difference interpretation
 
-Script `71_common_runtime_benchmark.jl` times 7 methods on both portfolios:
+### Market-pattern storage
 
-1. Load case data and generate N=20 scenarios **outside** the timed block.
-2. Run each method once as a warm-up (JIT compilation + first scenario set).
-3. Time dispatch-only for **5 repetitions** using wall-clock time.
-4. Report **median and IQR** (Q3 − Q1) per scenario.
+The pure market-pattern estimates are comparatively stable across N and δ. For example, balanced-VRE δ=1 MW changes from approximately 0.144 at N=20 to approximately 0.145 at N=1000.
 
-The IQR captures garbage-collection and OS scheduling jitter without contamination
-from JIT compilation (warm-up is excluded). Median is preferred over mean for the
-paper table because it is robust to occasional slow outlier runs.
+### Market-pattern + emergency
 
-M2 and M3 use the same number of reps as fast methods (5) unless `--skip-m3` is
-passed (M3 is included but takes longer; 3 reps default for M3).
+The emergency variant is more sensitive to scenario count and finite-difference size:
 
----
+- Balanced-VRE δ=1 MW increases from approximately 0.358 at N=20 to approximately 0.401 at N=1000.
+- Wind-heavy δ=1 MW increases from approximately 0.494 at N=20 to approximately 0.525 at N=1000.
+- At wind-heavy N=1000, the δ=5 and δ=10 point estimates are approximately 0.466 and 0.473, respectively.
 
-## 6. Provisional CC Estimates
+This variation does not invalidate the N=20 comparison, but it shows that the emergency-override CC is less locally linear and more sample-sensitive than the pure market-pattern CC. The manuscript should avoid describing it as fully converged based only on the N=20 point estimate.
 
-Prior CC values (raw pattern, 50% fixed SOC, N=20) for reference:
+### Emergency-only and M2
 
-| Portfolio | Method | Prior CC | Expected direction of change |
-|---|---|---|---|
-| VRE120_base | MP_pure_cur | 0.143 | ~unchanged (robust to calibration) |
-| VRE120_base | MP_emergency_cur | 0.336 | Likely higher (calibration increases SOC) |
-| VRE120_wind_hvy | MP_pure_cur | 0.128 | ~unchanged |
-| VRE120_wind_hvy | MP_emergency_cur | 0.430 | Likely higher |
+Emergency-only CC also changes with sample composition, especially in the wind-heavy case: the δ=1 estimate declines from approximately 0.604 at N=20 to approximately 0.538 at N=1000.
 
-MP_pure_cur CC is expected to be nearly unchanged because EUE is robust to
-calibration (<2% variation in Table IV). MP_emergency_cur CC may shift up because
-the energy-balanced calibration increases available SOC in shortage hours, reducing
-base EUE more than storage-augmented EUE (widening the numerator).
-
-**Run script 70 to obtain validated CC values before updating the manuscript.**
+The current M2 rows numerically match the emergency-only rows. This supports equivalence in aggregate EUE-based CC, but it does not prove identical hourly dispatch. The solver/provenance regression remains required before treating the M2 rows as fully validated.
 
 ---
 
-## 7. Required Actions Before Manuscript Update
+## 7. Policy-switching diagnostics
 
-1. Run `scripts/70_market_pattern_marginal_cc.jl` (N_MAX=1000 run takes ~5–15 min).
-2. Run `scripts/71_common_runtime_benchmark.jl` for calibrated timing.
-3. Join `market_pattern_table_iv_rows.csv` with `runtime_common_benchmark.csv` on
-   (portfolio, method) to fill in `runtime_median` and `runtime_IQR`.
-4. Review CC denominator status: any "unstable/not identified" at N=20 means CC
-   should be reported with wider CIs or at larger N for the paper.
-5. Review with research team before editing `RA-assessment/main.tex`.
+The `EueDecomposition` fields are **not an additive partition** of total EUE.
+
+Their definitions are:
+
+- `pre_storage_shortfall_eue`: EUE occurring in hours that were already short before storage action;
+- `missed_discharge_eue`: a subset calculated only when `emergency_override=false`, measuring additional discharge that the emergency rule could have supplied;
+- `charging_induced_eue`: EUE created in previously non-short hours by charging beyond surplus;
+- `low_soc_shortfall_eue`: a subset of pre-storage-shortfall EUE occurring when start-of-hour SOC is below 25%.
+
+For `MP_emergency_cur`:
+
+- `missed_discharge_eue = 0` by implementation because the emergency rule is already active;
+- `charging_induced_eue = 0` by construction because charging is curtailed to surplus;
+- residual EUE remains when storage power or available SOC is insufficient to cover the pre-storage shortfall;
+- `low_soc_shortfall_eue` is an overlapping conditional diagnostic, not a separate additive cause.
+
+At N=1000, low-SOC shortage EUE is approximately 95% of total EUE in the balanced case and 91% in the wind-heavy case. This shows a strong association between residual EUE and low start-of-hour SOC, but it should not be interpreted alone as proof that initial SOC or pre-event depletion is the sole causal mechanism. Event duration, within-event depletion, power limits, and the prior market-dispatch trajectory can all contribute.
+
+---
+
+## 8. Runtime benchmark
+
+The current runtime CSV records:
+
+- five timed repetitions for M1a, M1b, M1c, `MP_pure_cur`, `MP_emergency_cur`, and M2;
+- three timed repetitions for M3;
+- one untimed warm-up before each method;
+- scenario generation and case loading outside the timed block;
+- median and IQR in seconds per scenario.
+
+| Portfolio | Method | Median s/scenario | IQR s/scenario |
+|---|---|---:|---:|
+| Balanced VRE | Emergency-only | 0.04145 | 0.00185 |
+| Balanced VRE | Market-pattern | 0.05040 | 0.01460 |
+| Balanced VRE | Market-pattern + emergency | 0.05005 | 0.00250 |
+| Balanced VRE | M2 event-window | 0.18065 | 0.01605 |
+| Balanced VRE | Full-year ED | 9.11720 | 0.03372 |
+| Wind-heavy | Emergency-only | 0.04325 | 0.00030 |
+| Wind-heavy | Market-pattern | 0.04640 | 0.00020 |
+| Wind-heavy | Market-pattern + emergency | 0.04695 | 0.00325 |
+| Wind-heavy | M2 event-window | 0.15860 | 0.00460 |
+| Wind-heavy | Full-year ED | 8.92105 | 0.06950 |
+
+Any documentation saying that the M2 median is based on only three repetitions is incorrect. The current CSV records five M2 repetitions; only M3 uses three.
+
+---
+
+## 9. Remaining blocking checks
+
+Before final team approval:
+
+1. Establish whether the appended M2 CC rows were generated with the historical HiGHS implementation or the current Gurobi implementation.
+2. Run a same-scenario N=20 HiGHS-versus-Gurobi regression for M2 at δ=1, 5, and 10 MW.
+3. Record solver name/version and clean-working-tree status in a run manifest.
+4. Verify that the M2 N=20 CC and reliability values agree within numerical tolerance under both solvers.
+5. Audit the manuscript row-by-row against the current source files and add uncertainty language where appropriate.
+
+A full N=1000 rerun is not necessary unless the N=20 solver regression fails.
+
+---
+
+## 10. Manuscript recommendation
+
+- Keep the corrected N=20 reliability values.
+- Keep the market-pattern and emergency-only N=20 CC point estimates, while reporting their bootstrap uncertainty in the appendix or table note.
+- Do not replace N=20 CC with N=1000 estimates in the main comparison table.
+- Treat the M2 CC values as provisional until solver provenance and the N=20 regression are documented.
+- Use the five-repetition M2 runtime medians of approximately 0.18 and 0.16 s/scenario.
+- Describe the emergency-override CC as sample- and increment-sensitive rather than fully converged.
