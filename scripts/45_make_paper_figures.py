@@ -20,6 +20,7 @@ Usage:
 """
 
 import os
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -28,6 +29,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.ticker as ticker
 from matplotlib.patches import FancyBboxPatch
+
+sys.path.insert(0, os.path.dirname(__file__))
+from mp_figure_style import MP_STYLE as _MP_STYLE_MODULE
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Paths
@@ -270,12 +274,13 @@ def make_fig2():
 # Figure 3 — Runtime vs EUE error frontier  (revised: includes MP variants)
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Market-pattern method styling — warm brown family, distinct from all core methods
-MP_COLOR = "#795548"   # sienna brown; used for both MP variants
+# Market-pattern styling — imported from shared module; two distinct brown shades
+# MP_pure_cur: sienna #795548 (v), MP_emergency_cur: dark brown #4E342E (p)
 MP_STYLE = {
-    "MP_pure_cur":      dict(color=MP_COLOR, marker="v",  s=40, alpha=0.85),
-    "MP_emergency_cur": dict(color=MP_COLOR, marker="p",  s=48, alpha=0.85),
+    k: dict(color=v["color"], marker=v["marker"], s=44, alpha=v["alpha"])
+    for k, v in _MP_STYLE_MODULE.items()
 }
+MP_COLOR = _MP_STYLE_MODULE["MP_pure_cur"]["color"]   # used for inter-MP annotation
 
 def make_fig3():
     """Log-log scatter: per-scenario runtime vs absolute EUE error vs PCM-UCED.

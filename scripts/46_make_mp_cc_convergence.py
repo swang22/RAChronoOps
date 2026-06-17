@@ -30,12 +30,16 @@ Usage:
 """
 
 import os
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+
+sys.path.insert(0, os.path.dirname(__file__))
+from mp_figure_style import MP_STYLE as _MP_STYLE_MODULE
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Paths
@@ -76,10 +80,12 @@ plt.rcParams.update({
     "ps.fonttype":        42,
 })
 
-MP_PURE_COLOR = "#795548"    # sienna brown — market-pattern pure
-MP_EMG_COLOR  = "#1565C0"    # blue — market-pattern + emergency (distinct)
-MP_PURE_MARKER = "v"
-MP_EMG_MARKER  = "o"
+# MP colours/markers from shared style module — consistent across all paper figures
+# MP_pure_cur: sienna #795548 (v), MP_emergency_cur: dark brown #4E342E (p)
+MP_PURE_COLOR  = _MP_STYLE_MODULE["MP_pure_cur"]["color"]
+MP_EMG_COLOR   = _MP_STYLE_MODULE["MP_emergency_cur"]["color"]
+MP_PURE_MARKER = _MP_STYLE_MODULE["MP_pure_cur"]["marker"]
+MP_EMG_MARKER  = _MP_STYLE_MODULE["MP_emergency_cur"]["marker"]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Load data
@@ -102,8 +108,16 @@ df = df[
 df = df[df["denominator_status"] == "identified"].copy()
 
 METHODS = {
-    "MP_pure_cur":      ("Market-pattern",             MP_PURE_COLOR, MP_PURE_MARKER, "-"),
-    "MP_emergency_cur": ("Market-pattern + emergency", MP_EMG_COLOR,  MP_EMG_MARKER,  "--"),
+    "MP_pure_cur":      (
+        _MP_STYLE_MODULE["MP_pure_cur"]["label"],
+        MP_PURE_COLOR, MP_PURE_MARKER,
+        _MP_STYLE_MODULE["MP_pure_cur"]["linestyle"],
+    ),
+    "MP_emergency_cur": (
+        _MP_STYLE_MODULE["MP_emergency_cur"]["label"],
+        MP_EMG_COLOR, MP_EMG_MARKER,
+        _MP_STYLE_MODULE["MP_emergency_cur"]["linestyle"],
+    ),
 }
 
 PORTFOLIOS = [
