@@ -421,7 +421,7 @@ m3_thresh_rows = DataFrame(
     mean_lolh=Float64[], total_eue_excluded_mwh=Float64[],
 )
 
-any_m3_dispute = false
+any_m3_dispute = Ref(false)
 
 for cname in CASES
     sys  = load_system_data(joinpath(DATA_ROOT, cname))
@@ -446,7 +446,7 @@ for cname in CASES
     end
 
     println("  → LOLH differs: computing disputed-hour diagnostics …")
-    any_m3_dispute = true
+    any_m3_dispute[] = true
     disputed_sheds = Float64[]
 
     for s in 1:N
@@ -491,7 +491,7 @@ for cname in CASES
     end
 end
 
-if any_m3_dispute
+if any_m3_dispute[]
     OUT_MDIAG  = joinpath(REPO, "results", "paper_tables", "m3_lolh_solver_diagnostics.csv")
     OUT_MTHRESH = joinpath(REPO, "results", "paper_tables", "m3_lolh_threshold_sensitivity.csv")
     CSV.write(OUT_MDIAG,   m3_diag_rows)
@@ -526,7 +526,7 @@ for cname in CASES
             cname, lolh_h, lolh_g, abs(eue_h - eue_g))
 end
 
-if any_m3_dispute
+if any_m3_dispute[]
     println("\nM3 exhibits solver-dependent LOLH (Case B confirmed or suspected).")
     println("Disputed-hour diagnostics written to paper_tables/.")
 else
