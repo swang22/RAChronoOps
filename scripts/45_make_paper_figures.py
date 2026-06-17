@@ -280,80 +280,78 @@ MP_STYLE = {
 def make_fig3():
     """Log-log scatter: per-scenario runtime vs absolute EUE error vs PCM-UCED.
 
-    Existing core methods (M1/M1b/M1c/M2/M3/HOPE-UC) come from paper_runtime_accuracy.csv.
-    Market-pattern variants come from market_pattern_revalidated_metrics.csv (EUE) and
-    runtime_common_benchmark.csv (controlled median runtime per scenario).
-    EUE errors are computed from source values in the script.
+    All storage MCS methods use runtime_common_benchmark.csv (controlled warm-start
+    median seconds per scenario, 5 reps, seed 42, VRE120_base).  PCM-UCED runtime
+    comes from paper_runtime_accuracy.csv (HOPE-UC row, mean_runtime_s — the only
+    available timing source for the PCM run).  EUE errors are computed from
+    market_pattern_revalidated_metrics.csv relative to the M1c EUE reference.
     """
-    # ── Core methods ──────────────────────────────────────────────────────────
-    df   = pd.read_csv(os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
-    df_b = df[df["case"] == "VRE120_base"].copy()
+    # ── EUE source: revalidated metrics (contains all storage MCS methods) ────
+    df_met = pd.read_csv(
+        os.path.join(RES, "paper_tables", "market_pattern_revalidated_metrics.csv"))
+    df_b   = df_met[df_met["case_name"] == "VRE120_base"].copy()
 
-    include = ["M1", "M1b", "M1c", "M2", "M3", "HOPE-UC"]
-    df_b = df_b[df_b["model_internal"].isin(include)].copy()
+    # PCM-UCED reference EUE = M1c EUE for balanced VRE (exact agreement)
+    pcm_uced_eue = float(df_b.loc[df_b["method"] == "M1c", "eue_mwh"].values[0])
 
-    # For balanced VRE, PCM-UCED EUE == Full-year ED EUE, so abs_eue_error_mwh (vs M3)
-    # equals the error vs PCM-UCED for all methods; HOPE-UC self-error is 0.
-    eue_map = {row["model_internal"]: row["abs_eue_error_mwh"] for _, row in df_b.iterrows()}
+    # ── Runtime source: controlled benchmark for all storage MCS methods ──────
+    df_rt   = pd.read_csv(
+        os.path.join(RES, "paper_tables", "runtime_common_benchmark.csv"))
+    df_rt_b = df_rt[df_rt["case_name"] == "VRE120_base"].copy()
+
+    # ── PCM-UCED runtime from paper_runtime_accuracy.csv (only source) ────────
+    df_ra  = pd.read_csv(
+        os.path.join(RES, "paper_tables", "paper_runtime_accuracy.csv"))
+    pcm_rt = float(df_ra.loc[
+        (df_ra["case"] == "VRE120_base") & (df_ra["model_internal"] == "HOPE-UC"),
+        "mean_runtime_s"].values[0])
 
     FLOOR = 0.05   # MWh floor for zero-error methods on log axis
 
     label_map = {
-        "M1":             "Naive",
-        "M1b":            "SOC-floor",
-        "M1c":            "Emergency",
-        "M2":             "Event-window",
-        "M3":             "Full-year ED",
-        "HOPE-UC":        "PCM-UCED",
-        "MP_pure_cur":    "Mkt-pattern",
+        "M1a":              "Naive",
+        "M1b":              "SOC-floor",
+        "M1c":              "Emergency",
+        "M2":               "Event-window",
+        "M3":               "Full-year ED",
+        "HOPE-UC":          "PCM-UCED",
+        "MP_pure_cur":      "Mkt-pattern",
         "MP_emergency_cur": "Mkt-pattern\n+emergency",
     }
 
-    # Smaller, lighter markers for cautionary heuristics
+    # Smaller, faded markers for cautionary heuristic methods
     style_override = {
-        "M1":  dict(color=C["red"],    marker="X",  s=38, alpha=0.65),
+        "M1a": dict(color=C["red"],    marker="X",  s=38, alpha=0.65),
         "M1b": dict(color=C["orange"], marker="s",  s=30, alpha=0.65),
     }
 
+    # ── Build rows ─────────────────────────────────────────────────────────────
     rows = []
-    for _, row in df_b.iterrows():
-        mid = row["model_internal"]
-        rt  = row["mean_runtime_s"]
-        err = eue_map[mid]
+
+    # Core storage MCS methods: controlled benchmark runtime, revalidated EUE
+    for mid in ["M1a", "M1b", "M1c", "M2", "M3"]:
+        eue_r = df_b[df_b["method"] == mid]
+        rt_r  = df_rt_b[df_rt_b["method"] == mid]
+        if eue_r.empty or rt_r.empty:
+            continue
+        eue = float(eue_r["eue_mwh"].values[0])
+        rt  = float(rt_r["median_rt_s_per_scenario"].values[0])
+        err = abs(eue - pcm_uced_eue)
         rows.append(dict(mid=mid, rt=rt, err=err, err_plot=max(err, FLOOR)))
 
-    # ── Market-pattern variants (energy-balanced calibration, cyclic SOC 23.1%) ──
-    df_mp_metrics = pd.read_csv(
-        os.path.join(RES, "paper_tables", "market_pattern_revalidated_metrics.csv"))
-    df_rt_bench   = pd.read_csv(
-        os.path.join(RES, "paper_tables", "runtime_common_benchmark.csv"))
+    # PCM-UCED: legacy runtime source, EUE error = 0 (reference method)
+    rows.append(dict(mid="HOPE-UC", rt=pcm_rt, err=0.0, err_plot=FLOOR))
 
-    # PCM-UCED reference EUE for balanced VRE: M1c exactly matches (EUE error = 0)
-    pcm_uced_eue = float(
-        df_mp_metrics.loc[
-            (df_mp_metrics["case_name"] == "VRE120_base") &
-            (df_mp_metrics["method"]    == "M1c"),
-            "eue_mwh"
-        ].values[0]
-    )
-
+    # Market-pattern variants: controlled benchmark runtime, revalidated EUE
     for mp_mid in ["MP_pure_cur", "MP_emergency_cur"]:
-        mp_eue = float(
-            df_mp_metrics.loc[
-                (df_mp_metrics["case_name"] == "VRE120_base") &
-                (df_mp_metrics["method"]    == mp_mid),
-                "eue_mwh"
-            ].values[0]
-        )
-        mp_rt = float(
-            df_rt_bench.loc[
-                (df_rt_bench["case_name"] == "VRE120_base") &
-                (df_rt_bench["method"]    == mp_mid),
-                "median_rt_s_per_scenario"
-            ].values[0]
-        )
-        mp_err = abs(mp_eue - pcm_uced_eue)
-        rows.append(dict(mid=mp_mid, rt=mp_rt, err=mp_err, err_plot=max(mp_err, FLOOR)))
+        eue_r = df_b[df_b["method"] == mp_mid]
+        rt_r  = df_rt_b[df_rt_b["method"] == mp_mid]
+        if eue_r.empty or rt_r.empty:
+            continue
+        eue = float(eue_r["eue_mwh"].values[0])
+        rt  = float(rt_r["median_rt_s_per_scenario"].values[0])
+        err = abs(eue - pcm_uced_eue)
+        rows.append(dict(mid=mp_mid, rt=rt, err=err, err_plot=max(err, FLOOR)))
 
     fig, ax = plt.subplots(figsize=(4.5, 3.3))
 
@@ -376,21 +374,24 @@ def make_fig3():
                        color=st["color"], marker=st["marker"], s=st["ms"]**2,
                        zorder=5, label=lbl, clip_on=False)
 
-    # Direct text labels — explicit per-method offsets to eliminate overlap.
-    # White bbox behind each label prevents visual bleed through markers/grid.
+    # Direct text labels with explicit per-method offsets.
+    # With corrected runtimes, M1a(0.044), M1b(0.043), M1c(0.041), MP_pure(0.050),
+    # and MP_emergency(0.050) all cluster within 0.009 s on the log-x axis.
+    # Offsets stagger labels across both axes to keep the cluster readable.
     LBOX = dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.80)
     offsets = {
         # (dx_pts, dy_pts, va, ha)
-        "M1":             (+10, +18, "bottom", "left"),   # right AND above X marker
-        "M1b":            (+8,  -28, "top",    "left"),   # below AND right of square
-        "M1c":            (+6,  +10, "bottom", "left"),
-        "M2":             (+6,   +9, "bottom", "left"),
-        "M3":             (+6,   +9, "bottom", "left"),
-        "HOPE-UC":        (+6,  -12, "top",    "left"),   # below marker, clear of green note
-        # MP pure clusters at x≈0.05, y≈11176 — annotate above and right
-        "MP_pure_cur":    (-70, +10, "bottom", "left"),
-        # MP emergency at x≈0.05, y≈1117 — annotate below to avoid overlap with M1c/M2
-        "MP_emergency_cur": (+6, -12, "top", "left"),
+        # Heuristics at x≈0.043–0.044, y≈26k–29k — stagger upper-right / lower-left
+        "M1a":              (+15, +14, "bottom", "left"),
+        "M1b":              (-12, -14, "top",    "right"),
+        # Accurate MCS at floor — label above, slight horizontal spread
+        "M1c":              ( -6, +11, "bottom", "right"),
+        "M2":               ( +5, +11, "bottom", "left"),
+        "M3":               ( +5, +11, "bottom", "left"),
+        "HOPE-UC":          ( -5, +11, "bottom", "right"),
+        # MP cluster at x≈0.050 — both labels to the far right, staggered in y
+        "MP_pure_cur":      (+48, +8,  "bottom", "left"),
+        "MP_emergency_cur": (+48, -8,  "top",    "left"),
     }
     for r in rows:
         mid = r["mid"]
@@ -402,7 +403,7 @@ def make_fig3():
             col = MP_STYLE[mid]["color"]
         else:
             st = METHOD_STYLE.get(mid, dict(color="gray"))
-            col = st["color"] if "color" in st else "gray"
+            col = st.get("color", "gray")
         ax.annotate(
             lbl,
             xy=(r["rt"], r["err_plot"]),
@@ -410,34 +411,31 @@ def make_fig3():
             textcoords="offset points",
             fontsize=6.5, color=col, va=va, ha=ha,
             bbox=LBOX,
-            arrowprops=dict(arrowstyle="-", color=col, lw=0.4,
-                            shrinkA=2, shrinkB=0)
+            arrowprops=dict(arrowstyle="-", color=col, lw=0.4, shrinkA=2, shrinkB=0)
                     if (ox != 0 or oy != 0) else None,
         )
 
-    # Annotate vertical span between MP pure and MP emergency to convey the key message.
-    # Arrow from MP emergency (lower) pointing up toward MP pure (upper), both at x≈0.05.
+    # Double-headed arrow between MP_pure (y≈11176) and MP_emergency (y≈1117)
+    # conveys "emergency override recovers reliability accuracy at no extra runtime".
     mp_pure_err = next(r["err_plot"] for r in rows if r["mid"] == "MP_pure_cur")
     mp_emg_err  = next(r["err_plot"] for r in rows if r["mid"] == "MP_emergency_cur")
     mp_rt_val   = next(r["rt"]       for r in rows if r["mid"] == "MP_pure_cur")
     ax.annotate(
         "",
-        xy=(mp_rt_val * 1.12, mp_pure_err),
-        xytext=(mp_rt_val * 1.12, mp_emg_err),
+        xy=(mp_rt_val * 1.25, mp_pure_err),
+        xytext=(mp_rt_val * 1.25, mp_emg_err),
         arrowprops=dict(arrowstyle="<->", color=MP_COLOR, lw=0.8),
     )
-    ax.text(mp_rt_val * 1.20, np.sqrt(mp_pure_err * mp_emg_err),
+    ax.text(mp_rt_val * 1.38, np.sqrt(mp_pure_err * mp_emg_err),
             "emergency\noverride",
             fontsize=5.5, color=MP_COLOR, va="center", ha="left", style="italic",
             bbox=dict(boxstyle="round,pad=0.10", fc="white", ec="none", alpha=0.80))
 
-    # Zero-error floor line.  Place the label between M3 (~9.6 s) and
-    # PCM-UCED (~572 s) so it does not overlap any method marker or label.
+    # Floor line — label between M3 (~9.1 s) and PCM-UCED (~572 s)
     ax.axhline(FLOOR, color=C["green"], ls=":", lw=0.9, zorder=1, alpha=0.7)
     ax.text(80, FLOOR * 5,
             "zero EUE error\nvs PCM-UCED",
-            fontsize=6.0, color=C["green"], va="bottom", ha="center",
-            style="italic",
+            fontsize=6.0, color=C["green"], va="bottom", ha="center", style="italic",
             bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.80))
 
     ax.set_xscale("log")

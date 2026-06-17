@@ -115,11 +115,19 @@ PORTFOLIOS = [
 # Build figure
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Shared y-axis test (documented decision):
+# MP_pure CC range is approximately 0.11–0.15 (span ≈ 0.04).
+# MP_emergency CC range is approximately 0.33–0.72 (span ≈ 0.39).
+# A shared axis spanning ~0.05–0.78 compresses MP_pure into <6% of y-range
+# (~0.2 inches on a 3-inch panel), making its convergence pattern illegible.
+# Separate y-limits are retained; each panel is independently scaled.
+
 fig, axes = plt.subplots(1, 2, figsize=(6.8, 3.0), sharey=False)
 
 for ax, (portfolio, port_label, panel_tag) in zip(axes, PORTFOLIOS):
     df_p = df[df["portfolio"] == portfolio].copy()
 
+    all_lo, all_hi = [], []
     for method_id, (method_label, color, marker, ls) in METHODS.items():
         df_m = df_p[df_p["method"] == method_id].sort_values("N")
 
@@ -130,6 +138,8 @@ for ax, (portfolio, port_label, panel_tag) in zip(axes, PORTFOLIOS):
         cc_vals = df_m["cc"].values
         ci_lo   = df_m["cc_ci_lo"].values
         ci_hi   = df_m["cc_ci_hi"].values
+        all_lo.extend(ci_lo.tolist())
+        all_hi.extend(ci_hi.tolist())
 
         # Plot point estimates
         ax.plot(n_vals, cc_vals,
@@ -150,6 +160,12 @@ for ax, (portfolio, port_label, panel_tag) in zip(axes, PORTFOLIOS):
                     f"Gap at N={missing}: unidentified",
                     transform=ax.transAxes, fontsize=5.5,
                     ha="right", va="bottom", color="#999999", style="italic")
+
+    # Set per-panel ylim with 10% headroom so CI bands are not clipped
+    if all_lo and all_hi:
+        ymin = max(0.0, min(all_lo) - 0.05 * (max(all_hi) - min(all_lo)))
+        ymax = max(all_hi) + 0.10 * (max(all_hi) - min(all_lo))
+        ax.set_ylim(ymin, ymax)
 
     ax.set_xscale("log")
     ax.set_xticks(TARGET_N)
