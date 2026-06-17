@@ -1,7 +1,7 @@
 # Market-Pattern Capacity Credit and Runtime Validation
 
 **Updated:** 2026-06-16  
-**Current RAChronoOps result commit:** `c122c3d` (pending next commit for regression outputs)  
+**Current RAChronoOps result commit:** `8e080e8`  
 **Primary scripts:** `scripts/70_market_pattern_marginal_cc.jl`, `scripts/71_runtime_common_benchmark.jl`, `scripts/72_m2_solver_regression.jl`
 
 ## Current status
@@ -26,8 +26,8 @@ The market-pattern, emergency-only, and M2 results are structurally complete and
 | M2 solver change to Gurobi | — | `e82dbf9` | Code change complete |
 | Common runtime benchmark | `e82dbf9` | `c5d785d` | Complete |
 | Appended M2 CC rows and final result bundle | rows record `c88914a`; actual code = Gurobi (see §9) | `fb8eaa4` | Complete — provenance documented |
-| Run manifest (`market_pattern_run_manifest.csv`) | — | pending | Created 2026-06-16 |
-| N=20 HiGHS vs Gurobi solver regression | `c122c3d` | pending | Completed 2026-06-16; see §9 |
+| Run manifest (`market_pattern_run_manifest.csv`) | — | `8e080e8` | Complete |
+| N=20 HiGHS vs Gurobi solver regression | `c122c3d` | `8e080e8` | Complete — see §9 |
 | Current manuscript submodule | — | `a3a826f` in `RA-assessment` | Updated before final audit |
 
 The `code_commit` field denotes the repository HEAD seen by the script at execution time. It is not necessarily the same as the later commit that adds the generated output file.
