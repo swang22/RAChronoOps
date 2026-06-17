@@ -1,8 +1,8 @@
 # Market-Pattern Capacity Credit and Runtime Validation
 
-**Updated:** 2026-06-16  
-**Current RAChronoOps result commit:** `09ade78`  
-**Current RA-assessment commit:** `64e1746`  
+**Updated:** 2026-06-17  
+**Current RAChronoOps result commit:** `b0f9aa4` (script 74 results); final provenance commit TBD  
+**Current RA-assessment commit:** `a082e24`  
 **Primary scripts:** `scripts/70_market_pattern_marginal_cc.jl`, `scripts/71_common_runtime_benchmark.jl`, `scripts/72_m2_solver_regression.jl`, `scripts/73_m2_lolh_diagnostics.jl`, `scripts/74_m3_lolh_diagnostics.jl`
 
 ## Current status
@@ -13,7 +13,7 @@ The manuscript has also already been updated through the `paper` submodule. Thos
 
 **Current validation decision:**
 
-> **READY FOR TEAM REVIEW** — pending M3 solver-sensitivity result (script 74, ~4 h runtime)
+> **READY FOR TEAM REVIEW**
 
 The M2 LOLH issue has been diagnosed (Case B: genuine LP degeneracy), resolved by adopting Gurobi as the single production solver for all LP results, and disclosed in the manuscript. All M2 table values now use Gurobi consistently. The manuscript has been updated: `RA-assessment` commit `64e1746`.
 
@@ -42,7 +42,7 @@ Script 74 (`74_m3_lolh_diagnostics.jl`) is running M3 HiGHS vs Gurobi comparison
 | Run manifest (`market_pattern_run_manifest.csv`) | — | `8e080e8` | Complete |
 | N=20 HiGHS vs Gurobi solver regression | `c122c3d` | `8e080e8` | Complete — see §9 |
 | M2 LOLH hourly diagnostic + threshold sweep | `8e080e8` | `397e78b` | Complete — see §9 |
-| M2 Gurobi event-shape + M3 solver screening | `09ade78` | pending script 74 | In progress (~4 h) |
+| M2 Gurobi event-shape + M3 solver screening | `09ade78` | `b0f9aa4` | Complete — see §9 |
 | M2 LOLH → Gurobi values; solver appendix | — | `64e1746` in `RA-assessment` | Complete |
 
 The `code_commit` field denotes the repository HEAD seen by the script at execution time. It is not necessarily the same as the later commit that adds the generated output file.
@@ -110,6 +110,9 @@ If the denominator interval contains zero, the ratio is **not statistically reso
 | `results/paper_tables/m2_solver_regression.csv` | N=20 HiGHS vs Gurobi solver regression output | Complete (2026-06-16) |
 | `results/paper_tables/m2_lolh_solver_diagnostics.csv` | Per-scenario, per-hour disputed load-shed with window and dispatch context | Complete (2026-06-16) |
 | `results/paper_tables/m2_lolh_threshold_sensitivity.csv` | LOLH at nine thresholds (0 to 1e-3 MW) for both solvers | Complete (2026-06-16) |
+| `results/paper_tables/m2_gurobi_event_shape.csv` | Gurobi M2 event-shape statistics (events/yr, mean dur, max dur, max shortfall, EUE) | Complete (2026-06-17) |
+| `results/paper_tables/m3_lolh_comparison.csv` | M3 HiGHS vs Gurobi N=20 per-scenario LOLH, EUE, obj, status, runtime | Complete (2026-06-17) |
+| `results/paper_tables/diag_74_log.txt` | Full script 74 console log with per-portfolio disputed-hour summary | Complete (2026-06-17) |
 
 The capacity-credit CSV contains four methods:
 
@@ -347,7 +350,7 @@ Note: Gurobi M2 produces similar event counts to HiGHS (2.9 vs 2.9; 1.0 vs 1.1) 
 - Event-shape table `tab:event_shape`: M2 rows updated to Gurobi values
 - Convergence appendix text corrected: no longer claims "0.2–0.45 h lower"
 - Body text (§ Results): added Gurobi reference for M2 LOLH
-- M3 screening: script 74 running; result pending; M3 table values unchanged (already Gurobi)
+- M3 screening (script 74, complete): M3 also exhibits solver-dependent LOLH (Case B confirmed). Gurobi 5.95 h/yr vs HiGHS 5.70 h/yr (balanced, diff 0.25 h/yr); Gurobi 2.25 h/yr vs HiGHS 1.95 h/yr (wind-heavy, diff 0.30 h/yr). EUE diff ≤9×10⁻¹³ MWh. 93 disputed hours (balanced, 14–968 MW) + 20 (wind-heavy, 21–971 MW), all Case B. Current M3 table values (6.0/2.3 h/yr) are already Gurobi; no change needed. Manuscript appendix `app:solver_sensitivity` updated with M3 result.
 
 ### N=20 metric rerun
 
@@ -356,5 +359,5 @@ Not required. EUE and CC are solver-independent; no rerun is needed. No lexicogr
 ### Remaining items
 
 - M3 solver screening (script 74): running, ~4 h. Does not block team review.
-- Once M3 finishes: if solver-dependent, add M3 diagnostic paragraph to `app:solver_sensitivity` and commit. If solver-independent, the current appendix text already correctly describes M3 as a "pending" screening with no action needed.
+- M3 completed: solver-dependent (Case B). M3 diagnostic paragraph added to `app:solver_sensitivity` in RA-assessment. Both repos committed and pushed.
 - Figures (`event_shape_dashboard.pdf`, `storage_operation_comparison_compact.pdf`): were generated from the Gurobi production run and should already reflect Gurobi M2 dispatch. No regeneration required unless team observes inconsistency.
